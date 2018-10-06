@@ -855,6 +855,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
 //        });
 //    }
 
+
     @SuppressLint("SetTextI18n")
     public void clear(int type) {
         if (type == 0) {
