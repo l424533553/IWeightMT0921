@@ -38,7 +38,9 @@ import com.axecom.iweight.bean.Advertis;
 import com.axecom.iweight.bean.HotKeyBean;
 import com.axecom.iweight.bean.HotKeyBean_Table;
 import com.axecom.iweight.bean.LoginInfo;
+import com.axecom.iweight.bean.PayNoticeBean;
 import com.axecom.iweight.bean.ScalesCategoryGoods;
+import com.axecom.iweight.bean.SubOrderBean;
 import com.axecom.iweight.bean.SubOrderReqBean;
 import com.axecom.iweight.manager.AccountManager;
 import com.axecom.iweight.manager.MacManager;
@@ -52,9 +54,12 @@ import com.axecom.iweight.my.helper.HttpHelper;
 import com.axecom.iweight.net.RetrofitFactory;
 import com.axecom.iweight.ui.adapter.GoodMenuAdapter;
 import com.axecom.iweight.utils.ButtonUtils;
+import com.axecom.iweight.utils.LogUtils;
 import com.axecom.iweight.utils.MoneyTextWatcher;
+import com.axecom.iweight.utils.NetworkUtil;
 import com.axecom.iweight.utils.SPUtils;
 import com.bigkoo.convenientbanner.holder.CBViewHolderCreator;
+import com.bumptech.glide.Glide;
 import com.luofx.listener.VolleyListener;
 import com.luofx.listener.VolleyStringListener;
 import com.luofx.utils.PreferenceUtils;
@@ -65,6 +70,7 @@ import com.raizlabs.android.dbflow.structure.ModelAdapter;
 import com.shangtongyin.tools.serialport.Print;
 import com.shangtongyin.tools.serialport.WeightHelper;
 
+import org.greenrobot.eventbus.EventBus;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -119,6 +125,8 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
     /************************************************************************************/
     private SysApplication application;
     private ThreadPool threadPool;  //线程池 管理
+    private MyRun mRun;
+    private boolean flag = true;
 
     @SuppressLint("InflateParams")
     @Override
@@ -148,6 +156,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         rootView.findViewById(R.id.main_clear_btn).setOnClickListener(this);
         rootView.findViewById(R.id.main_digital_clear_btn).setOnClickListener(this);
         rootView.findViewById(R.id.main_digital_add_btn).setOnClickListener(this);
+        rootView.findViewById(R.id.main_scan_pay).setOnClickListener(this);
         etPrice = rootView.findViewById(R.id.main_commodity_price_et);
         etPrice.requestFocus();
         etPrice.addTextChangedListener(new MoneyTextWatcher(etPrice));
@@ -522,14 +531,14 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
             case R.id.main_cash_btn:
                 if (!ButtonUtils.isFastDoubleClick(R.id.main_cash_btn)) {
                     if (Float.parseFloat(priceTotalTv.getText().toString()) > 0 || Float.parseFloat(tvgrandTotal.getText().toString()) > 0) {
-                        showDialog(v);
+                        showDialog(v,true);
                     }
                 }
                 break;
                 case R.id.main_scan_pay:
                 if (!ButtonUtils.isFastDoubleClick(R.id.main_cash_btn)) {
                     if (Float.parseFloat(priceTotalTv.getText().toString()) > 0 || Float.parseFloat(tvgrandTotal.getText().toString()) > 0) {
-                        showDialog(v);
+                        showDialog(v,false);
                     }
                 }
                 break;
@@ -811,7 +820,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                     if (index1 > 0) {
                         String qrString = bitmap.substring(index1 + 4);
                         if (qrString.length() > 0) {
-                            bytes = print.getbyteData2(qrString, 32, 32);
+                            bytes = print.getbyteData(qrString, 32, 32);
                         }
                     }
                 } catch (Exception e) {
@@ -894,7 +903,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         }
     }
 
-    public void showDialog(View v) {
+    public void showDialog(View v,boolean useCash) {
 
         if (seledtedGoodsList.size() < 1) {
             accumulative();
@@ -929,10 +938,160 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         bundle.putSerializable("orderBean", subOrderReqBean);
         intent.putExtras(bundle);
         intent.setClass(this, UseCashActivity.class);
-        startActivity(intent);
         SPUtils.saveObject(this, "selectedGoodList", seledtedGoodsList);
+        if(useCash){
+            setOrderBean(subOrderReqBean);
+        }else{
+            startActivity(intent);
+        }
+    }
 
+    public void setOrderBean(SubOrderReqBean orderBean) {
+//        现金直接支付
+        String payId =  "4";
+        orderBean.setPayment_id(payId);
+        if (NetworkUtil.isConnected(this)) {
+            submitOrder(orderBean);
+        } else {
+            List<SubOrderReqBean> orders = (List<SubOrderReqBean>) SPUtils.readObject(this, "local_order");
+            if (orders != null) {
+                orders.add(orderBean);
+                SPUtils.saveObject(this, "local_order", orders);
+            } else {
+                List<SubOrderReqBean> localOrder = new ArrayList<>();
+                localOrder.add(orderBean);
+                SPUtils.saveObject(this, "local_order", localOrder);
+            }
 
+            EventBus.getDefault().post(new BusEvent(BusEvent.PRINTER_NO_BITMAP, "", payId, ""));
+        }
+    }
+
+    class MyRun implements Runnable {
+
+        private BaseEntity<SubOrderBean> subOrderBeanBaseEntity;
+
+        public MyRun(BaseEntity<SubOrderBean> subOrderBeanBaseEntity) {
+            this.subOrderBeanBaseEntity = subOrderBeanBaseEntity;
+        }
+
+        @Override
+        public void run() {
+            if (flag) {
+                Message msg = Message.obtain();
+                msg.obj = subOrderBeanBaseEntity.getData();
+                mHandler.sendMessage(msg);
+                mHandler.postDelayed(this, 1000 * 3);//延迟5秒,再次执行task本身,实现了循环的效果
+            }
+
+        }
+    }
+
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            SubOrderBean subOrderBeanBaseEntity = (SubOrderBean) msg.obj;
+
+            String order_no = subOrderBeanBaseEntity.getOrder_no();
+            String qrCode = subOrderBeanBaseEntity.getPrint_code_img();
+            getPayNotice(order_no, qrCode);
+        }
+    };
+    public void getPayNotice(final String order_no, final String qrCode) {
+        RetrofitFactory.getInstance().API()
+                .getPayNotice(order_no)
+                .compose(this.<BaseEntity<PayNoticeBean>>setThread())
+                .subscribe(new Observer<BaseEntity<PayNoticeBean>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(final BaseEntity<PayNoticeBean> payNoticeBeanBaseEntity) {
+                        if (payNoticeBeanBaseEntity.isSuccess()) {
+                            if (payNoticeBeanBaseEntity.getData().flag == 0) {
+                                flag = false;
+                                mHandler.removeCallbacks(mRun);
+//                                Toast.makeText(UseCashActivity.this, "支付成功", Toast.LENGTH_SHORT).show();
+                                banner.bannerOrderLayout.setVisibility(View.GONE);
+                                EventBus.getDefault().post(new BusEvent(BusEvent.PRINTER_LABEL, bitmap, order_no, "4", qrCode));
+                            }
+                            LogUtils.d(payNoticeBeanBaseEntity.getData().msg);
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
+    public void submitOrder(final SubOrderReqBean subOrderReqBean) {
+        RetrofitFactory.getInstance().API()
+                .submitOrder(subOrderReqBean)
+                .compose(this.<BaseEntity<SubOrderBean>>setThread())
+                .subscribe(new Observer<BaseEntity<SubOrderBean>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        showLoading();
+                    }
+
+                    @Override
+                    public void onNext(final BaseEntity<SubOrderBean> subOrderBeanBaseEntity) {
+                        if (subOrderBeanBaseEntity.isSuccess()) {
+//                            imageLoader.displayImage(subOrderBeanBaseEntity.getData().getCode_img_url(), qrCodeIv, options);
+//                            Glide.with(MainActivity.this).load(subOrderBeanBaseEntity.getData().getCode_img_url()).into(qrCodeIv);
+
+                            banner.bannerOrderLayout.setVisibility(View.VISIBLE);
+                            banner.bannerTotalPriceTv.setText(getString(R.string.string_amount_txt3, Float.parseFloat(subOrderReqBean.getTotal_amount())));
+//                            imageLoader.displayImage(subOrderBeanBaseEntity.getData().getCode_img_url(), banner.bannerQRCode, options);
+
+                            switch (subOrderReqBean.getPayment_id()){
+                                case "1":
+                                    banner.tvPayWay.setText("支付方式：微信支付");
+                                    break;
+                                case "2":
+                                    banner.tvPayWay.setText("支付方式：支付宝支付");
+                                    break;
+                                case "4":
+                                    banner.tvPayWay.setText("支付方式：现金支付");
+                                    break;
+                            }
+
+//                            Glide.with(UseCashActivity.this).load(subOrderBeanBaseEntity.getData().getCode_img_url()).into(banner.bannerQRCode);
+                            SPUtils.putString(SysApplication.getContext(), "print_bitmap", subOrderBeanBaseEntity.getData().getPrint_code_img());
+
+                            banner.goodsList.clear();
+                            banner.goodsList.addAll(subOrderReqBean.getGoods());
+                            banner.adapter.notifyDataSetChanged();
+                            bitmap = (subOrderBeanBaseEntity.getData().getPrint_code_img());
+
+                            mRun = new MyRun(subOrderBeanBaseEntity);
+                            mHandler.postDelayed(mRun, 1000);
+                        } else {
+                            showLoading(subOrderBeanBaseEntity.getMsg());
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        closeLoading();
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        closeLoading();
+                    }
+                });
     }
 
 

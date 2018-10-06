@@ -31,7 +31,7 @@
     <string name="string_clear_txt">清除</string>
     <string name="string_useing_card">刷卡结算中...</string>
     <string name="string_cancel_txt">取&#160;&#160;&#160;消</string>
-    <string name="string_cash_dialog_title">现金收银</string>
+    <string name="string_cash_dialog_title">收银</string>
     <string name="string_total_cash">总货款：</string>
     <string name="string_rmb_txt">元</string>
     <string name="string_rounding_txt">取舍：</string>

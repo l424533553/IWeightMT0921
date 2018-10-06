@@ -174,6 +174,12 @@ public class UseCashActivity extends BaseActivity implements View.OnClickListene
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        aliPayBtn.callOnClick();
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         flag = false;
