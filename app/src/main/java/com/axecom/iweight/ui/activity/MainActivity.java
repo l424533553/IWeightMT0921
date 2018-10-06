@@ -571,6 +571,8 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
     private void accumulative() {
         if (selectedGoods == null) {
             return;
+
+
         }
         if (TextUtils.isEmpty(etPrice.getText()) && TextUtils.isEmpty(etPrice.getHint().toString())) {
             return;
