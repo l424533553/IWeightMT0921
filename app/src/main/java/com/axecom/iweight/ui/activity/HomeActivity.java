@@ -150,6 +150,7 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
         NetHelper netHelper = new NetHelper(application, this);
         netHelper.getUserInfo(netHelper.getIMEI(HomeActivity.this), 1);
         findViewById(R.id.ivLog).setOnClickListener(this);
+        isLogin();
     }
 
 
@@ -237,6 +238,7 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
                             if (TextUtils.equals(pwdTv.getText(), user.password)) {
                                 AccountManager.getInstance().setAdminToken(user.user_token);
                                 startDDMActivity(MainActivity.class, false);
+                                finish();
                             } else {
                                 Toast.makeText(this, "密码错误", Toast.LENGTH_SHORT).show();
                             }
@@ -382,6 +384,7 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
                             user.user_token = loginDataBaseEntity.getData().getToken();
                             userAdapter.insert(user);
                             startDDMActivity(MainActivity.class, false);
+                            finish();
                         } else {
                             showLoading(loginDataBaseEntity.getMsg());
                         }
@@ -474,4 +477,11 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
     }
 
 
+    public void isLogin() {
+        String token = AccountManager.getInstance().getToken();
+        if(!TextUtils.isEmpty(token)){
+            startDDMActivity(MainActivity.class,true);
+            finish();
+        }
+    }
 }

@@ -86,4 +86,5 @@
     <string name="str_state">状态：</string>
     <string name="kilogram">kg</string>
     <string name="Administrators_pwd">88888888</string>
+    <string name="string_login_out">退出登录</string>
 </resources>

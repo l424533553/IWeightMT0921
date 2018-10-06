@@ -20,6 +20,7 @@ import android.widget.Toast;
 import com.axecom.iweight.R;
 import com.axecom.iweight.base.BaseActivity;
 import com.axecom.iweight.base.BaseEntity;
+import com.axecom.iweight.base.BusEvent;
 import com.axecom.iweight.base.SysApplication;
 import com.axecom.iweight.bean.LoginData;
 import com.axecom.iweight.bean.User;
@@ -36,6 +37,8 @@ import com.hoho.android.usbserial.driver.UsbSerialProber;
 import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.raizlabs.android.dbflow.structure.ModelAdapter;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -69,6 +72,7 @@ public class StaffMemberLoginActivity extends BaseActivity {
         softKey = rootView.findViewById(R.id.staff_member_softkey);
         doneBtn = rootView.findViewById(R.id.staff_member_done_btn);
         backBtn = rootView.findViewById(R.id.staff_member_back_btn);
+        rootView.findViewById(R.id.login_out_btn).setOnClickListener(this);
 
 
         doneBtn.setOnClickListener(this);
@@ -137,6 +141,12 @@ public class StaffMemberLoginActivity extends BaseActivity {
                 break;
             case R.id.staff_member_back_btn:
                 setResult(RESULT_CANCELED);
+                finish();
+                break;
+            case R.id.login_out_btn:
+                AccountManager.getInstance().loginOut();
+                EventBus.getDefault().post(new BusEvent(BusEvent.LOGIN_OUT,""));
+                startDDMActivity(HomeActivity.class,true);
                 finish();
                 break;
         }

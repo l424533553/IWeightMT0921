@@ -19,6 +19,7 @@ public class BusEvent {
     public static final int POSITION_PATCH = 9;
     public static final int PRINTER_NO_BITMAP = 10;
     public static final int BLUETOOTH_CONNECTED = 11;
+    public static final int LOGIN_OUT = 12;
 
     public static final int POSITION_PATCH22 = 99;
 

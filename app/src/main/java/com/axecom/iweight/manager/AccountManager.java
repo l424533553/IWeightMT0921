@@ -73,4 +73,8 @@ public class AccountManager {
     public void setAdminToken(String adminToken) {
         this.adminToken = adminToken;
     }
+
+    public void loginOut() {
+        SPUtils.putString(mCtx, Constants.USER_TOKEN, "");
+    }
 }
