@@ -11,6 +11,7 @@ import android.hardware.usb.UsbManager;
 import android.text.TextUtils;
 import android.view.Display;
 import android.view.LayoutInflater;
+import android.view.TextureView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -212,6 +213,12 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
 //                openGpinter();
                 break;
             case R.id.home_confirm_btn:
+                String serialNumber = cardNumberTv.getText().toString();
+                String password = pwdTv.getText().toString();
+                if(TextUtils.isEmpty(serialNumber)&&getString(R.string.Administrators_pwd).equals(password)){
+                    startDDMActivity(LocalSettingsActivity.class,true);
+                }
+
                 if (NetworkUtil.isConnected(this)) {
                     LinkedHashMap valueMap = (LinkedHashMap) SPUtils.readObject(this, KEY_DEFAULT_LOGIN_TYPE);
                     String value = "";
@@ -219,13 +226,13 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
                         value = valueMap.get("val").toString();
                     }
                     if (TextUtils.equals(loginType, "卖方卡") || TextUtils.equals(loginType, "3.0") || TextUtils.isEmpty(loginType)) {
-                        clientLogin(weightId + "", cardNumberTv.getText().toString(), pwdTv.getText().toString());
+                        clientLogin(weightId + "", serialNumber, password);
                     } else {
-                        staffMemberLogin(weightId + "", cardNumberTv.getText().toString(), pwdTv.getText().toString());
+                        staffMemberLogin(weightId + "", serialNumber, password);
                     }
                 } else {
                     if (!TextUtils.isEmpty(cardNumberTv.getText())) {
-                        User user = SQLite.select().from(User.class).where(User_Table.card_number.is(cardNumberTv.getText().toString())).querySingle();
+                        User user = SQLite.select().from(User.class).where(User_Table.card_number.is(serialNumber)).querySingle();
                         if (user != null) {
                             if (TextUtils.equals(pwdTv.getText(), user.password)) {
                                 AccountManager.getInstance().setAdminToken(user.user_token);

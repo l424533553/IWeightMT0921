@@ -530,6 +530,8 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         switch (v.getId()) {
             case R.id.main_cash_btn:
                 if (!ButtonUtils.isFastDoubleClick(R.id.main_cash_btn)) {
+                    //结算时带上当前称重的记录
+                    accumulative();
                     if (Float.parseFloat(priceTotalTv.getText().toString()) > 0 || Float.parseFloat(tvgrandTotal.getText().toString()) > 0) {
                         showDialog(v,true);
                     }
@@ -537,6 +539,8 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                 break;
                 case R.id.main_scan_pay:
                 if (!ButtonUtils.isFastDoubleClick(R.id.main_cash_btn)) {
+                    //结算时带上当前称重的记录
+                    accumulative();
                     if (Float.parseFloat(priceTotalTv.getText().toString()) > 0 || Float.parseFloat(tvgrandTotal.getText().toString()) > 0) {
                         showDialog(v,false);
                     }
@@ -592,6 +596,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                 .set(HotKeyBean_Table.price.eq(selectedGoods.price))
                 .where(HotKeyBean_Table.id.eq(selectedGoods.id))
                 .query();
+        MainActivity.this.selectedGoods.price = selectedGoods.price;
         calculatePrice();
         clear(3);
     }
@@ -885,13 +890,20 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
             tvgrandTotal.setText("0.00");
             priceTotalTv.setText("0.00");
             seledtedGoodsList.clear();
+            commodityNameTv.setText("");
 
             commodityAdapter = new CommodityAdapter(this, seledtedGoodsList);
             commoditysListView.setAdapter(commodityAdapter);
+
+            goodMenuAdapter.cleanCheckedPosition();
+            goodMenuAdapter.notifyDataSetChanged();
+
         }
         if (type == 3) {
             selectedGoods = null;
             commodityNameTv.setText("");
+            goodMenuAdapter.cleanCheckedPosition();
+            goodMenuAdapter.notifyDataSetChanged();
             String hint = "";
             if (!TextUtils.isEmpty(etPrice.getText())) {
                 hint = etPrice.getText().toString();

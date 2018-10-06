@@ -44,6 +44,10 @@ public class GoodMenuAdapter extends BaseAdapter {
         this.pos = position;
     }
 
+    public void cleanCheckedPosition() {
+        this.pos = -1;
+    }
+
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         ViewHolder holder = null;
