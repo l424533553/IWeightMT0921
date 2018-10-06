@@ -100,6 +100,8 @@ public class QRHelper {
      * @return
      */
     public static byte[] createPixelsQR(String contents1, int width, int height) {
+
+
         //判断URL合法性
         if (contents1 == null || "".equals(contents1) || contents1.length() < 1) {
             return null;
