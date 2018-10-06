@@ -191,6 +191,7 @@ public class Print {
      * 打印二维码
      */
     public void printQR( byte[] bytes) {
+
         try {
             //设置间距 为 0
             byte[] by = {27, 51, 0};
