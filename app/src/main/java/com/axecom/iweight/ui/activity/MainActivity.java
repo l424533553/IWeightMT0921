@@ -565,6 +565,16 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         }
     }
 
+    private void displayToBanner(SubOrderReqBean orderBean) {
+        banner.bannerOrderLayout.setVisibility(View.VISIBLE);
+        banner.bannerTotalPriceTv.setText(getString(R.string.string_amount_txt3, Float.parseFloat(orderBean.getTotal_amount())));
+        banner.tvPayWay.setText("支付方式：现金支付");
+        banner.bannerQRCode.setImageDrawable(this.getResources().getDrawable(R.drawable.logo));
+        banner.goodsList.clear();
+        banner.goodsList.addAll(orderBean.getGoods());
+        banner.adapter.notifyDataSetChanged();
+    }
+
     /**
      * 累计 菜品价格
      */
@@ -967,6 +977,8 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
 
     public void payCashDirect(SubOrderReqBean orderBean) {
 //        现金直接支付
+
+        displayToBanner(orderBean);
         String payId =  "4";
         orderBean.setPayment_id(payId);
         if (NetworkUtil.isConnected(this)) {
@@ -1035,7 +1047,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                                 mHandler.removeCallbacks(mRun);
                                 flag = true;//轮循停止设置初始值
 //                                Toast.makeText(UseCashActivity.this, "支付成功", Toast.LENGTH_SHORT).show();
-                                banner.bannerOrderLayout.setVisibility(View.GONE);
+//                                banner.bannerOrderLayout.setVisibility(View.GONE);
                                 EventBus.getDefault().post(new BusEvent(BusEvent.PRINTER_LABEL, bitmap, order_no, "4", qrCode));
                             }
                             LogUtils.d(payNoticeBeanBaseEntity.getData().msg);

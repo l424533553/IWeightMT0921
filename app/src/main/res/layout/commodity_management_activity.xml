@@ -72,7 +72,6 @@
                             android:id="@+id/commodity_management_class_titlte_all_tv"
                             android:layout_width="100dp"
                             android:layout_height="match_parent"
-                            android:layout_weight="1"
                             android:gravity="center"
                             android:text="全部"
                             android:tag="-1"
