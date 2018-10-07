@@ -474,11 +474,11 @@ public abstract class BaseActivity extends Activity implements View.OnClickListe
     @Subscribe
     public void onEventMainThread(BusEvent event) {
         LogUtils.d("main", this.getClass().getSimpleName());
-        if (event.getType() == BusEvent.GO_HOME_CODE || event.getType() == BusEvent.LOGIN_SUCCESS) {
+       /* if (event.getType() == BusEvent.GO_HOME_CODE || event.getType() == BusEvent.LOGIN_SUCCESS) {
             if (!(this instanceof MainActivity)) {
                 finish();
             }
-        }
+        }*/
         if (event.getType() == BusEvent.GO_HOME_PAGE) {
             if (!(this instanceof HomeActivity)) {
                 finish();

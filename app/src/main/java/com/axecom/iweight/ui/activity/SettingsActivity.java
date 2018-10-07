@@ -189,7 +189,7 @@ public class SettingsActivity extends BaseActivity {
                     startDDMActivity(SystemSettingsActivity.class, false);
                     break;
                 case POSITION_RE_BOOT:
-//                    EventBus.getDefault().post(new BusEvent(BusEvent.GO_HOME_PAGE, true));
+                    EventBus.getDefault().post(new BusEvent(BusEvent.GO_HOME_PAGE, true));
                     Intent intent = new Intent();
                     intent.setClass(SettingsActivity.this, HomeActivity.class);
                     intent.putExtra(IS_RE_BOOT, true);

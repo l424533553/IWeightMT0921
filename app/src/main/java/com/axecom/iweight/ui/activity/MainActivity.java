@@ -622,6 +622,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
 
     @Override
     public void onEventMainThread(BusEvent event) {
+        super.onEventMainThread(event);
         if (event != null) {
             if (event.getType() == BusEvent.POSITION_PATCH22) {  //补打上一笔 交易
                 new Thread(new Runnable() {
