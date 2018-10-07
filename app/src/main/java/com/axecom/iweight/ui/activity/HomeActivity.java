@@ -8,10 +8,10 @@ import android.content.SharedPreferences;
 import android.hardware.display.DisplayManager;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.view.Display;
 import android.view.LayoutInflater;
-import android.view.TextureView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -39,6 +39,7 @@ import com.axecom.iweight.my.entity.ResultInfo;
 import com.axecom.iweight.my.entity.UserInfo;
 import com.axecom.iweight.my.net.NetHelper;
 import com.axecom.iweight.net.RetrofitFactory;
+import com.axecom.iweight.ui.view.CustomDialog;
 import com.axecom.iweight.ui.view.SoftKeyborad;
 import com.axecom.iweight.utils.ButtonUtils;
 import com.axecom.iweight.utils.LogUtils;
@@ -46,7 +47,6 @@ import com.axecom.iweight.utils.NetworkUtil;
 import com.axecom.iweight.utils.SPUtils;
 import com.google.gson.internal.LinkedTreeMap;
 import com.hoho.android.usbserial.driver.UsbSerialPort;
-import com.luofx.entity.dao.BaseDao;
 import com.luofx.listener.VolleyListener;
 import com.luofx.utils.DateUtils;
 import com.luofx.utils.PreferenceUtils;
@@ -73,6 +73,7 @@ import static com.axecom.iweight.ui.activity.SystemSettingsActivity.KEY_DEFAULT_
  */
 public class HomeActivity extends BaseActivity implements VolleyListener, IConstants_ST {
 
+    private static final String AUTO_LOGIN = "auto_login";
     private TextView cardNumberTv;
     private TextView pwdTv;
 
@@ -84,47 +85,58 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
     UsbSerialPort port;
     public BannerActivity banner = null;
     private String loginType;
+    private CheckedTextView autoLogin;
+    private Handler mHandler = new Handler();
+    private boolean cancelAutoLogin;
+    private Button confirmBtn;
+    private boolean reBoot;
 
     /****************************************************************************************/
+
     @Override
     public View setInitView() {
+        reBoot = getIntent().getBooleanExtra(SettingsActivity.IS_RE_BOOT, false);
 
         View rootView = null;
         try {
-         rootView = LayoutInflater.from(this).inflate(R.layout.activity_home, null);
-        Button confirmBtn = rootView.findViewById(R.id.home_confirm_btn);
-        cardNumberTv = rootView.findViewById(R.id.home_card_number_tv);
-        pwdTv = rootView.findViewById(R.id.home_pwd_tv);
-        TextView loginTv = rootView.findViewById(R.id.home_login_tv);
-        weightTv = rootView.findViewById(R.id.home_weight_number_tv);
-        savePwdCtv = rootView.findViewById(R.id.home_save_pwd_ctv);
-        UpdateManager updateManager = new UpdateManager();
-        updateManager.getNewVersion(this, 0);
-        pwdTv.setOnClickListener(this);
-        loginTv.setOnClickListener(this);
-        cardNumberTv.setOnClickListener(this);
-        confirmBtn.setOnClickListener(this);
-        savePwdCtv.setOnClickListener(this);
-        DisplayManager displayManager = (DisplayManager) getSystemService(Context.DISPLAY_SERVICE);
-        //获取屏幕数量
-        Display[] presentationDisplays = new Display[0];
-        if (displayManager != null) {
-            presentationDisplays = displayManager.getDisplays();
-        }
-
-        if (presentationDisplays.length > 1) {
-            if (banner == null) {
-                banner = new BannerActivity(this.getApplicationContext(), presentationDisplays[1]);
-                Objects.requireNonNull(banner.getWindow()).setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
-                banner.show();
+            rootView = LayoutInflater.from(this).inflate(R.layout.activity_home, null);
+            confirmBtn = rootView.findViewById(R.id.home_confirm_btn);
+            cardNumberTv = rootView.findViewById(R.id.home_card_number_tv);
+            pwdTv = rootView.findViewById(R.id.home_pwd_tv);
+            TextView loginTv = rootView.findViewById(R.id.home_login_tv);
+            weightTv = rootView.findViewById(R.id.home_weight_number_tv);
+            savePwdCtv = rootView.findViewById(R.id.home_save_pwd_ctv);
+            savePwdCtv.setChecked(AccountManager.getInstance().getRememberPwdState());
+            autoLogin = rootView.findViewById(R.id.home_login_auto);
+            autoLogin.setOnClickListener(this);
+            boolean autoLoin = (boolean) SPUtils.get(this, AUTO_LOGIN, false);
+            autoLogin.setChecked(autoLoin);
+            UpdateManager updateManager = new UpdateManager();
+            updateManager.getNewVersion(this, 0);
+            pwdTv.setOnClickListener(this);
+            loginTv.setOnClickListener(this);
+            cardNumberTv.setOnClickListener(this);
+            confirmBtn.setOnClickListener(this);
+            savePwdCtv.setOnClickListener(this);
+            DisplayManager displayManager = (DisplayManager) getSystemService(Context.DISPLAY_SERVICE);
+            //获取屏幕数量
+            Display[] presentationDisplays = new Display[0];
+            if (displayManager != null) {
+                presentationDisplays = displayManager.getDisplays();
             }
-        }
 
-        if (!banner.isShowing())
-            banner.show();
+            if (presentationDisplays.length > 1) {
+                if (banner == null) {
+                    banner = new BannerActivity(this.getApplicationContext(), presentationDisplays[1]);
+                    Objects.requireNonNull(banner.getWindow()).setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
+                    banner.show();
+                }
+            }
+
+            if (!banner.isShowing())
+                banner.show();
         } catch (Exception e) {
-
-            LogBean logBean=new LogBean();
+            LogBean logBean = new LogBean();
             logBean.setMessage(e.getMessage());
             logBean.setTime(DateUtils.getYY_TO_ss(new Date()));
             logBean.setType(sysApplication.TYPE_ERROR);
@@ -150,7 +162,6 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
         NetHelper netHelper = new NetHelper(application, this);
         netHelper.getUserInfo(netHelper.getIMEI(HomeActivity.this), 1);
         findViewById(R.id.ivLog).setOnClickListener(this);
-        isLogin();
     }
 
 
@@ -161,6 +172,38 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
         intentFilter.addAction("android.hardware.usb.action.USB_DEVICE_DETACHED");
         intentFilter.addAction("android.hardware.usb.action.USB_DEVICE_ATTACHED");
         registerReceiver(usbReceiver, intentFilter);
+
+        initAutoLogin();
+    }
+
+    private void initAutoLogin() {
+        String lastSerialNumber = AccountManager.getInstance().getLastSerialNumber();
+        boolean serialNumberEmpty = TextUtils.isEmpty(lastSerialNumber);
+        String pwd ="";
+        if(!serialNumberEmpty){
+            pwd = AccountManager.getInstance().getPwdBySerialNumber(lastSerialNumber);
+            cardNumberTv.setText(lastSerialNumber);
+            pwdTv.setText(pwd);
+        }
+        if (reBoot||!autoLogin.isChecked() || serialNumberEmpty||TextUtils.isEmpty(pwd)) return;
+        CustomDialog.Builder builder;
+        builder = new CustomDialog.Builder(this);
+        builder.setMessage("自动登录中...").setSingleButton("取消", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cancelAutoLogin = true;
+            }
+        });
+        final CustomDialog singleButtonDialog = builder.createSingleButtonDialog();
+        singleButtonDialog.show();
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                singleButtonDialog.dismiss();
+                if (cancelAutoLogin) return;
+                if (confirmBtn != null) confirmBtn.callOnClick();
+            }
+        }, 2000);
     }
 
     @Override
@@ -215,9 +258,10 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
                 break;
             case R.id.home_confirm_btn:
                 String serialNumber = cardNumberTv.getText().toString();
+                AccountManager.getInstance().saveLastSerialNumber(serialNumber);
                 String password = pwdTv.getText().toString();
-                if(TextUtils.isEmpty(serialNumber)&&getString(R.string.Administrators_pwd).equals(password)){
-                    startDDMActivity(LocalSettingsActivity.class,true);
+                if (TextUtils.isEmpty(serialNumber) && getString(R.string.Administrators_pwd).equals(password)) {
+                    startDDMActivity(LocalSettingsActivity.class, true);
                 }
 
                 if (NetworkUtil.isConnected(this)) {
@@ -278,12 +322,17 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
                 break;
             case R.id.home_save_pwd_ctv:
                 savePwdCtv.setChecked(!savePwdCtv.isChecked());
+                AccountManager.getInstance().saveRememberPwdState(savePwdCtv.isChecked());
                 break;
 
             case R.id.ivLog:
                 //进入日志界面
                 Intent intent = new Intent(this, LogActivity.class);
                 startActivity(intent);
+                break;
+            case R.id.home_login_auto:
+                autoLogin.setChecked(!autoLogin.isChecked());
+                SPUtils.put(this, AUTO_LOGIN, autoLogin.isChecked());
                 break;
             default:
                 break;
@@ -372,7 +421,7 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
                     public void onNext(BaseEntity<LoginData> loginDataBaseEntity) {
                         if (loginDataBaseEntity.isSuccess()) {
                             AccountManager.getInstance().saveToken(loginDataBaseEntity.getData().getToken());
-                            if (savePwdCtv.isChecked()) {
+                            if (savePwdCtv.isChecked()||autoLogin.isChecked()) {
                                 AccountManager.getInstance().savePwd(serialNumber, password);
                             } else {
                                 AccountManager.getInstance().savePwd(serialNumber, null);
@@ -473,15 +522,6 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
                 editor.putString(SELLER, userInfo.getSeller());
                 editor.apply();
             }
-        }
-    }
-
-
-    public void isLogin() {
-        String token = AccountManager.getInstance().getToken();
-        if(!TextUtils.isEmpty(token)){
-            startDDMActivity(MainActivity.class,true);
-            finish();
         }
     }
 }

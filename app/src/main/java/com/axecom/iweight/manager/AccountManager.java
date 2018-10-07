@@ -10,6 +10,8 @@ import com.axecom.iweight.utils.SPUtils;
  * 账号管理者
  */
 public class AccountManager {
+    private static final String LAST_SERIALNUMBER = "last_serialnumber";
+    private static final String IS_SAVE_PWD = "is_save_pwd";
     private static AccountManager accountManager ;
     private String adminToken;
 
@@ -48,6 +50,22 @@ public class AccountManager {
 
     public String getScalesId(){
         return SPUtils.getString(mCtx, Constants.USER_SCALES_ID, null);
+    }
+
+    public void saveRememberPwdState(boolean save){
+        SPUtils.put(mCtx, IS_SAVE_PWD, save);
+    }
+
+    public boolean getRememberPwdState(){
+        return (boolean)SPUtils.get(mCtx, IS_SAVE_PWD,false);
+    }
+
+    public void saveLastSerialNumber(String serialNumber){
+        SPUtils.putString(mCtx, LAST_SERIALNUMBER, serialNumber);
+    }
+
+    public String getLastSerialNumber(){
+       return SPUtils.getString(mCtx, LAST_SERIALNUMBER, "");
     }
 
     public void savePwd(String serialNumber, String pwd){

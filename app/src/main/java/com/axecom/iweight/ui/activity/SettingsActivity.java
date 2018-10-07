@@ -48,7 +48,8 @@ import top.wuhaojie.bthelper.BtHelperClient;
 
 public class SettingsActivity extends BaseActivity {
     public static final String KET_SWITCH_SIMPLE_OR_COMPLEX = "key_switch_simple_or_complex";
-    private static final String ACTION_NET_CHANGE = "android.net.conn.CONNECTIVITY_CHANGE";
+    public static final String ACTION_NET_CHANGE = "android.net.conn.CONNECTIVITY_CHANGE";
+    public static final String IS_RE_BOOT = "is_re_boot";
     ThreadPoolExecutor executor;
 
     private static final int POSITION_SWITCH = 0;
@@ -189,7 +190,10 @@ public class SettingsActivity extends BaseActivity {
                     break;
                 case POSITION_RE_BOOT:
 //                    EventBus.getDefault().post(new BusEvent(BusEvent.GO_HOME_PAGE, true));
-                    startDDMActivity(HomeActivity.class, false);
+                    Intent intent = new Intent();
+                    intent.setClass(SettingsActivity.this, HomeActivity.class);
+                    intent.putExtra(IS_RE_BOOT, true);
+                    startActivity(intent);
                     break;
                 case POSITION_WEIGHT:
                     finish();

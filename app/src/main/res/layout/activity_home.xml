@@ -250,8 +250,24 @@
                             android:paddingLeft="5dp" />
                     </LinearLayout>
 
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <CheckedTextView
+                            android:id="@+id/home_save_pwd_ctv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="50dp"
+                            android:layout_marginTop="20dp"
+                            android:drawableLeft="?android:attr/listChoiceIndicatorMultiple"
+                            android:gravity="center"
+                            android:text="@string/string_home_remember_pwd_txt"
+                            android:textSize="20sp" />
+
                     <CheckedTextView
-                        android:id="@+id/home_save_pwd_ctv"
+                        android:id="@+id/home_login_auto"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="50dp"
@@ -259,8 +275,8 @@
                         android:textSize="20sp"
                         android:drawableLeft="?android:attr/listChoiceIndicatorMultiple"
                         android:gravity="center"
-                        android:text="@string/string_home_remember_pwd_txt" />
-
+                        android:text="@string/string_login_auto_txt" />
+                    </LinearLayout>
                     <Button
                         android:id="@+id/home_confirm_btn"
                         android:layout_width="match_parent"
