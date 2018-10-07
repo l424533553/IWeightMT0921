@@ -128,7 +128,7 @@ public class UseCashActivity extends BaseActivity implements View.OnClickListene
     public void initView() {
         LinkedHashMap valueMap = (LinkedHashMap) SPUtils.readObject(this, SystemSettingsActivity.KEY_STOP_CASH);
         if (valueMap != null) {
-            boolean b = (boolean) valueMap.get("val");
+            /*boolean b = (boolean) valueMap.get("val");
             if (!b) {
                 cashPayBtn.setVisibility(View.VISIBLE);
                 cashPayLayout.setVisibility(View.VISIBLE);
@@ -142,7 +142,7 @@ public class UseCashActivity extends BaseActivity implements View.OnClickListene
                 qrCodeIv.setVisibility(View.VISIBLE);
                 payId = "2";
                 setOrderBean(payId);
-            }
+            }*/
         }
 
         if (NetworkUtil.isConnected(this)) {

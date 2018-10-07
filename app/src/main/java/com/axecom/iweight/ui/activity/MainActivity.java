@@ -59,7 +59,6 @@ import com.axecom.iweight.utils.MoneyTextWatcher;
 import com.axecom.iweight.utils.NetworkUtil;
 import com.axecom.iweight.utils.SPUtils;
 import com.bigkoo.convenientbanner.holder.CBViewHolderCreator;
-import com.bumptech.glide.Glide;
 import com.luofx.listener.VolleyListener;
 import com.luofx.listener.VolleyStringListener;
 import com.luofx.utils.PreferenceUtils;
@@ -458,6 +457,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                                     return new NetworkImageHolderView();
                                 }
                             }, list).startTurning(2000);
+//                            banner.showAutoCancel(2000);
                             banner.show();
                         }
                     }
@@ -538,7 +538,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                 }
                 break;
                 case R.id.main_scan_pay:
-                if (!ButtonUtils.isFastDoubleClick(R.id.main_cash_btn)) {
+                if (!ButtonUtils.isFastDoubleClick(R.id.main_scan_pay)) {
                     //结算时带上当前称重的记录
                     accumulative();
                     if (Float.parseFloat(priceTotalTv.getText().toString()) > 0 || Float.parseFloat(tvgrandTotal.getText().toString()) > 0) {
@@ -649,7 +649,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
 
             if (event.getType() == BusEvent.PRINTER_LABEL || event.getType() == BusEvent.POSITION_PATCH) {
                 if (event.getType() == BusEvent.PRINTER_LABEL) {
-                    showLoading("支付成功", "支付金额：" + priceTotalTv.getText().toString() + "元");
+                    showLoading("支付成功", "支付金额：" + priceTotalTv.getText().toString() + "元",1500);
                 }
 
 //                bitmap = (Bitmap) event.getParam();
@@ -697,7 +697,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                 clear(1);
             }
             if (event.getType() == BusEvent.PRINTER_NO_BITMAP) {
-                showLoading("支付成功", "支付金额：" + priceTotalTv.getText().toString() + "元");
+                showLoading("支付成功", "支付金额：" + priceTotalTv.getText().toString() + "元",1500);
 
 //                orderNo = (Math.random() * 9 + 1) * 100000 + getCurrentTime("yyyyMMddHHmmss");
                 int random = (int) (Math.random() * 9 + 1) * 100;
@@ -959,13 +959,13 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         intent.setClass(this, UseCashActivity.class);
         SPUtils.saveObject(this, "selectedGoodList", seledtedGoodsList);
         if(useCash){
-            setOrderBean(subOrderReqBean);
+            payCashDirect(subOrderReqBean);
         }else{
             startActivity(intent);
         }
     }
 
-    public void setOrderBean(SubOrderReqBean orderBean) {
+    public void payCashDirect(SubOrderReqBean orderBean) {
 //        现金直接支付
         String payId =  "4";
         orderBean.setPayment_id(payId);
@@ -1033,6 +1033,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                             if (payNoticeBeanBaseEntity.getData().flag == 0) {
                                 flag = false;
                                 mHandler.removeCallbacks(mRun);
+                                flag = true;//轮循停止设置初始值
 //                                Toast.makeText(UseCashActivity.this, "支付成功", Toast.LENGTH_SHORT).show();
                                 banner.bannerOrderLayout.setVisibility(View.GONE);
                                 EventBus.getDefault().post(new BusEvent(BusEvent.PRINTER_LABEL, bitmap, order_no, "4", qrCode));

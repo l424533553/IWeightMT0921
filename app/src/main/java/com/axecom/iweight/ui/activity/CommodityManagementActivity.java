@@ -41,6 +41,7 @@ import com.axecom.iweight.impl.OnItemMoveListener;
 import com.axecom.iweight.manager.AccountManager;
 import com.axecom.iweight.manager.ActivityController;
 import com.axecom.iweight.manager.MacManager;
+import com.axecom.iweight.my.entity.scalescategory.AllGoods;
 import com.axecom.iweight.net.RetrofitFactory;
 
 import org.greenrobot.eventbus.EventBus;
@@ -70,7 +71,7 @@ public class CommodityManagementActivity extends Activity implements View.OnClic
     private ClassAdapter classAdapter;
     private DragAdapter adapter;
     private List<CommodityBean> hotKeyList;
-    private Map<Integer, CommodityBean> hotKeyMap;
+    private Map<String, CommodityBean> hotKeyMap;
     private List<CommodityBean> allGoodsList;
     private List<CommodityBean> categoryList;
     private List<CommodityBean> categoryChildList;
@@ -302,9 +303,11 @@ public class CommodityManagementActivity extends Activity implements View.OnClic
                             CommodityBean commodityBean;
                             for (int i = 0; i < scalesCategoryGoodsBaseEntity.getData().hotKeyGoods.size(); i++) {
                                 commodityBean = new CommodityBean();
-                                commodityBean.setHotKeyBean(scalesCategoryGoodsBaseEntity.getData().hotKeyGoods.get(i));
+                                HotKeyBean hotKeyBean = scalesCategoryGoodsBaseEntity.getData().hotKeyGoods.get(i);
+                                commodityBean.setHotKeyBean(hotKeyBean);
                                 hotKeyList.add(commodityBean);
-                                hotKeyMap.put((scalesCategoryGoodsBaseEntity.getData().hotKeyGoods.get(i)).id, commodityBean);
+                                String uid = hotKeyBean.getName() + hotKeyBean.getCid();
+                                hotKeyMap.put(uid, commodityBean);
                             }
                             CommodityBean allGoodsBean;
                             for (int i = 0; i < scalesCategoryGoodsBaseEntity.getData().allGoods.size(); i++) {
@@ -457,15 +460,17 @@ public class CommodityManagementActivity extends Activity implements View.OnClic
                 @Override
                 public void onClick(View v) {
 //                    CommodityBean bean = (CommodityBean) classAdapter.getItem(position);
+                    AllGoods goods = item.getAllGoods();
+                    if(hotKeyMap.containsKey(goods.getName()+goods.cid))return;
                     item.setShow(isShowDelTv);
                     HotKeyBean HotKeyBean = new HotKeyBean();
-                    if (item.getAllGoods() != null) {
-                        HotKeyBean.id = item.getAllGoods().id;
-                        HotKeyBean.cid = item.getAllGoods().cid;
-                        HotKeyBean.name = item.getAllGoods().name;
-                        HotKeyBean.price = item.getAllGoods().price;
-                        HotKeyBean.traceable_code = item.getAllGoods().traceable_code;
-                        HotKeyBean.is_default = item.getAllGoods().is_default;
+                    if (goods != null) {
+                        HotKeyBean.id = goods.id;
+                        HotKeyBean.cid = goods.cid;
+                        HotKeyBean.name = goods.name;
+                        HotKeyBean.price = goods.price;
+                        HotKeyBean.traceable_code = goods.traceable_code;
+                        HotKeyBean.is_default = goods.is_default;
                     }
                     if (item.getCategoryChilds() != null) {
                         HotKeyBean.id = item.getCategoryChilds().id;
@@ -477,7 +482,7 @@ public class CommodityManagementActivity extends Activity implements View.OnClic
                     }
                     CommodityBean hotKeyBean = new CommodityBean();
                     hotKeyBean.setHotKeyBean(HotKeyBean);
-                    hotKeyMap.put(hotKeyBean.getHotKeyBean().id, hotKeyBean);
+                    hotKeyMap.put(hotKeyBean.getHotKeyBean().getName()+hotKeyBean.getHotKeyBean().cid, hotKeyBean);
                     hotKeyList.add(hotKeyBean);
 
                     for (int i = 0; i < hotKeyList.size() - 1; i++) {
