@@ -1178,7 +1178,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
             requestPushStoreGoods(hotKeyGoods);
         }
 
-        if(!hotKeyGoods.isEmpty()){
+        if(hotKeyGoods!=null&&!hotKeyGoods.isEmpty()){
             showSelectedGoods(hotKeyGoods);
             return;
         }

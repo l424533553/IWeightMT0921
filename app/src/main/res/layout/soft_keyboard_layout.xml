@@ -33,7 +33,6 @@
             android:padding="5dp"
             android:textColor="@color/black"
             android:textSize="30sp"
-            android:text="222"
             android:gravity="center_vertical"
             android:layout_marginRight="40dp"
             android:layout_marginTop="10dp"

@@ -54,7 +54,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -69,10 +68,10 @@ import io.reactivex.schedulers.Schedulers;
 
 import static com.axecom.iweight.base.BaseActivity.FLAG_HOMEKEY_DISPATCHED;
 
-public class CommodityManagementActivity extends Activity implements View.OnClickListener{
+public class CommodityManagementActivity extends Activity implements View.OnClickListener {
 
-    interface SelectedGoodsState{
-        String selectedGoods= "select_goods";
+    interface SelectedGoodsState {
+        String selectedGoods = "select_goods";
         String NOT_PUSH_REMOTE = "NOT_PUSH_REMOTE";
     }
 
@@ -91,38 +90,19 @@ public class CommodityManagementActivity extends Activity implements View.OnClic
     private boolean isShowDelTv = false;
 
     protected SysApplication sysApplication;
-    private String GOODSDATA ="goodsdata";
+    private String GOODSDATA = "goodsdata";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         super.onCreate(savedInstanceState);
         this.getWindow().setFlags(FLAG_HOMEKEY_DISPATCHED, FLAG_HOMEKEY_DISPATCHED);//关键代码
-
         setContentView(R.layout.commodity_management_activity);
-
-
-        sysApplication= (SysApplication) getApplication();
-
-
-        //
-       setInitView();
-
-        //这里这一段会影响弹出的dialog型的Activity，故暂时注释掉
-        //getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
-
-//        mViewUtils = new ViewUtils(this);
-//        //获取屏幕的宽高的像素
-//        dm = new DisplayMetrics();
-//        getWindowManager().getDefaultDisplay().getMetrics(dm);
-//        SysApplication.mWidthPixels = dm.widthPixels;
-//        SysApplication.mHeightPixels = dm.heightPixels;
-
-
+        sysApplication = (SysApplication) getApplication();
+        setInitView();
         ActivityController.addActivity(this);
         initView();
     }
-
 
 
     public void setInitView() {
@@ -133,7 +113,6 @@ public class CommodityManagementActivity extends Activity implements View.OnClic
         categoryChildList = new ArrayList<>();
         adapter = new DragAdapter(this, hotKeyList);
         classAdapter = new ClassAdapter(this, allGoodsList);
-
 
 
         commodityRV = findViewById(R.id.commodity_management_rv);
@@ -222,7 +201,7 @@ public class CommodityManagementActivity extends Activity implements View.OnClic
                 break;
             case R.id.commodity_management_save_btn:
                 List<HotKeyBean> list = new ArrayList<>();
-                for(CommodityBean bean :hotKeyList){
+                for (CommodityBean bean : hotKeyList) {
                     list.add(bean.getHotKeyBean());
                 }
                 requestSaveSelectedGoods(list);
@@ -233,7 +212,7 @@ public class CommodityManagementActivity extends Activity implements View.OnClic
         }
     }
 
-    public  void requestSaveSelectedGoods(List<HotKeyBean> dataList) {
+    public void requestSaveSelectedGoods(List<HotKeyBean> dataList) {
         SaveGoodsReqBean goodsReqBean = new SaveGoodsReqBean();
         List<SaveGoodsReqBean.Goods> goodsList = new ArrayList<>();
         SaveGoodsReqBean.Goods good;
@@ -276,14 +255,14 @@ public class CommodityManagementActivity extends Activity implements View.OnClic
         allTitleTv.setTextColor(CommodityManagementActivity.this.getResources().getColor(R.color.green_3CB371));
     }
 
-    public  void storeGoodsData(SaveGoodsReqBean goodsReqBean) {
+    public void storeGoodsData(SaveGoodsReqBean goodsReqBean) {
         List<HotKeyBean> list = new ArrayList<>();
-        for(CommodityBean bean :hotKeyList){
+        for (CommodityBean bean : hotKeyList) {
             list.add(bean.getHotKeyBean());
         }
-        FileUtils.saveObject(CommodityManagementActivity.this, (Serializable) list,SelectedGoodsState.selectedGoods);
-        if(!NetworkUtil.isConnected(CommodityManagementActivity.this)){
-            SPUtils.put(CommodityManagementActivity.this, SelectedGoodsState.NOT_PUSH_REMOTE,true);
+        FileUtils.saveObject(CommodityManagementActivity.this, (Serializable) list, SelectedGoodsState.selectedGoods);
+        if (!NetworkUtil.isConnected(CommodityManagementActivity.this)) {
+            SPUtils.put(CommodityManagementActivity.this, SelectedGoodsState.NOT_PUSH_REMOTE, true);
             saveSelectedGoods("本地保存成功");
             return;
         }
@@ -302,13 +281,13 @@ public class CommodityManagementActivity extends Activity implements View.OnClic
                             saveSelectedGoods(baseEntity.getMsg());
                         } else {
                             showLoading(baseEntity.getMsg());
-                            SPUtils.put(CommodityManagementActivity.this, SelectedGoodsState.NOT_PUSH_REMOTE,true);
+                            SPUtils.put(CommodityManagementActivity.this, SelectedGoodsState.NOT_PUSH_REMOTE, true);
                         }
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        SPUtils.put(CommodityManagementActivity.this, SelectedGoodsState.NOT_PUSH_REMOTE,true);
+                        SPUtils.put(CommodityManagementActivity.this, SelectedGoodsState.NOT_PUSH_REMOTE, true);
                     }
 
                     @Override
@@ -329,9 +308,9 @@ public class CommodityManagementActivity extends Activity implements View.OnClic
     public void getGoodsData() {
 
         boolean b = !NetworkUtil.isConnected(CommodityManagementActivity.this);
-        if(b){
+        if (b) {
             ScalesCategoryGoods goods = (ScalesCategoryGoods) FileUtils.readObject(CommodityManagementActivity.this, GOODSDATA);
-            if(goods==null)return;
+            if (goods == null) return;
             processCategoryGoods(goods);
             return;
         }
@@ -350,7 +329,7 @@ public class CommodityManagementActivity extends Activity implements View.OnClic
                     public void onNext(final BaseEntity<ScalesCategoryGoods> scalesCategoryGoodsBaseEntity) {
                         if (scalesCategoryGoodsBaseEntity.isSuccess()) {
                             final ScalesCategoryGoods data = scalesCategoryGoodsBaseEntity.getData();
-                            FileUtils.saveObject(CommodityManagementActivity.this,data,GOODSDATA);
+                            FileUtils.saveObject(CommodityManagementActivity.this, data, GOODSDATA);
                             processCategoryGoods(data);
                         } else {
                             showLoading(scalesCategoryGoodsBaseEntity.getMsg());
@@ -371,10 +350,15 @@ public class CommodityManagementActivity extends Activity implements View.OnClic
     }
 
     private void processCategoryGoods(final ScalesCategoryGoods data) {
+        List<HotKeyBean> hotKeyGoods = (List<HotKeyBean>) FileUtils.readObject(CommodityManagementActivity.this, CommodityManagementActivity.SelectedGoodsState.selectedGoods);
         CommodityBean commodityBean;
-        for (int i = 0; i < data.hotKeyGoods.size(); i++) {
+        List<HotKeyBean> hotKeyBeanList = data.hotKeyGoods;
+        if (hotKeyGoods != null && hotKeyGoods.size() > 0) {
+            hotKeyBeanList = hotKeyGoods;
+        }
+        for (int i = 0; i < hotKeyBeanList.size(); i++) {
             commodityBean = new CommodityBean();
-            HotKeyBean hotKeyBean = data.hotKeyGoods.get(i);
+            HotKeyBean hotKeyBean = hotKeyBeanList.get(i);
             commodityBean.setHotKeyBean(hotKeyBean);
             hotKeyList.add(commodityBean);
             String uid = hotKeyBean.getName() + hotKeyBean.getCid();
@@ -396,7 +380,7 @@ public class CommodityManagementActivity extends Activity implements View.OnClic
             titleTv.setTextSize(25);
             titleTv.setTextColor(CommodityManagementActivity.this.getResources().getColor(R.color.black));
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            params.setMargins(UIUtils.dip2px(10f),0,0,0);
+            params.setMargins(UIUtils.dip2px(10f), 0, 0, 0);
             titleTv.setLayoutParams(params);
             titleTv.setGravity(Gravity.CENTER);
             titleTv.setTag((data.categoryGoods.get(i)).id);
@@ -468,7 +452,7 @@ public class CommodityManagementActivity extends Activity implements View.OnClic
         mSweetAlertDialog.show();
     }
 
-   private class ClassAdapter extends BaseAdapter {
+    private class ClassAdapter extends BaseAdapter {
         List<CommodityBean> list;
         private Context context;
 
@@ -492,13 +476,12 @@ public class CommodityManagementActivity extends Activity implements View.OnClic
             return position;
         }
 
-       /**
-        *
-        * @param position  位置索引
-        * @param convertView  view
-        * @param parent    group 控件
-        * @return          返回 控件View
-        */
+        /**
+         * @param position    位置索引
+         * @param convertView view
+         * @param parent      group 控件
+         * @return 返回 控件View
+         */
         @SuppressLint("InflateParams")
         @Override
         public View getView(final int position, View convertView, ViewGroup parent) {
@@ -518,7 +501,7 @@ public class CommodityManagementActivity extends Activity implements View.OnClic
                 public void onClick(View v) {
 //                    CommodityBean bean = (CommodityBean) classAdapter.getItem(position);
                     AllGoods goods = item.getAllGoods();
-                    if(hotKeyMap.containsKey(goods.getName()+goods.cid))return;
+                    if (hotKeyMap.containsKey(goods.getName() + goods.cid)) return;
                     item.setShow(isShowDelTv);
                     HotKeyBean HotKeyBean = new HotKeyBean();
                     if (goods != null) {
@@ -539,7 +522,7 @@ public class CommodityManagementActivity extends Activity implements View.OnClic
                     }
                     CommodityBean hotKeyBean = new CommodityBean();
                     hotKeyBean.setHotKeyBean(HotKeyBean);
-                    hotKeyMap.put(hotKeyBean.getHotKeyBean().getName()+hotKeyBean.getHotKeyBean().cid, hotKeyBean);
+                    hotKeyMap.put(hotKeyBean.getHotKeyBean().getName() + hotKeyBean.getHotKeyBean().cid, hotKeyBean);
                     hotKeyList.add(hotKeyBean);
 
                     for (int i = 0; i < hotKeyList.size() - 1; i++) {
