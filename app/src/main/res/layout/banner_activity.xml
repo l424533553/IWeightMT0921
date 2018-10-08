@@ -112,4 +112,52 @@
 
         </LinearLayout>
     </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_alert"
+        android:orientation="vertical"
+        android:background="@color/white"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:padding="30dp"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <FrameLayout
+            android:id="@+id/warning_frame"
+            android:layout_width="53dp"
+            android:layout_height="53dp"
+            android:layout_marginTop="5dp"
+            >
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/warning_circle" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/app_name"
+                android:scaleType="center"
+                android:src="@drawable/warning_sigh" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:textSize="20sp"
+            android:text="支付成功"
+            android:layout_marginTop="18dp"
+            android:layout_marginBottom="18dp"
+            android:textColor="@color/black"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/alert_message"
+            style="@style/dialog_blue_button"
+            android:text="支付成功" />
+    </LinearLayout>
+
+
 </FrameLayout>

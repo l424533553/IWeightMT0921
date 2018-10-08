@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.axecom.iweight.R;
 import com.axecom.iweight.bean.SubOrderReqBean;
+import com.axecom.iweight.ui.uiutils.UIUtils;
 import com.bigkoo.convenientbanner.ConvenientBanner;
 import com.bigkoo.convenientbanner.holder.CBViewHolderCreator;
 import com.bigkoo.convenientbanner.holder.Holder;
@@ -40,6 +41,9 @@ public class BannerActivity extends Presentation {
     public List<SubOrderReqBean.Goods> goodsList;
     public MyAdapter adapter;
     public List<String> list;
+    private LinearLayout alertView;
+    private Button messageBtn;
+    private TextView titleTv;
 
     public BannerActivity(Context outerContext, Display display) {
         super(outerContext, display);
@@ -56,6 +60,10 @@ public class BannerActivity extends Presentation {
         bannerTotalPriceTv = findViewById(R.id.banner_total_price_tv);
         bannerOrderLayout = findViewById(R.id.banner_order_layout);
         convenientBanner = findViewById(R.id.banner_convenient_banner);
+
+        alertView = findViewById(R.id.ll_alert);
+        titleTv = findViewById(R.id.tv_title);
+        messageBtn = findViewById(R.id.alert_message);
         List<Integer> localImages = new ArrayList<>();
         localImages.add(R.drawable.logo);
         convenientBanner.setPages(
@@ -70,6 +78,19 @@ public class BannerActivity extends Presentation {
         adapter = new MyAdapter(context, goodsList);
         orderListView.setAdapter(adapter);
 
+    }
+
+    public void showPayResult(String titleText,String confirmText,long times) {
+        titleTv.setText(titleText);
+        messageBtn.setText(confirmText);
+        alertView.setVisibility(View.VISIBLE);
+
+        UIUtils.getMainThreadHandler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                alertView.setVisibility(View.GONE);
+            }
+        }, times);
     }
 
     public class LocalImageHolderView implements Holder<Integer> {

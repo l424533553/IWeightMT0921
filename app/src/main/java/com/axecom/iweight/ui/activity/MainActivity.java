@@ -659,7 +659,11 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
 
             if (event.getType() == BusEvent.PRINTER_LABEL || event.getType() == BusEvent.POSITION_PATCH) {
                 if (event.getType() == BusEvent.PRINTER_LABEL) {
-                    showLoading("支付成功", "支付金额：" + priceTotalTv.getText().toString() + "元",1500);
+                    String title = "支付成功";
+                    String message = "支付金额：" + priceTotalTv.getText().toString() + "元";
+                    int delayTimes = 2000;
+                    showLoading(title, message, delayTimes);
+                    banner.showPayResult(title,message,delayTimes);
                 }
 
 //                bitmap = (Bitmap) event.getParam();
@@ -707,7 +711,12 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                 clear(1);
             }
             if (event.getType() == BusEvent.PRINTER_NO_BITMAP) {
-                showLoading("支付成功", "支付金额：" + priceTotalTv.getText().toString() + "元",1500);
+                String title = "支付成功";
+                String message = "支付金额：" + priceTotalTv.getText().toString() + "元";
+                int delayTimes = 2000;
+                showLoading(title, message, delayTimes);
+                banner.showPayResult(title,message,delayTimes);
+
 
 //                orderNo = (Math.random() * 9 + 1) * 100000 + getCurrentTime("yyyyMMddHHmmss");
                 int random = (int) (Math.random() * 9 + 1) * 100;
