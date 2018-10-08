@@ -119,12 +119,12 @@ public class UpdateManager {
                         if(versionBeanBaseEntity.isSuccess()){
                             VersionBean version = versionBeanBaseEntity.getData();
                             String versionName = CommonUtils.getVersionName(context);
-                            if(!TextUtils.isEmpty(version.version) && !TextUtils.isEmpty(versionName) && !TextUtils.isEmpty(version.downloadurl)){
+                            /*if(!TextUtils.isEmpty(version.version) && !TextUtils.isEmpty(versionName) && !TextUtils.isEmpty(version.downloadurl)){
 
                                 if(version.version.compareTo(versionName) > 0){
                                     showDialog(context, version);
                                 }
-                            }
+                            }*/
                         }
                     }
 
