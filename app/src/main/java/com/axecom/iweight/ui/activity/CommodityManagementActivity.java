@@ -43,6 +43,7 @@ import com.axecom.iweight.manager.ActivityController;
 import com.axecom.iweight.manager.MacManager;
 import com.axecom.iweight.my.entity.scalescategory.AllGoods;
 import com.axecom.iweight.net.RetrofitFactory;
+import com.axecom.iweight.ui.uiutils.UIUtils;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -324,7 +325,9 @@ public class CommodityManagementActivity extends Activity implements View.OnClic
                                 titleTv.setText(categoryBean.getCategoryGoods().name);
                                 titleTv.setTextSize(25);
                                 titleTv.setTextColor(CommodityManagementActivity.this.getResources().getColor(R.color.black));
-                                titleTv.setLayoutParams(new LinearLayout.LayoutParams(100, LinearLayout.LayoutParams.WRAP_CONTENT));
+                                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                                params.setMargins(UIUtils.dip2px(10f),0,0,0);
+                                titleTv.setLayoutParams(params);
                                 titleTv.setGravity(Gravity.CENTER);
                                 titleTv.setTag((scalesCategoryGoodsBaseEntity.getData().categoryGoods.get(i)).id);
                                 classTitleLayout.addView(titleTv);
