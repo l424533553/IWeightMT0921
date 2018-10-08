@@ -28,11 +28,12 @@
         <TextView
             android:id="@+id/soft_keybroad_input_tv"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:layout_marginLeft="40dp"
             android:padding="5dp"
             android:textColor="@color/black"
             android:textSize="30sp"
+            android:text="222"
             android:gravity="center_vertical"
             android:layout_marginRight="40dp"
             android:layout_marginTop="10dp"

@@ -44,9 +44,13 @@ import com.axecom.iweight.manager.MacManager;
 import com.axecom.iweight.my.entity.scalescategory.AllGoods;
 import com.axecom.iweight.net.RetrofitFactory;
 import com.axecom.iweight.ui.uiutils.UIUtils;
+import com.axecom.iweight.utils.FileUtils;
+import com.axecom.iweight.utils.NetworkUtil;
+import com.axecom.iweight.utils.SPUtils;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +71,11 @@ import static com.axecom.iweight.base.BaseActivity.FLAG_HOMEKEY_DISPATCHED;
 
 public class CommodityManagementActivity extends Activity implements View.OnClickListener{
 
+    interface SelectedGoodsState{
+        String selectedGoods= "select_goods";
+        String NOT_PUSH_REMOTE = "NOT_PUSH_REMOTE";
+    }
+
     private RecyclerView commodityRV;
     private GridView classGv;
     private ClassAdapter classAdapter;
@@ -82,6 +91,7 @@ public class CommodityManagementActivity extends Activity implements View.OnClic
     private boolean isShowDelTv = false;
 
     protected SysApplication sysApplication;
+    private String GOODSDATA ="goodsdata";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,6 +126,16 @@ public class CommodityManagementActivity extends Activity implements View.OnClic
 
 
     public void setInitView() {
+        hotKeyList = new ArrayList<>();
+        hotKeyMap = new ArrayMap<>();
+        allGoodsList = new ArrayList<>();
+        categoryList = new ArrayList<>();
+        categoryChildList = new ArrayList<>();
+        adapter = new DragAdapter(this, hotKeyList);
+        classAdapter = new ClassAdapter(this, allGoodsList);
+
+
+
         commodityRV = findViewById(R.id.commodity_management_rv);
         classGv = findViewById(R.id.commodity_management_class_gv);
         classTitleLayout = findViewById(R.id.commodity_management_class_title_layout);
@@ -159,11 +179,7 @@ public class CommodityManagementActivity extends Activity implements View.OnClic
 
 
     public void initView() {
-        hotKeyList = new ArrayList<>();
-        hotKeyMap = new ArrayMap<>();
-        allGoodsList = new ArrayList<>();
-        categoryList = new ArrayList<>();
-        categoryChildList = new ArrayList<>();
+
         GridLayoutManager manager = new GridLayoutManager(this, 3);
         commodityRV.setLayoutManager(manager);
         ItemDragHelperCallback callback = new ItemDragHelperCallback() {
@@ -176,7 +192,6 @@ public class CommodityManagementActivity extends Activity implements View.OnClic
         ItemTouchHelper helper = new ItemTouchHelper(callback);
         helper.attachToRecyclerView(commodityRV);
 
-        adapter = new DragAdapter(this, hotKeyList);
         commodityRV.setAdapter(adapter);
 
         //TODO 待恢复
@@ -194,7 +209,6 @@ public class CommodityManagementActivity extends Activity implements View.OnClic
 //            }
 //        });
 
-        classAdapter = new ClassAdapter(this, allGoodsList);
         classGv.setAdapter(classAdapter);
     }
 
@@ -207,23 +221,11 @@ public class CommodityManagementActivity extends Activity implements View.OnClic
                 setClassTitleTxtColor();
                 break;
             case R.id.commodity_management_save_btn:
-                SaveGoodsReqBean goodsReqBean = new SaveGoodsReqBean();
-                List<SaveGoodsReqBean.Goods> goodsList = new ArrayList<>();
-                SaveGoodsReqBean.Goods good;
-                for (int i = 0; i < hotKeyList.size(); i++) {
-                    good = new SaveGoodsReqBean.Goods();
-                    good.id = hotKeyList.get(i).getHotKeyBean().id;
-                    good.cid = hotKeyList.get(i).getHotKeyBean().cid;
-                    good.is_default = hotKeyList.get(i).getHotKeyBean().is_default;
-                    good.name = hotKeyList.get(i).getHotKeyBean().name;
-                    good.price = hotKeyList.get(i).getHotKeyBean().price;
-                    good.traceable_code = hotKeyList.get(i).getHotKeyBean().traceable_code;
-                    goodsList.add(good);
+                List<HotKeyBean> list = new ArrayList<>();
+                for(CommodityBean bean :hotKeyList){
+                    list.add(bean.getHotKeyBean());
                 }
-                goodsReqBean.setToken(AccountManager.getInstance().getAdminToken());
-                goodsReqBean.setMac(MacManager.getInstace(this).getMac());
-                goodsReqBean.setGoods(goodsList);
-                storeGoodsData(goodsReqBean);
+                requestSaveSelectedGoods(list);
                 break;
             case R.id.commodity_management_back_btn:
                 finish();
@@ -231,10 +233,31 @@ public class CommodityManagementActivity extends Activity implements View.OnClic
         }
     }
 
+    public  void requestSaveSelectedGoods(List<HotKeyBean> dataList) {
+        SaveGoodsReqBean goodsReqBean = new SaveGoodsReqBean();
+        List<SaveGoodsReqBean.Goods> goodsList = new ArrayList<>();
+        SaveGoodsReqBean.Goods good;
+        for (int i = 0; i < dataList.size(); i++) {
+            good = new SaveGoodsReqBean.Goods();
+            HotKeyBean bean = dataList.get(i);
+            good.id = bean.id;
+            good.cid = bean.cid;
+            good.is_default = bean.is_default;
+            good.name = bean.name;
+            good.price = bean.price;
+            good.traceable_code = bean.traceable_code;
+            goodsList.add(good);
+        }
+        goodsReqBean.setToken(AccountManager.getInstance().getAdminToken());
+        goodsReqBean.setMac(MacManager.getInstace(SysApplication.getContext()).getMac());
+        goodsReqBean.setGoods(goodsList);
+        storeGoodsData(goodsReqBean);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == 1001) {
+        /*if (resultCode == 1001) {
             if (data != null) {
                 int position = data.getIntExtra("position", -1);
                 HotKeyBean goods = (HotKeyBean) Objects.requireNonNull(data.getExtras()).getSerializable("HotKeyBean");
@@ -243,7 +266,7 @@ public class CommodityManagementActivity extends Activity implements View.OnClic
                 hotKeyList.set(position, bean);
             }
 
-        }
+        }*/
     }
 
     public void setClassTitleTxtColor() {
@@ -253,7 +276,17 @@ public class CommodityManagementActivity extends Activity implements View.OnClic
         allTitleTv.setTextColor(CommodityManagementActivity.this.getResources().getColor(R.color.green_3CB371));
     }
 
-    public void storeGoodsData(SaveGoodsReqBean goodsReqBean) {
+    public  void storeGoodsData(SaveGoodsReqBean goodsReqBean) {
+        List<HotKeyBean> list = new ArrayList<>();
+        for(CommodityBean bean :hotKeyList){
+            list.add(bean.getHotKeyBean());
+        }
+        FileUtils.saveObject(CommodityManagementActivity.this, (Serializable) list,SelectedGoodsState.selectedGoods);
+        if(!NetworkUtil.isConnected(CommodityManagementActivity.this)){
+            SPUtils.put(CommodityManagementActivity.this, SelectedGoodsState.NOT_PUSH_REMOTE,true);
+            saveSelectedGoods("本地保存成功");
+            return;
+        }
         RetrofitFactory.getInstance().API()
                 .storeGoodsData(goodsReqBean)
                 .compose(this.<BaseEntity>setThread())
@@ -266,19 +299,16 @@ public class CommodityManagementActivity extends Activity implements View.OnClic
                     @Override
                     public void onNext(BaseEntity baseEntity) {
                         if (baseEntity.isSuccess()) {
-                            EventBus.getDefault().post(new BusEvent(BusEvent.SAVE_COMMODITY_SUCCESS, true));
-                            Toast.makeText(CommodityManagementActivity.this, baseEntity.getMsg(), Toast.LENGTH_SHORT).show();
-                            adapter = new DragAdapter(CommodityManagementActivity.this, hotKeyList);
-                            adapter.showDeleteTv(false);
-                            commodityRV.setAdapter(adapter);
+                            saveSelectedGoods(baseEntity.getMsg());
                         } else {
                             showLoading(baseEntity.getMsg());
+                            SPUtils.put(CommodityManagementActivity.this, SelectedGoodsState.NOT_PUSH_REMOTE,true);
                         }
                     }
 
                     @Override
                     public void onError(Throwable e) {
-
+                        SPUtils.put(CommodityManagementActivity.this, SelectedGoodsState.NOT_PUSH_REMOTE,true);
                     }
 
                     @Override
@@ -288,7 +318,25 @@ public class CommodityManagementActivity extends Activity implements View.OnClic
                 });
     }
 
+    private void saveSelectedGoods(String message) {
+        EventBus.getDefault().post(new BusEvent(BusEvent.SAVE_COMMODITY_SUCCESS, true));
+        Toast.makeText(CommodityManagementActivity.this, message, Toast.LENGTH_SHORT).show();
+        adapter = new DragAdapter(CommodityManagementActivity.this, hotKeyList);
+        adapter.showDeleteTv(false);
+        commodityRV.setAdapter(adapter);
+    }
+
     public void getGoodsData() {
+
+        boolean b = !NetworkUtil.isConnected(CommodityManagementActivity.this);
+        if(b){
+            ScalesCategoryGoods goods = (ScalesCategoryGoods) FileUtils.readObject(CommodityManagementActivity.this, GOODSDATA);
+            if(goods==null)return;
+            processCategoryGoods(goods);
+            return;
+        }
+
+
         RetrofitFactory.getInstance().API()
                 .getGoodsData(AccountManager.getInstance().getAdminToken(), MacManager.getInstace(this).getMac())
                 .compose(this.<BaseEntity<ScalesCategoryGoods>>setThread())
@@ -301,76 +349,9 @@ public class CommodityManagementActivity extends Activity implements View.OnClic
                     @Override
                     public void onNext(final BaseEntity<ScalesCategoryGoods> scalesCategoryGoodsBaseEntity) {
                         if (scalesCategoryGoodsBaseEntity.isSuccess()) {
-                            CommodityBean commodityBean;
-                            for (int i = 0; i < scalesCategoryGoodsBaseEntity.getData().hotKeyGoods.size(); i++) {
-                                commodityBean = new CommodityBean();
-                                HotKeyBean hotKeyBean = scalesCategoryGoodsBaseEntity.getData().hotKeyGoods.get(i);
-                                commodityBean.setHotKeyBean(hotKeyBean);
-                                hotKeyList.add(commodityBean);
-                                String uid = hotKeyBean.getName() + hotKeyBean.getCid();
-                                hotKeyMap.put(uid, commodityBean);
-                            }
-                            CommodityBean allGoodsBean;
-                            for (int i = 0; i < scalesCategoryGoodsBaseEntity.getData().allGoods.size(); i++) {
-                                allGoodsBean = new CommodityBean();
-                                allGoodsBean.setAllGoods(scalesCategoryGoodsBaseEntity.getData().allGoods.get(i));
-                                allGoodsList.add(allGoodsBean);
-                            }
-                            CommodityBean categoryBean;
-                            for (int i = 0; i < scalesCategoryGoodsBaseEntity.getData().categoryGoods.size(); i++) {
-                                categoryBean = new CommodityBean();
-                                categoryBean.setCategoryGoods(scalesCategoryGoodsBaseEntity.getData().categoryGoods.get(i));
-                                categoryList.add(categoryBean);
-                                final TextView titleTv = new TextView(CommodityManagementActivity.this);
-                                titleTv.setText(categoryBean.getCategoryGoods().name);
-                                titleTv.setTextSize(25);
-                                titleTv.setTextColor(CommodityManagementActivity.this.getResources().getColor(R.color.black));
-                                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                                params.setMargins(UIUtils.dip2px(10f),0,0,0);
-                                titleTv.setLayoutParams(params);
-                                titleTv.setGravity(Gravity.CENTER);
-                                titleTv.setTag((scalesCategoryGoodsBaseEntity.getData().categoryGoods.get(i)).id);
-                                classTitleLayout.addView(titleTv);
-                                final int finalI = i;
-                                final int finalI1 = i;
-                                titleTv.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        categoryChildList.clear();
-                                        CommodityBean clildBean;
-                                        for (int j = 0; j < (scalesCategoryGoodsBaseEntity.getData().categoryGoods.get(finalI)).child.size(); j++) {
-                                            if (((scalesCategoryGoodsBaseEntity.getData().categoryGoods.get(finalI)).child.get(j)).cid ==
-                                                    (scalesCategoryGoodsBaseEntity.getData().categoryGoods.get(finalI1)).id) {
-                                                clildBean = new CommodityBean();
-                                                clildBean.setCategoryChilds((scalesCategoryGoodsBaseEntity.getData().categoryGoods.get(finalI)).child.get(j));
-                                                categoryChildList.add(clildBean);
-                                                ClassAdapter adapter = new ClassAdapter(CommodityManagementActivity.this, categoryChildList);
-                                                classGv.setAdapter(adapter);
-                                                titleTv.setTextColor(CommodityManagementActivity.this.getResources().getColor(R.color.green_3CB371));
-                                                for (int i = 0; i < classTitleLayout.getChildCount(); i++) {
-                                                    TextView tv = (TextView) classTitleLayout.getChildAt(i);
-                                                    if (tv.getTag() == titleTv.getTag()) {
-                                                        tv.setTextColor(CommodityManagementActivity.this.getResources().getColor(R.color.green_3CB371));
-                                                    } else {
-                                                        tv.setTextColor(CommodityManagementActivity.this.getResources().getColor(R.color.black));
-                                                    }
-                                                }
-                                                allTitleTv.setTextColor(CommodityManagementActivity.this.getResources().getColor(R.color.black));
-                                            }
-                                        }
-                                    }
-                                });
-                            }
-//                            CommodityBean clildBean;
-//                            for (int i = 0; i < scalesCategoryGoodsBaseEntity.getData().categoryGoods.size(); i++) {
-//                                for (int j = 0; j < ((ScalesCategoryGoods.categoryGoods)scalesCategoryGoodsBaseEntity.getData().categoryGoods.get(i)).child.size(); j++) {
-//                                    clildBean = new CommodityBean();
-//                                    clildBean.setCategoryChilds((ScalesCategoryGoods.categoryGoods.child) ((ScalesCategoryGoods.categoryGoods)scalesCategoryGoodsBaseEntity.getData().categoryGoods.get(i)).child.get(j));
-//                                    categoryChildList.add(clildBean);
-//                                }
-//                            }
-                            adapter.notifyDataSetChanged();
-                            classAdapter.notifyDataSetChanged();
+                            final ScalesCategoryGoods data = scalesCategoryGoodsBaseEntity.getData();
+                            FileUtils.saveObject(CommodityManagementActivity.this,data,GOODSDATA);
+                            processCategoryGoods(data);
                         } else {
                             showLoading(scalesCategoryGoodsBaseEntity.getMsg());
                         }
@@ -387,6 +368,79 @@ public class CommodityManagementActivity extends Activity implements View.OnClic
                         closeLoading();
                     }
                 });
+    }
+
+    private void processCategoryGoods(final ScalesCategoryGoods data) {
+        CommodityBean commodityBean;
+        for (int i = 0; i < data.hotKeyGoods.size(); i++) {
+            commodityBean = new CommodityBean();
+            HotKeyBean hotKeyBean = data.hotKeyGoods.get(i);
+            commodityBean.setHotKeyBean(hotKeyBean);
+            hotKeyList.add(commodityBean);
+            String uid = hotKeyBean.getName() + hotKeyBean.getCid();
+            hotKeyMap.put(uid, commodityBean);
+        }
+        CommodityBean allGoodsBean;
+        for (int i = 0; i < data.allGoods.size(); i++) {
+            allGoodsBean = new CommodityBean();
+            allGoodsBean.setAllGoods(data.allGoods.get(i));
+            allGoodsList.add(allGoodsBean);
+        }
+        CommodityBean categoryBean;
+        for (int i = 0; i < data.categoryGoods.size(); i++) {
+            categoryBean = new CommodityBean();
+            categoryBean.setCategoryGoods(data.categoryGoods.get(i));
+            categoryList.add(categoryBean);
+            final TextView titleTv = new TextView(CommodityManagementActivity.this);
+            titleTv.setText(categoryBean.getCategoryGoods().name);
+            titleTv.setTextSize(25);
+            titleTv.setTextColor(CommodityManagementActivity.this.getResources().getColor(R.color.black));
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            params.setMargins(UIUtils.dip2px(10f),0,0,0);
+            titleTv.setLayoutParams(params);
+            titleTv.setGravity(Gravity.CENTER);
+            titleTv.setTag((data.categoryGoods.get(i)).id);
+            classTitleLayout.addView(titleTv);
+            final int finalI = i;
+            final int finalI1 = i;
+            titleTv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    categoryChildList.clear();
+                    CommodityBean clildBean;
+                    for (int j = 0; j < (data.categoryGoods.get(finalI)).child.size(); j++) {
+                        if (((data.categoryGoods.get(finalI)).child.get(j)).cid ==
+                                (data.categoryGoods.get(finalI1)).id) {
+                            clildBean = new CommodityBean();
+                            clildBean.setCategoryChilds((data.categoryGoods.get(finalI)).child.get(j));
+                            categoryChildList.add(clildBean);
+                            ClassAdapter adapter = new ClassAdapter(CommodityManagementActivity.this, categoryChildList);
+                            classGv.setAdapter(adapter);
+                            titleTv.setTextColor(CommodityManagementActivity.this.getResources().getColor(R.color.green_3CB371));
+                            for (int i = 0; i < classTitleLayout.getChildCount(); i++) {
+                                TextView tv = (TextView) classTitleLayout.getChildAt(i);
+                                if (tv.getTag() == titleTv.getTag()) {
+                                    tv.setTextColor(CommodityManagementActivity.this.getResources().getColor(R.color.green_3CB371));
+                                } else {
+                                    tv.setTextColor(CommodityManagementActivity.this.getResources().getColor(R.color.black));
+                                }
+                            }
+                            allTitleTv.setTextColor(CommodityManagementActivity.this.getResources().getColor(R.color.black));
+                        }
+                    }
+                }
+            });
+        }
+//                            CommodityBean clildBean;
+//                            for (int i = 0; i < scalesCategoryGoodsBaseEntity.getData().categoryGoods.size(); i++) {
+//                                for (int j = 0; j < ((ScalesCategoryGoods.categoryGoods)scalesCategoryGoodsBaseEntity.getData().categoryGoods.get(i)).child.size(); j++) {
+//                                    clildBean = new CommodityBean();
+//                                    clildBean.setCategoryChilds((ScalesCategoryGoods.categoryGoods.child) ((ScalesCategoryGoods.categoryGoods)scalesCategoryGoodsBaseEntity.getData().categoryGoods.get(i)).child.get(j));
+//                                    categoryChildList.add(clildBean);
+//                                }
+//                            }
+        adapter.notifyDataSetChanged();
+        classAdapter.notifyDataSetChanged();
     }
 
     private SweetAlertDialog mSweetAlertDialog;

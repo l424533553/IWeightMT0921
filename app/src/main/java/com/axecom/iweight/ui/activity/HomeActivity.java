@@ -261,7 +261,7 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
                 AccountManager.getInstance().saveLastSerialNumber(serialNumber);
                 String password = pwdTv.getText().toString();
                 if (TextUtils.isEmpty(serialNumber) && getString(R.string.Administrators_pwd).equals(password)) {
-                    startDDMActivity(LocalSettingsActivity.class, true);
+                    startDDMActivity(SettingsActivity.class, true);
                 }
 
                 if (NetworkUtil.isConnected(this)) {

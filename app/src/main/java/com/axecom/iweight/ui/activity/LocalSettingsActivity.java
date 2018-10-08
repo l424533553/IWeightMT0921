@@ -177,6 +177,7 @@ public class LocalSettingsActivity extends BaseActivity {
 
                     @Override
                     public void onNext(BaseEntity<LocalSettingsBean> localSettingsBeanBaseEntity) {
+
                         if (localSettingsBeanBaseEntity.isSuccess()) {
                             Long saveDate = (Long) SPUtils.get(LocalSettingsActivity.this, "currentDate", null);
                             if (saveDate != null) {

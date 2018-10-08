@@ -39,6 +39,7 @@ import com.axecom.iweight.bean.HotKeyBean;
 import com.axecom.iweight.bean.HotKeyBean_Table;
 import com.axecom.iweight.bean.LoginInfo;
 import com.axecom.iweight.bean.PayNoticeBean;
+import com.axecom.iweight.bean.SaveGoodsReqBean;
 import com.axecom.iweight.bean.ScalesCategoryGoods;
 import com.axecom.iweight.bean.SubOrderBean;
 import com.axecom.iweight.bean.SubOrderReqBean;
@@ -54,6 +55,7 @@ import com.axecom.iweight.my.helper.HttpHelper;
 import com.axecom.iweight.net.RetrofitFactory;
 import com.axecom.iweight.ui.adapter.GoodMenuAdapter;
 import com.axecom.iweight.utils.ButtonUtils;
+import com.axecom.iweight.utils.FileUtils;
 import com.axecom.iweight.utils.LogUtils;
 import com.axecom.iweight.utils.MoneyTextWatcher;
 import com.axecom.iweight.utils.NetworkUtil;
@@ -272,15 +274,14 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         weightNumberTv.setText(AccountManager.getInstance().getScalesId());
         initSettlement();
         commoditysGridView.setAdapter(goodMenuAdapter);
-//        boolean isConnected = NetworkUtil.isConnected(this);
-//        if (isConnected) {
-        List<HotKeyBean> hotKeyBeanList = SQLite.select().from(HotKeyBean.class).queryList();
+
+       /* List<HotKeyBean> hotKeyBeanList = SQLite.select().from(HotKeyBean.class).queryList();
         if (hotKeyBeanList.size() > 0) {
             HotKeyBeanList.addAll(hotKeyBeanList);
             goodMenuAdapter.notifyDataSetChanged();
-        } else {
+        } else {*/
             getGoodsData();
-        }
+//        }
 
         commoditysGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @SuppressLint("DefaultLocale")
@@ -391,6 +392,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         }
         mTotalCopies = (int) SPUtils.get(this, LocalSettingsActivity.KEY_PRINTER_COUNT, mTotalCopies);
     }
+
 
     private TextWatcher countTextWatcher = new TextWatcher() {
 
@@ -533,16 +535,16 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                     //结算时带上当前称重的记录
                     accumulative();
                     if (Float.parseFloat(priceTotalTv.getText().toString()) > 0 || Float.parseFloat(tvgrandTotal.getText().toString()) > 0) {
-                        showDialog(v,true);
+                        showDialog(v, true);
                     }
                 }
                 break;
-                case R.id.main_scan_pay:
+            case R.id.main_scan_pay:
                 if (!ButtonUtils.isFastDoubleClick(R.id.main_scan_pay)) {
                     //结算时带上当前称重的记录
                     accumulative();
                     if (Float.parseFloat(priceTotalTv.getText().toString()) > 0 || Float.parseFloat(tvgrandTotal.getText().toString()) > 0) {
-                        showDialog(v,false);
+                        showDialog(v, false);
                     }
                 }
                 break;
@@ -663,7 +665,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                     String message = "支付金额：" + priceTotalTv.getText().toString() + "元";
                     int delayTimes = 2000;
                     showLoading(title, message, delayTimes);
-                    banner.showPayResult(title,message,delayTimes);
+                    banner.showPayResult(title, message, delayTimes);
                 }
 
 //                bitmap = (Bitmap) event.getParam();
@@ -715,7 +717,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                 String message = "支付金额：" + priceTotalTv.getText().toString() + "元";
                 int delayTimes = 2000;
                 showLoading(title, message, delayTimes);
-                banner.showPayResult(title,message,delayTimes);
+                banner.showPayResult(title, message, delayTimes);
 
 
 //                orderNo = (Math.random() * 9 + 1) * 100000 + getCurrentTime("yyyyMMddHHmmss");
@@ -862,13 +864,13 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                 print.PrintString(sb.toString());
 
                 try {
-                    if(bytes!=null){
+                    if (bytes != null) {
                         print.PrintltString("扫一扫获取追溯信息：");
                         print.printQR(bytes);
                         print.PrintltString("--------------------------------\n\n\n");
                     }
 
-                } catch (IOException |InterruptedException e) {
+                } catch (IOException | InterruptedException e) {
                     e.printStackTrace();
                 }
                 orderInfo.setItems(itemsBeans);
@@ -941,7 +943,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         }
     }
 
-    public void showDialog(View v,boolean useCash) {
+    public void showDialog(View v, boolean useCash) {
 
         if (seledtedGoodsList.size() < 1) {
             accumulative();
@@ -977,9 +979,9 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         intent.putExtras(bundle);
         intent.setClass(this, UseCashActivity.class);
         SPUtils.saveObject(this, "selectedGoodList", seledtedGoodsList);
-        if(useCash){
+        if (useCash) {
             payCashDirect(subOrderReqBean);
-        }else{
+        } else {
             startActivity(intent);
         }
     }
@@ -988,7 +990,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
 //        现金直接支付
 
         displayToBanner(orderBean);
-        String payId =  "4";
+        String payId = "4";
         orderBean.setPayment_id(payId);
         if (NetworkUtil.isConnected(this)) {
             submitOrder(orderBean);
@@ -1038,6 +1040,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
             getPayNotice(order_no, qrCode);
         }
     };
+
     public void getPayNotice(final String order_no, final String qrCode) {
         RetrofitFactory.getInstance().API()
                 .getPayNotice(order_no)
@@ -1095,7 +1098,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                             banner.bannerTotalPriceTv.setText(getString(R.string.string_amount_txt3, Float.parseFloat(subOrderReqBean.getTotal_amount())));
 //                            imageLoader.displayImage(subOrderBeanBaseEntity.getData().getCode_img_url(), banner.bannerQRCode, options);
 
-                            switch (subOrderReqBean.getPayment_id()){
+                            switch (subOrderReqBean.getPayment_id()) {
                                 case "1":
                                     banner.tvPayWay.setText("支付方式：微信支付");
                                     break;
@@ -1168,6 +1171,17 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
     }
 
     public void getGoodsData() {
+        boolean notPushRemote = (boolean) SPUtils.get(this, CommodityManagementActivity.SelectedGoodsState.NOT_PUSH_REMOTE, false);
+        List<HotKeyBean> hotKeyGoods = (List<HotKeyBean>) FileUtils.readObject(MainActivity.this, CommodityManagementActivity.SelectedGoodsState.selectedGoods);
+
+        if (notPushRemote && NetworkUtil.isConnected(MainActivity.this)) {
+            requestPushStoreGoods(hotKeyGoods);
+        }
+
+        if(!hotKeyGoods.isEmpty()){
+            showSelectedGoods(hotKeyGoods);
+            return;
+        }
         RetrofitFactory.getInstance().API()
                 .getGoodsData(AccountManager.getInstance().getToken(), MacManager.getInstace(this).getMac())
                 .compose(this.<BaseEntity<ScalesCategoryGoods>>setThread())
@@ -1180,24 +1194,8 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                     public void onNext(BaseEntity<ScalesCategoryGoods> scalesCategoryGoodsBaseEntity) {
                         if (scalesCategoryGoodsBaseEntity.isSuccess()) {
                             ScalesCategoryGoods scalesCategoryGoods = scalesCategoryGoodsBaseEntity.getData();
-
-                            HotKeyBeanList.clear();
-                            HotKeyBeanList.addAll(scalesCategoryGoods.getHotKeyGoods());
-                            HotKeyBean hotKey = new HotKeyBean();
-                            SQLite.delete(HotKeyBean.class).execute();
-                            ModelAdapter<HotKeyBean> modelAdapter = FlowManager.getModelAdapter(HotKeyBean.class);
-                            for (HotKeyBean goods : HotKeyBeanList) {
-                                hotKey.id = goods.id;
-                                hotKey.cid = goods.cid;
-                                hotKey.grandTotal = goods.grandTotal;
-                                hotKey.is_default = goods.is_default;
-                                hotKey.name = goods.name;
-                                hotKey.price = goods.price;
-                                hotKey.traceable_code = goods.traceable_code;
-                                hotKey.weight = goods.weight;
-                                modelAdapter.insert(hotKey);
-                            }
-                            goodMenuAdapter.notifyDataSetChanged();
+                            List<HotKeyBean> hotKeyGoods = scalesCategoryGoods.getHotKeyGoods();
+                            showSelectedGoods(hotKeyGoods);
                         } else {
                             showLoading(scalesCategoryGoodsBaseEntity.getMsg(), "数据加载失败");
                         }
@@ -1211,6 +1209,72 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                     @Override
                     public void onComplete() {
                         closeLoading();
+                    }
+                });
+    }
+
+    private void showSelectedGoods(List<HotKeyBean> hotKeyGoods) {
+        HotKeyBeanList.clear();
+        HotKeyBeanList.addAll(hotKeyGoods);
+        HotKeyBean hotKey = new HotKeyBean();
+        SQLite.delete(HotKeyBean.class).execute();
+        ModelAdapter<HotKeyBean> modelAdapter = FlowManager.getModelAdapter(HotKeyBean.class);
+        for (HotKeyBean goods : HotKeyBeanList) {
+            hotKey.id = goods.id;
+            hotKey.cid = goods.cid;
+            hotKey.grandTotal = goods.grandTotal;
+            hotKey.is_default = goods.is_default;
+            hotKey.name = goods.name;
+            hotKey.price = goods.price;
+            hotKey.traceable_code = goods.traceable_code;
+            hotKey.weight = goods.weight;
+            modelAdapter.insert(hotKey);
+        }
+        goodMenuAdapter.notifyDataSetChanged();
+    }
+
+    public void requestPushStoreGoods(List<HotKeyBean> hotKeyGoods) {
+        SaveGoodsReqBean goodsReqBean = new SaveGoodsReqBean();
+        List<SaveGoodsReqBean.Goods> goodsList = new ArrayList<>();
+        SaveGoodsReqBean.Goods good;
+        for (int i = 0; i < hotKeyGoods.size(); i++) {
+            good = new SaveGoodsReqBean.Goods();
+            HotKeyBean bean = hotKeyGoods.get(i);
+            good.id = bean.id;
+            good.cid = bean.cid;
+            good.is_default = bean.is_default;
+            good.name = bean.name;
+            good.price = bean.price;
+            good.traceable_code = bean.traceable_code;
+            goodsList.add(good);
+        }
+        goodsReqBean.setToken(AccountManager.getInstance().getAdminToken());
+        goodsReqBean.setMac(MacManager.getInstace(SysApplication.getContext()).getMac());
+        goodsReqBean.setGoods(goodsList);
+        RetrofitFactory.getInstance().API()
+                .storeGoodsData(goodsReqBean)
+                .compose(this.<BaseEntity>setThread())
+                .subscribe(new Observer<BaseEntity>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                    }
+
+                    @Override
+                    public void onNext(BaseEntity baseEntity) {
+                        if (baseEntity.isSuccess()) {
+                            SPUtils.put(MainActivity.this, CommodityManagementActivity.SelectedGoodsState.NOT_PUSH_REMOTE, false);
+                        } else {
+                            SPUtils.put(MainActivity.this, CommodityManagementActivity.SelectedGoodsState.NOT_PUSH_REMOTE, true);
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
                     }
                 });
     }

@@ -1,5 +1,7 @@
 package com.axecom.iweight.my.entity.scalescategory;
 
+import java.io.Serializable;
+
 /**
  * author: luofaxin
  * date： 2018/9/26 0026.
@@ -8,7 +10,7 @@ package com.axecom.iweight.my.entity.scalescategory;
  */
 
 
-public class Goods {
+public class Goods implements Serializable{
     public int id;
     public String name;
     public int cid;

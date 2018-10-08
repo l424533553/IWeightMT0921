@@ -1,8 +1,9 @@
 package com.axecom.iweight.bean;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class SaveGoodsReqBean {
+public class SaveGoodsReqBean implements Serializable {
     private String token;
     private String mac;
     private List goods;
@@ -31,7 +32,7 @@ public class SaveGoodsReqBean {
         this.goods = goods;
     }
 
-    public static class Goods{
+    public static class Goods implements Serializable{
         public int id;
         public String name;
         public int cid;
