@@ -14,6 +14,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
 
+import com.allenliu.versionchecklib.v2.AllenVersionChecker;
+import com.allenliu.versionchecklib.v2.builder.UIData;
 import com.axecom.iweight.R;
 import com.axecom.iweight.base.BaseActivity;
 import com.axecom.iweight.base.BaseEntity;
@@ -119,12 +121,13 @@ public class UpdateManager {
                         if(versionBeanBaseEntity.isSuccess()){
                             VersionBean version = versionBeanBaseEntity.getData();
                             String versionName = CommonUtils.getVersionName(context);
-                            /*if(!TextUtils.isEmpty(version.version) && !TextUtils.isEmpty(versionName) && !TextUtils.isEmpty(version.downloadurl)){
+                            AllenVersionChecker
+                                    .getInstance()
+                                    .downloadOnly(
+                                            UIData.create().setDownloadUrl("https://github.com/l424533553/IWeightMT0921/tree/master/app/app-release.apk")
+                                    )
+                                    .excuteMission(context);
 
-                                if(version.version.compareTo(versionName) > 0){
-                                    showDialog(context, version);
-                                }
-                            }*/
                         }
                     }
 
@@ -140,17 +143,19 @@ public class UpdateManager {
                 });
     }
 
-    private void showDialog(final Activity context, final VersionBean version) {
+    /*private void showDialog(final Activity context, final VersionBean version) {
+        final String url = ;
+        final VersionBean version1 = new VersionBean("123",url,"test");
         UIUtils.postTaskSafely(new Runnable() {
             @Override
             public void run() {
                 final CustomDialog.Builder builder = new CustomDialog.Builder(context);
-                builder.setMessage(context.getString(R.string.app_update_found_version) + version.version);
-                dialog = builder.setMessage(version.description)
+                builder.setMessage(context.getString(R.string.app_update_found_version) + version1.version);
+                dialog = builder.setMessage(version1.description)
                         .setPositiveButton(context.getString(R.string.app_update_now), new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                startTask(context, version.downloadurl);
+                                startTask(context,version1.downloadurl);
 //                                startTask2(context, response.getDownloadurl());
                                 dialog.dismiss();
                             }
@@ -166,7 +171,7 @@ public class UpdateManager {
             }
         });
     }
-
+*/
 
     private void startTask(final Context context, String url) {
         createNotification(context);

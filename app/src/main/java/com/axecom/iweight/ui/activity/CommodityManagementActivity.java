@@ -42,6 +42,7 @@ import com.axecom.iweight.manager.AccountManager;
 import com.axecom.iweight.manager.ActivityController;
 import com.axecom.iweight.manager.MacManager;
 import com.axecom.iweight.my.entity.scalescategory.AllGoods;
+import com.axecom.iweight.my.entity.scalescategory.CategoryGoods;
 import com.axecom.iweight.net.RetrofitFactory;
 import com.axecom.iweight.ui.uiutils.UIUtils;
 import com.axecom.iweight.utils.FileUtils;
@@ -501,7 +502,9 @@ public class CommodityManagementActivity extends Activity implements View.OnClic
                 public void onClick(View v) {
 //                    CommodityBean bean = (CommodityBean) classAdapter.getItem(position);
                     AllGoods goods = item.getAllGoods();
-                    if (hotKeyMap.containsKey(goods.getName() + goods.cid)) return;
+                    if (goods!=null&&hotKeyMap.containsKey(goods.getName() + goods.cid)) return;
+                    CategoryGoods.child categoryChilds = item.getCategoryChilds();
+                    if (categoryChilds != null&&hotKeyMap.containsKey(categoryChilds.name + categoryChilds.cid))return;
                     item.setShow(isShowDelTv);
                     HotKeyBean HotKeyBean = new HotKeyBean();
                     if (goods != null) {
@@ -512,13 +515,13 @@ public class CommodityManagementActivity extends Activity implements View.OnClic
                         HotKeyBean.traceable_code = goods.traceable_code;
                         HotKeyBean.is_default = goods.is_default;
                     }
-                    if (item.getCategoryChilds() != null) {
-                        HotKeyBean.id = item.getCategoryChilds().id;
-                        HotKeyBean.cid = item.getCategoryChilds().cid;
-                        HotKeyBean.name = item.getCategoryChilds().name;
-                        HotKeyBean.price = item.getCategoryChilds().price;
-                        HotKeyBean.traceable_code = item.getCategoryChilds().traceable_code;
-                        HotKeyBean.is_default = item.getCategoryChilds().is_default;
+                    if (categoryChilds != null) {
+                        HotKeyBean.id = categoryChilds.id;
+                        HotKeyBean.cid = categoryChilds.cid;
+                        HotKeyBean.name = categoryChilds.name;
+                        HotKeyBean.price = categoryChilds.price;
+                        HotKeyBean.traceable_code = categoryChilds.traceable_code;
+                        HotKeyBean.is_default = categoryChilds.is_default;
                     }
                     CommodityBean hotKeyBean = new CommodityBean();
                     hotKeyBean.setHotKeyBean(HotKeyBean);

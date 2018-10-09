@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:gravity="center"
     android:descendantFocusability="blocksDescendants"
@@ -16,4 +16,9 @@
         android:textStyle="bold"
         android:background="@drawable/shape_weight_display_bg"
         android:text="白菜白菜"/>
-</LinearLayout>
+
+    <ImageView
+        android:background="@drawable/circle_trade"
+        android:layout_width="14dp"
+        android:layout_height="14dp" />
+</FrameLayout>

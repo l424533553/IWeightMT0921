@@ -128,6 +128,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
     private ThreadPool threadPool;  //线程池 管理
     private MyRun mRun;
     private boolean flag = true;
+    private TextView loginTypeName;
 
     @SuppressLint("InflateParams")
     @Override
@@ -146,6 +147,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
 //        weightTotalMsgTv = rootView.findViewById(R.id.main_weight_total_msg_tv);
         weightTv = rootView.findViewById(R.id.main_weight_tv);
         operatorTv = rootView.findViewById(R.id.main_operator_tv);
+        loginTypeName = rootView.findViewById(R.id.tv_login_type_name);
         stallNumberTv = rootView.findViewById(R.id.main_stall_number_tv);
         weightNumberTv = rootView.findViewById(R.id.main_weight_number_tv);
         componyTitleTv = rootView.findViewById(R.id.main_compony_title_tv);
