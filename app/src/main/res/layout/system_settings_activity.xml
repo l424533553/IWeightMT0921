@@ -476,7 +476,29 @@
                 android:gravity="center"
                 android:text="停用现金模式"
                 android:textColor="@color/black"
-                android:textSize="20sp" />
+                android:textSize="16sp" />
+
+            <CheckedTextView
+                android:id="@+id/system_settings_stop_alipay_ctv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:drawableLeft="?android:listChoiceIndicatorMultiple"
+                android:gravity="center"
+                android:text="停用支付宝模式"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
+
+            <CheckedTextView
+                android:id="@+id/system_settings_stop_weichatpay_ctv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:drawableLeft="?android:listChoiceIndicatorMultiple"
+                android:gravity="center"
+                android:text="停用微信模式"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
         </LinearLayout>
         </LinearLayout>
 

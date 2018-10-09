@@ -111,8 +111,6 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
             autoLogin.setOnClickListener(this);
             boolean autoLoin = (boolean) SPUtils.get(this, AUTO_LOGIN, false);
             autoLogin.setChecked(autoLoin);
-            UpdateManager updateManager = new UpdateManager();
-            updateManager.getNewVersion(this, 0);
             pwdTv.setOnClickListener(this);
             loginTv.setOnClickListener(this);
             cardNumberTv.setOnClickListener(this);

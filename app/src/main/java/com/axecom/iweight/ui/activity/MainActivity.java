@@ -46,6 +46,7 @@ import com.axecom.iweight.bean.SubOrderReqBean;
 import com.axecom.iweight.manager.AccountManager;
 import com.axecom.iweight.manager.MacManager;
 import com.axecom.iweight.manager.ThreadPool;
+import com.axecom.iweight.manager.UpdateManager;
 import com.axecom.iweight.my.adapter.CommodityAdapter;
 import com.axecom.iweight.my.adapter.DigitalAdapter;
 import com.axecom.iweight.my.entity.ItemsBean;
@@ -75,6 +76,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -184,7 +186,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         advertising();
 
         weightTopTv.setOnClickListener(this);
-
+        UpdateManager.getNewVersion(this);
         return rootView;
     }
 
@@ -282,7 +284,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
             HotKeyBeanList.addAll(hotKeyBeanList);
             goodMenuAdapter.notifyDataSetChanged();
         } else {*/
-            getGoodsData();
+        getGoodsData();
 //        }
 
         commoditysGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -535,7 +537,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
             case R.id.main_cash_btn:
                 if (!ButtonUtils.isFastDoubleClick(R.id.main_cash_btn)) {
                     //结算时带上当前称重的记录
-                    accumulative();
+                    accumulative(true);
                     if (Float.parseFloat(priceTotalTv.getText().toString()) > 0 || Float.parseFloat(tvgrandTotal.getText().toString()) > 0) {
                         showDialog(v, true);
                     }
@@ -544,7 +546,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
             case R.id.main_scan_pay:
                 if (!ButtonUtils.isFastDoubleClick(R.id.main_scan_pay)) {
                     //结算时带上当前称重的记录
-                    accumulative();
+                    accumulative(true);
                     if (Float.parseFloat(priceTotalTv.getText().toString()) > 0 || Float.parseFloat(tvgrandTotal.getText().toString()) > 0) {
                         showDialog(v, false);
                     }
@@ -564,7 +566,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                 clear(1);
                 break;
             case R.id.main_digital_add_btn:
-                accumulative();
+                accumulative(false);
                 break;
         }
     }
@@ -582,7 +584,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
     /**
      * 累计 菜品价格
      */
-    private void accumulative() {
+    private void accumulative(boolean clean) {
         if (selectedGoods == null) {
             return;
 
@@ -614,7 +616,8 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                 .query();
         MainActivity.this.selectedGoods.price = selectedGoods.price;
         calculatePrice();
-        clear(3);
+        if (clean)
+            clear(3);
     }
 
     @SuppressLint("DefaultLocale")
@@ -948,7 +951,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
     public void showDialog(View v, boolean useCash) {
 
         if (seledtedGoodsList.size() < 1) {
-            accumulative();
+            accumulative(true);
         }
         Intent intent = new Intent();
         SubOrderReqBean subOrderReqBean = new SubOrderReqBean();
@@ -1153,9 +1156,18 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                     @Override
                     public void onNext(BaseEntity<LoginInfo> loginInfoBaseEntity) {
                         if (loginInfoBaseEntity.isSuccess()) {
-                            stallNumberTv.setText(loginInfoBaseEntity.getData().boothNumber);
-                            operatorTv.setText(loginInfoBaseEntity.getData().name);
-                            componyTitleTv.setText(loginInfoBaseEntity.getData().organizationName);
+                            LoginInfo data = loginInfoBaseEntity.getData();
+                            stallNumberTv.setText(data.boothNumber);
+                            operatorTv.setText(data.client_name);
+                            componyTitleTv.setText(data.organizationName);
+                            switch (data.user_type) {
+                                case LoginInfo.TYPE_seller:
+                                    loginTypeName.setText("商户:");
+                                    break;
+                                case LoginInfo.TYPE_ADMIN:
+                                    loginTypeName.setText(MainActivity.this.getString(R.string.string_operator));
+                                    break;
+                            }
                         }
                     }
 
@@ -1180,7 +1192,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
             requestPushStoreGoods(hotKeyGoods);
         }
 
-        if(hotKeyGoods!=null&&!hotKeyGoods.isEmpty()){
+        if (hotKeyGoods != null && !hotKeyGoods.isEmpty()) {
             showSelectedGoods(hotKeyGoods);
             return;
         }
@@ -1197,6 +1209,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                         if (scalesCategoryGoodsBaseEntity.isSuccess()) {
                             ScalesCategoryGoods scalesCategoryGoods = scalesCategoryGoodsBaseEntity.getData();
                             List<HotKeyBean> hotKeyGoods = scalesCategoryGoods.getHotKeyGoods();
+                            FileUtils.saveObject(MainActivity.this, (Serializable) hotKeyGoods, CommodityManagementActivity.SelectedGoodsState.selectedGoods);
                             showSelectedGoods(hotKeyGoods);
                         } else {
                             showLoading(scalesCategoryGoodsBaseEntity.getMsg(), "数据加载失败");
