@@ -60,7 +60,7 @@ public class SystemSettingsActivity extends BaseActivity {
     private TextView buyerNumberTv, sellerNumberTv;
     private TextView loginTypeTv, printerTv, balanceRoundingTv, priceingMethodTv, weightRoundingTv, weightUnitTv;
     private Button backBtn, saveBtn;
-    private CheckedTextView notClearPriceCtv, saveWeightCtv, autoObtainCtv, cashEttlementCtv, distinguishCtv, icCardSettlementCtv, stopPrintCtv, noPatchSettlementCtv, autoPrevCtv, cashRoundingCtv, stopCashCtv;
+    private CheckedTextView notClearPriceCtv, saveWeightCtv, autoObtainCtv, cashEttlementCtv, distinguishCtv, icCardSettlementCtv, stopPrintCtv, noPatchSettlementCtv, autoPrevCtv, cashRoundingCtv, stopCashCtv, stopAlipayCtv, stopweichatpayCtv;
 
 
     List<Map<String, String>> loginTypeList = new ArrayList<>();
@@ -103,6 +103,8 @@ public class SystemSettingsActivity extends BaseActivity {
         autoPrevCtv = rootView.findViewById(R.id.system_settings_auto_prev_ctv);
         cashRoundingCtv = rootView.findViewById(R.id.system_settings_cash_rounding_ctv);
         stopCashCtv = rootView.findViewById(R.id.system_settings_stop_cash_ctv);
+        stopAlipayCtv = rootView.findViewById(R.id.system_settings_stop_alipay_ctv);
+        stopweichatpayCtv = rootView.findViewById(R.id.system_settings_stop_weichatpay_ctv);
 
         backBtn = rootView.findViewById(R.id.system_settings_back_btn);
         saveBtn = rootView.findViewById(R.id.system_settings_save_btn);
@@ -128,6 +130,8 @@ public class SystemSettingsActivity extends BaseActivity {
         autoPrevCtv.setOnClickListener(this);
         cashRoundingCtv.setOnClickListener(this);
         stopCashCtv.setOnClickListener(this);
+        stopAlipayCtv.setOnClickListener(this);
+        stopweichatpayCtv.setOnClickListener(this);
         icCardSettlementCtv.setOnClickListener(this);
 
 
@@ -178,7 +182,7 @@ public class SystemSettingsActivity extends BaseActivity {
                     @Override
                     public void onSelected(AdapterView<?> parent, View view, int position, long id) {
                         priceingMethodPos = position;
-                        SPUtils.put(SystemSettingsActivity.this, SettingsActivity.KET_SWITCH_SIMPLE_OR_COMPLEX, position == 0? false:true);
+                        SPUtils.put(SystemSettingsActivity.this, SettingsActivity.KET_SWITCH_SIMPLE_OR_COMPLEX, position == 0 ? false : true);
                         priceingMethodTv.setText(((Map<String, String>) parent.getAdapter().getItem(position)).get(position + 1 + ""));
                     }
                 }).show();
@@ -249,6 +253,12 @@ public class SystemSettingsActivity extends BaseActivity {
                 break;
             case R.id.system_settings_stop_cash_ctv:
                 stopCashCtv.setChecked(!stopCashCtv.isChecked());
+                break;
+            case R.id.system_settings_stop_alipay_ctv:
+                stopAlipayCtv.setChecked(!stopCashCtv.isChecked());
+                break;
+            case R.id.system_settings_stop_weichatpay_ctv:
+                stopweichatpayCtv.setChecked(!stopCashCtv.isChecked());
                 break;
             case R.id.system_settings_back_btn:
                 finish();
@@ -414,11 +424,11 @@ public class SystemSettingsActivity extends BaseActivity {
                                 Long valueDate = ((Double) ((LinkedTreeMap) valueMap.get("default_login_type")).get("update_time")).longValue();
                                 if (loginDate.compareTo(valueDate) > 0) {
                                     loginTypeTv.setText((saveMap.get("val")).toString());
-                                }else {
+                                } else {
                                     loginTypeTv.setText((((LinkedTreeMap) valueMap.get("default_login_type")).get("val")).toString());
                                 }
-                            }else {
-                                loginTypeTv.setText((((LinkedTreeMap) valueMap.get("default_login_type")).get("val")) != null ?(((LinkedTreeMap) valueMap.get("default_login_type")).get("val")).toString() :"");
+                            } else {
+                                loginTypeTv.setText((((LinkedTreeMap) valueMap.get("default_login_type")).get("val")) != null ? (((LinkedTreeMap) valueMap.get("default_login_type")).get("val")).toString() : "");
                             }
                             LinkedHashMap printerMap = (LinkedHashMap) SPUtils.readObject(SystemSettingsActivity.this, KEY_PRINTER);
                             if (printerMap != null) {
@@ -426,10 +436,10 @@ public class SystemSettingsActivity extends BaseActivity {
                                 Long valueDate = ((Double) ((LinkedTreeMap) valueMap.get("printer_configuration")).get("update_time")).longValue();
                                 if (loginDate.compareTo(valueDate) > 0) {
                                     printerTv.setText((printerMap.get("val")).toString());
-                                }else {
+                                } else {
                                     printerTv.setText((((LinkedTreeMap) valueMap.get("printer_configuration")).get("val")).toString());
                                 }
-                            }else {
+                            } else {
                                 printerTv.setText((((LinkedTreeMap) valueMap.get("printer_configuration")).get("val")) != null ? (((LinkedTreeMap) valueMap.get("printer_configuration")).get("val")).toString() : "");
                             }
                             LinkedHashMap buyerNumberMap = (LinkedHashMap) SPUtils.readObject(SystemSettingsActivity.this, KEY_BUYER_NUMBER);
@@ -438,11 +448,11 @@ public class SystemSettingsActivity extends BaseActivity {
                                 Long valueDate = ((Double) ((LinkedTreeMap) valueMap.get("default_buyer_number")).get("update_time")).longValue();
                                 if (loginDate.compareTo(valueDate) > 0) {
                                     buyerNumberTv.setText((buyerNumberMap.get("val")).toString());
-                                }else {
+                                } else {
                                     buyerNumberTv.setText((((LinkedTreeMap) valueMap.get("default_buyer_number")).get("val")).toString());
                                 }
-                            }else {
-                                buyerNumberTv.setText((((LinkedTreeMap) valueMap.get("default_buyer_number")).get("val"))!=null?(((LinkedTreeMap) valueMap.get("default_buyer_number")).get("val")).toString(): "");
+                            } else {
+                                buyerNumberTv.setText((((LinkedTreeMap) valueMap.get("default_buyer_number")).get("val")) != null ? (((LinkedTreeMap) valueMap.get("default_buyer_number")).get("val")).toString() : "");
                             }
                             LinkedHashMap balanceRoundingMap = (LinkedHashMap) SPUtils.readObject(SystemSettingsActivity.this, KEY_BALANCE_ROUNDING);
                             if (balanceRoundingMap != null) {
@@ -450,11 +460,11 @@ public class SystemSettingsActivity extends BaseActivity {
                                 Long valueDate = ((Double) ((LinkedTreeMap) valueMap.get("balance_rounding")).get("update_time")).longValue();
                                 if (loginDate.compareTo(valueDate) > 0) {
                                     balanceRoundingTv.setText((balanceRoundingMap.get("val")).toString());
-                                }else {
+                                } else {
                                     balanceRoundingTv.setText(((LinkedTreeMap) valueMap.get("balance_rounding")).get("val").toString());
                                 }
-                            }else {
-                                balanceRoundingTv.setText(((LinkedTreeMap) valueMap.get("balance_rounding")).get("val")!=null?((LinkedTreeMap) valueMap.get("balance_rounding")).get("val").toString():"");
+                            } else {
+                                balanceRoundingTv.setText(((LinkedTreeMap) valueMap.get("balance_rounding")).get("val") != null ? ((LinkedTreeMap) valueMap.get("balance_rounding")).get("val").toString() : "");
                             }
                             LinkedHashMap priceingMethodMap = (LinkedHashMap) SPUtils.readObject(SystemSettingsActivity.this, KEY_PRICEING_METHOD);
                             if (priceingMethodMap != null) {
@@ -462,11 +472,11 @@ public class SystemSettingsActivity extends BaseActivity {
                                 Long valueDate = ((Double) ((LinkedTreeMap) valueMap.get("default_pricing_model")).get("update_time")).longValue();
                                 if (loginDate.compareTo(valueDate) > 0) {
                                     priceingMethodTv.setText((priceingMethodMap.get("val")).toString());
-                                }else {
+                                } else {
                                     priceingMethodTv.setText(((LinkedTreeMap) valueMap.get("default_pricing_model")).get("val").toString());
                                 }
-                            }else {
-                                priceingMethodTv.setText(((LinkedTreeMap) valueMap.get("default_pricing_model")).get("val")!=null?((LinkedTreeMap) valueMap.get("default_pricing_model")).get("val").toString():"");
+                            } else {
+                                priceingMethodTv.setText(((LinkedTreeMap) valueMap.get("default_pricing_model")).get("val") != null ? ((LinkedTreeMap) valueMap.get("default_pricing_model")).get("val").toString() : "");
                             }
                             LinkedHashMap weightRoundingMap = (LinkedHashMap) SPUtils.readObject(SystemSettingsActivity.this, KEY_WEIGHT_ROUNDING);
                             if (weightRoundingMap != null) {
@@ -474,11 +484,11 @@ public class SystemSettingsActivity extends BaseActivity {
                                 Long valueDate = ((Double) ((LinkedTreeMap) valueMap.get("rounding_weight")).get("update_time")).longValue();
                                 if (loginDate.compareTo(valueDate) > 0) {
                                     weightRoundingTv.setText((weightRoundingMap.get("val")).toString());
-                                }else {
+                                } else {
                                     weightRoundingTv.setText(((LinkedTreeMap) valueMap.get("rounding_weight")).get("val").toString());
                                 }
-                            }else {
-                                weightRoundingTv.setText(((LinkedTreeMap) valueMap.get("rounding_weight")).get("val")!=null?((LinkedTreeMap) valueMap.get("rounding_weight")).get("val").toString():"");
+                            } else {
+                                weightRoundingTv.setText(((LinkedTreeMap) valueMap.get("rounding_weight")).get("val") != null ? ((LinkedTreeMap) valueMap.get("rounding_weight")).get("val").toString() : "");
                             }
                             LinkedHashMap sellerNumberMap = (LinkedHashMap) SPUtils.readObject(SystemSettingsActivity.this, KEY_SELLER_NUMBER);
                             if (sellerNumberMap != null) {
@@ -486,11 +496,11 @@ public class SystemSettingsActivity extends BaseActivity {
                                 Long valueDate = ((Double) ((LinkedTreeMap) valueMap.get("default_seller_number")).get("update_time")).longValue();
                                 if (loginDate.compareTo(valueDate) > 0) {
                                     sellerNumberTv.setText((sellerNumberMap.get("val")).toString());
-                                }else {
+                                } else {
                                     sellerNumberTv.setText(((LinkedTreeMap) valueMap.get("default_seller_number")).get("val").toString());
                                 }
-                            }else {
-                                sellerNumberTv.setText(((LinkedTreeMap) valueMap.get("default_seller_number")).get("val")!=null?((LinkedTreeMap) valueMap.get("default_seller_number")).get("val").toString():"");
+                            } else {
+                                sellerNumberTv.setText(((LinkedTreeMap) valueMap.get("default_seller_number")).get("val") != null ? ((LinkedTreeMap) valueMap.get("default_seller_number")).get("val").toString() : "");
                             }
                             LinkedHashMap weightUnitMap = (LinkedHashMap) SPUtils.readObject(SystemSettingsActivity.this, KEY_WEIGHT_UNIT);
                             if (weightUnitMap != null) {
@@ -498,11 +508,11 @@ public class SystemSettingsActivity extends BaseActivity {
                                 Long valueDate = ((Double) ((LinkedTreeMap) valueMap.get("screen_unit_display")).get("update_time")).longValue();
                                 if (loginDate.compareTo(valueDate) > 0) {
                                     weightUnitTv.setText((weightUnitMap.get("val")).toString());
-                                }else {
+                                } else {
                                     weightUnitTv.setText(((LinkedTreeMap) valueMap.get("screen_unit_display")).get("val").toString());
                                 }
-                            }else {
-                                weightUnitTv.setText(((LinkedTreeMap) valueMap.get("screen_unit_display")).get("val")!=null?((LinkedTreeMap) valueMap.get("screen_unit_display")).get("val").toString():"");
+                            } else {
+                                weightUnitTv.setText(((LinkedTreeMap) valueMap.get("screen_unit_display")).get("val") != null ? ((LinkedTreeMap) valueMap.get("screen_unit_display")).get("val").toString() : "");
                             }
                             LinkedHashMap notClearPriceMap = (LinkedHashMap) SPUtils.readObject(SystemSettingsActivity.this, KEY_NOT_CLEAR);
                             if (notClearPriceMap != null) {
@@ -510,10 +520,10 @@ public class SystemSettingsActivity extends BaseActivity {
                                 Long valueDate = ((Double) ((LinkedTreeMap) valueMap.get("price_after_saving")).get("update_time")).longValue();
                                 if (loginDate.compareTo(valueDate) > 0) {
                                     notClearPriceCtv.setChecked((Boolean) notClearPriceMap.get("val"));
-                                }else {
+                                } else {
                                     notClearPriceCtv.setChecked((Boolean) ((LinkedTreeMap) valueMap.get("price_after_saving")).get("val"));
                                 }
-                            }else {
+                            } else {
                                 notClearPriceCtv.setChecked((Boolean) ((LinkedTreeMap) valueMap.get("price_after_saving")).get("val"));
                             }
 
@@ -523,10 +533,10 @@ public class SystemSettingsActivity extends BaseActivity {
                                 Long valueDate = ((Double) ((LinkedTreeMap) valueMap.get("confirm_the_preservation")).get("update_time")).longValue();
                                 if (loginDate.compareTo(valueDate) > 0) {
                                     saveWeightCtv.setChecked((Boolean) saveWeightMap.get("val"));
-                                }else {
+                                } else {
                                     saveWeightCtv.setChecked((Boolean) ((LinkedTreeMap) valueMap.get("confirm_the_preservation")).get("val"));
                                 }
-                            }else {
+                            } else {
                                 saveWeightCtv.setChecked((Boolean) ((LinkedTreeMap) valueMap.get("confirm_the_preservation")).get("val"));
                             }
                             LinkedHashMap autoObtainMap = (LinkedHashMap) SPUtils.readObject(SystemSettingsActivity.this, KEY_AUTO_OBTAIN);
@@ -535,10 +545,10 @@ public class SystemSettingsActivity extends BaseActivity {
                                 Long valueDate = ((Double) ((LinkedTreeMap) valueMap.get("buyers_and_sellers_by_default")).get("update_time")).longValue();
                                 if (loginDate.compareTo(valueDate) > 0) {
                                     autoObtainCtv.setChecked((Boolean) autoObtainMap.get("val"));
-                                }else {
+                                } else {
                                     autoObtainCtv.setChecked((Boolean) ((LinkedTreeMap) valueMap.get("buyers_and_sellers_by_default")).get("val"));
                                 }
-                            }else {
+                            } else {
                                 autoObtainCtv.setChecked((Boolean) ((LinkedTreeMap) valueMap.get("buyers_and_sellers_by_default")).get("val"));
                             }
                             LinkedHashMap cashEttlementMap = (LinkedHashMap) SPUtils.readObject(SystemSettingsActivity.this, KEY_CASH_SETTLEMENT);
@@ -547,10 +557,10 @@ public class SystemSettingsActivity extends BaseActivity {
                                 Long valueDate = ((Double) ((LinkedTreeMap) valueMap.get("online_settlement")).get("update_time")).longValue();
                                 if (loginDate.compareTo(valueDate) > 0) {
                                     cashEttlementCtv.setChecked((Boolean) cashEttlementMap.get("val"));
-                                }else {
+                                } else {
                                     cashEttlementCtv.setChecked((Boolean) ((LinkedTreeMap) valueMap.get("online_settlement")).get("val"));
                                 }
-                            }else {
+                            } else {
                                 cashEttlementCtv.setChecked((Boolean) ((LinkedTreeMap) valueMap.get("online_settlement")).get("val"));
                             }
                             LinkedHashMap distinguishMap = (LinkedHashMap) SPUtils.readObject(SystemSettingsActivity.this, KEY_DISTINGUISH);
@@ -559,10 +569,10 @@ public class SystemSettingsActivity extends BaseActivity {
                                 Long valueDate = ((Double) ((LinkedTreeMap) valueMap.get("buyers_and_sellers_after_weighing")).get("update_time")).longValue();
                                 if (loginDate.compareTo(valueDate) > 0) {
                                     distinguishCtv.setChecked((Boolean) distinguishMap.get("val"));
-                                }else {
+                                } else {
                                     distinguishCtv.setChecked((Boolean) ((LinkedTreeMap) valueMap.get("buyers_and_sellers_after_weighing")).get("val"));
                                 }
-                            }else {
+                            } else {
                                 distinguishCtv.setChecked((Boolean) ((LinkedTreeMap) valueMap.get("buyers_and_sellers_after_weighing")).get("val"));
                             }
                             LinkedHashMap icCardSettlementMap = (LinkedHashMap) SPUtils.readObject(SystemSettingsActivity.this, KEY_ICCARD_SETTLEMENT);
@@ -571,10 +581,10 @@ public class SystemSettingsActivity extends BaseActivity {
                                 Long valueDate = ((Double) ((LinkedTreeMap) valueMap.get("card_settlement")).get("update_time")).longValue();
                                 if (loginDate.compareTo(valueDate) > 0) {
                                     icCardSettlementCtv.setChecked((Boolean) icCardSettlementMap.get("val"));
-                                }else {
+                                } else {
                                     icCardSettlementCtv.setChecked((Boolean) ((LinkedTreeMap) valueMap.get("card_settlement")).get("val"));
                                 }
-                            }else {
+                            } else {
                                 icCardSettlementCtv.setChecked((Boolean) ((LinkedTreeMap) valueMap.get("card_settlement")).get("val"));
                             }
                             LinkedHashMap stopPrintMap = (LinkedHashMap) SPUtils.readObject(SystemSettingsActivity.this, KEY_STOP_PRINT);
@@ -583,10 +593,10 @@ public class SystemSettingsActivity extends BaseActivity {
                                 Long valueDate = ((Double) ((LinkedTreeMap) valueMap.get("disable_printing")).get("update_time")).longValue();
                                 if (loginDate.compareTo(valueDate) > 0) {
                                     stopPrintCtv.setChecked((Boolean) stopPrintMap.get("val"));
-                                }else {
+                                } else {
                                     stopPrintCtv.setChecked((Boolean) ((LinkedTreeMap) valueMap.get("disable_printing")).get("val"));
                                 }
-                            }else {
+                            } else {
                                 stopPrintCtv.setChecked((Boolean) ((LinkedTreeMap) valueMap.get("disable_printing")).get("val"));
                             }
                             LinkedHashMap noPatchSettlementMap = (LinkedHashMap) SPUtils.readObject(SystemSettingsActivity.this, KEY_NO_PATCH_SETTLEMENT);
@@ -595,10 +605,10 @@ public class SystemSettingsActivity extends BaseActivity {
                                 Long valueDate = ((Double) ((LinkedTreeMap) valueMap.get("allow_batchless_settlement")).get("update_time")).longValue();
                                 if (loginDate.compareTo(valueDate) > 0) {
                                     noPatchSettlementCtv.setChecked((Boolean) noPatchSettlementMap.get("val"));
-                                }else {
+                                } else {
                                     noPatchSettlementCtv.setChecked((Boolean) ((LinkedTreeMap) valueMap.get("allow_batchless_settlement")).get("val"));
                                 }
-                            }else {
+                            } else {
                                 noPatchSettlementCtv.setChecked((Boolean) ((LinkedTreeMap) valueMap.get("allow_batchless_settlement")).get("val"));
                             }
                             LinkedHashMap autoPrevMap = (LinkedHashMap) SPUtils.readObject(SystemSettingsActivity.this, KEY_AUTO_PREV);
@@ -607,10 +617,10 @@ public class SystemSettingsActivity extends BaseActivity {
                                 Long valueDate = ((Double) ((LinkedTreeMap) valueMap.get("take_a_unit_price")).get("update_time")).longValue();
                                 if (loginDate.compareTo(valueDate) > 0) {
                                     autoPrevCtv.setChecked((Boolean) autoPrevMap.get("val"));
-                                }else {
+                                } else {
                                     autoPrevCtv.setChecked((Boolean) ((LinkedTreeMap) valueMap.get("take_a_unit_price")).get("val"));
                                 }
-                            }else {
+                            } else {
                                 autoPrevCtv.setChecked((Boolean) ((LinkedTreeMap) valueMap.get("take_a_unit_price")).get("val"));
                             }
                             LinkedHashMap cashRoundingMap = (LinkedHashMap) SPUtils.readObject(SystemSettingsActivity.this, KEY_CASH_ROUNDING);
@@ -619,10 +629,10 @@ public class SystemSettingsActivity extends BaseActivity {
                                 Long valueDate = ((Double) ((LinkedTreeMap) valueMap.get("cash_change_rounding")).get("update_time")).longValue();
                                 if (loginDate.compareTo(valueDate) > 0) {
                                     cashRoundingCtv.setChecked((Boolean) cashRoundingMap.get("val"));
-                                }else {
+                                } else {
                                     cashRoundingCtv.setChecked((Boolean) ((LinkedTreeMap) valueMap.get("cash_change_rounding")).get("val"));
                                 }
-                            }else {
+                            } else {
                                 cashRoundingCtv.setChecked((Boolean) ((LinkedTreeMap) valueMap.get("cash_change_rounding")).get("val"));
                             }
                             LinkedHashMap stopCashMap = (LinkedHashMap) SPUtils.readObject(SystemSettingsActivity.this, KEY_STOP_CASH);
@@ -631,10 +641,10 @@ public class SystemSettingsActivity extends BaseActivity {
                                 Long valueDate = ((Double) ((LinkedTreeMap) valueMap.get("disable_cash_mode")).get("update_time")).longValue();
                                 if (loginDate.compareTo(valueDate) > 0) {
                                     stopCashCtv.setChecked((Boolean) stopCashMap.get("val"));
-                                }else {
+                                } else {
                                     stopCashCtv.setChecked((Boolean) ((LinkedTreeMap) valueMap.get("disable_cash_mode")).get("val"));
                                 }
-                            }else {
+                            } else {
                                 stopCashCtv.setChecked((Boolean) ((LinkedTreeMap) valueMap.get("disable_cash_mode")).get("val"));
                             }
 

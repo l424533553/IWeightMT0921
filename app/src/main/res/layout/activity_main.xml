@@ -239,6 +239,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="0.00"
+                    android:textStyle="bold"
                     android:textColor="@color/red_000"
                     android:textSize="20sp" />
 
@@ -455,6 +456,7 @@
                 android:layout_weight="1" />
 
             <TextView
+                android:id="@+id/tv_login_type_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/string_operator"
@@ -530,7 +532,7 @@
                 android:layout_width="0dp"
                 android:layout_height="70dp"
                 android:layout_weight="1"
-              android:background="@drawable/selector_btn_click"
+                android:background="@drawable/selector_btn_click"
                 android:text="@string/string_settings"
                 android:textColor="@color/black"
                 android:textSize="30sp"
@@ -539,7 +541,7 @@
             <Button
                 android:id="@+id/main_clear_btn"
                 android:layout_width="0dp"
-                android:layout_height="75dp"
+                android:layout_height="70dp"
                 android:layout_marginLeft="2dp"
                 android:layout_marginRight="1dp"
                 android:layout_weight="1"
@@ -550,16 +552,38 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <Button
-            android:id="@+id/main_cash_btn"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="75dp"
-            android:layout_marginTop="2dp"
-            android:background="@drawable/selector_btn_carsh_click"
-            android:text="@string/string_settlement"
-            android:textColor="@color/black"
-            android:textSize="30sp"
-            android:textStyle="bold" />
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/main_cash_btn"
+                android:layout_width="0dp"
+                android:layout_height="75dp"
+                android:layout_marginTop="2dp"
+                android:layout_weight="1"
+                android:background="@drawable/selector_btn_carsh_click"
+                android:text="@string/string_pay_cash"
+                android:textColor="@color/black"
+                android:textSize="30sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/main_scan_pay"
+                android:layout_width="0dp"
+                android:layout_height="75dp"
+                android:layout_marginTop="2dp"
+                android:layout_weight="1"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="1dp"
+                android:background="@drawable/selector_btn_carsh_click"
+                android:text="@string/string_scan_pay"
+                android:textColor="@color/black"
+                android:textSize="30sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>

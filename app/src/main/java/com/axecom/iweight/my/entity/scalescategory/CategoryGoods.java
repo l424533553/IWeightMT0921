@@ -1,5 +1,6 @@
 package com.axecom.iweight.my.entity.scalescategory;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -8,13 +9,13 @@ import java.util.List;
  * email:424533553@qq.com
  * describe:
  */
-public class CategoryGoods {
+public class CategoryGoods implements Serializable {
 
     public int id;
     public String name;
     public List<child> child;
 
-    public class child {
+    public class child implements Serializable {
         public int id;
         public String name;
         public int cid;

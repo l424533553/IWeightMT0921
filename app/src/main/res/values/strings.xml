@@ -8,7 +8,7 @@
     <string name="string_previous_month">上一月</string>
     <string name="string_next_month">下一月</string>
     <string name="string_delete">删除</string>
-    <string name="string_login_txt">登&#160;陆</string>
+    <string name="string_login_txt">登&#160;录</string>
     <string name="string_home_txt1">高效</string>
     <string name="string_home_txt2">便捷</string>
     <string name="string_home_txt3">优质</string>
@@ -19,7 +19,8 @@
     <string name="string_confirm">确&#160;认</string>
     <string name="string_cancel">取&#160;消</string>
     <string name="string_settings">设置</string>
-    <string name="string_settlement">结算</string>
+    <string name="string_pay_cash">现金</string>
+    <string name="string_scan_pay">扫码</string>
     <string name="string_clear">置&#160;零</string>
     <string name="string_bank_card">银行卡</string>
     <string name="string_cash">现&#160;金</string>
@@ -30,7 +31,7 @@
     <string name="string_clear_txt">清除</string>
     <string name="string_useing_card">刷卡结算中...</string>
     <string name="string_cancel_txt">取&#160;&#160;&#160;消</string>
-    <string name="string_cash_dialog_title">现金收银</string>
+    <string name="string_cash_dialog_title">收银</string>
     <string name="string_total_cash">总货款：</string>
     <string name="string_rmb_txt">元</string>
     <string name="string_rounding_txt">取舍：</string>
@@ -84,4 +85,7 @@
     <string name="str_printer_error">打印机出错</string>
     <string name="str_state">状态：</string>
     <string name="kilogram">kg</string>
+    <string name="Administrators_pwd">88888888</string>
+    <string name="string_login_out">退出登录</string>
+    <string name="string_login_auto_txt">自动登录</string>
 </resources>

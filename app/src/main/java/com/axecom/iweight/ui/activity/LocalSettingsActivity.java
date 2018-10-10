@@ -9,7 +9,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.axecom.iweight.R;
 import com.axecom.iweight.base.BaseActivity;
@@ -25,6 +27,7 @@ import com.axecom.iweight.ui.view.ChooseDialog;
 import com.axecom.iweight.ui.view.ChooseDialog2;
 import com.axecom.iweight.ui.view.SoftKeyborad;
 import com.axecom.iweight.utils.LogUtils;
+import com.axecom.iweight.utils.NetworkUtil;
 import com.axecom.iweight.utils.SPUtils;
 import com.google.gson.internal.LinkedTreeMap;
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
@@ -38,6 +41,8 @@ import java.util.List;
 
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
+
+import static com.axecom.iweight.ui.activity.SettingsActivity.IS_RE_BOOT;
 
 public class LocalSettingsActivity extends BaseActivity {
 
@@ -53,7 +58,8 @@ public class LocalSettingsActivity extends BaseActivity {
     private View rootView;
 
     private Button weightPortBtn, printerPortBtn, ledPortBtn, readCardPortBtn, readCardTypeBtn, saveBtn, backBtn;
-    private TextView weightPortTv, printerPortTv, printerCountTv, transactionDataTv, baudRateTv, serverIPTv, dataDaysTv, sleepTimeTv, serverPortTv;
+    private TextView weightPortTv, printerPortTv, printerCountTv, transactionDataTv, baudRateTv, dataDaysTv, sleepTimeTv, serverPortTv;
+    EditText serverIPTv;
     private TextView weightPortChooseTv, printerPortChooseTv, ledPortChooseTv, readCardPortChooseTv, readCardTypeChooseTv;
 
     private List<LocalSettingsBean.CardReaderTypeList> cardReaderTypeList;
@@ -136,6 +142,12 @@ public class LocalSettingsActivity extends BaseActivity {
 //            bean.setChooseItem("测试数据 " + i);
 //            list.add(bean);
 //        }
+        showLocalIp();
+    }
+
+    private void showLocalIp() {
+        serverIPTv.setText(SPUtils.getString(this,KEY_SERVER_IP,""));
+        serverPortTv.setText(SPUtils.getString(this,KEY_SVERVER_PORT,""));
     }
 
     public void getUsbDevices() {
@@ -166,6 +178,9 @@ public class LocalSettingsActivity extends BaseActivity {
     }
 
     public void getScalesSettingData() {
+        if (!NetworkUtil.isConnected(LocalSettingsActivity.this)) {
+            return;
+        }
         RetrofitFactory.getInstance().API()
                 .getScalesSettingData(AccountManager.getInstance().getAdminToken(), MacManager.getInstace(this).getMac())
                 .compose(this.<BaseEntity<LocalSettingsBean>>setThread())
@@ -177,6 +192,7 @@ public class LocalSettingsActivity extends BaseActivity {
 
                     @Override
                     public void onNext(BaseEntity<LocalSettingsBean> localSettingsBeanBaseEntity) {
+
                         if (localSettingsBeanBaseEntity.isSuccess()) {
                             Long saveDate = (Long) SPUtils.get(LocalSettingsActivity.this, "currentDate", null);
                             if (saveDate != null) {
@@ -265,7 +281,7 @@ public class LocalSettingsActivity extends BaseActivity {
                             }
 
                             LocalSettingsBean.Value.ServerIp serverIp = (LocalSettingsBean.Value.ServerIp) SPUtils.readObject(LocalSettingsActivity.this, KEY_SERVER_IP);
-                            if (serverIp != null) {
+                            /*if (serverIp != null) {
                                 Long loginDate = Long.parseLong(serverIp.update_time);
                                 Long valueDate = Long.parseLong(valueMap.server_ip.update_time);
                                 if (loginDate.compareTo(valueDate) > 0) {
@@ -275,9 +291,9 @@ public class LocalSettingsActivity extends BaseActivity {
                                 }
                             } else {
                                 serverIPTv.setText(valueMap.server_ip.val);
-                            }
+                            }*/
                             LocalSettingsBean.Value.ServerPort serverPort = (LocalSettingsBean.Value.ServerPort) SPUtils.readObject(LocalSettingsActivity.this, KEY_SVERVER_PORT);
-                            if (serverPort != null) {
+                            /*if (serverPort != null) {
                                 Long loginDate = Long.parseLong(serverPort.update_time);
                                 Long valueDate = Long.parseLong(valueMap.server_port.update_time);
                                 if (loginDate.compareTo(valueDate) > 0) {
@@ -287,7 +303,7 @@ public class LocalSettingsActivity extends BaseActivity {
                                 }
                             } else {
                                 serverPortTv.setText(valueMap.server_port.val);
-                            }
+                            }*/
 
                             weightPortChooseTv.setText(((LocalSettingsBean.WeightPort) localSettingsBeanBaseEntity.getData().weight_port.get(0)).val);
 
@@ -318,9 +334,18 @@ public class LocalSettingsActivity extends BaseActivity {
 
 
     public void saveSettingsToSP() {
-        if (valueMap == null)
-            return;
 
+        String ip = serverIPTv.getText().toString();
+        SPUtils.putString(this, KEY_SERVER_IP, ip);
+
+        String port = serverPortTv.getText().toString();
+        SPUtils.putString(this, KEY_SVERVER_PORT, port);
+
+        Toast.makeText(this, "保存服务器地址成功", Toast.LENGTH_SHORT).show();
+        if (valueMap == null){
+            resetIp();
+            return;
+        }
         if (!TextUtils.isEmpty(printerPortChooseTv.getText())) {
             valueMap.printer_port.update_time = System.currentTimeMillis() + "";
             valueMap.printer_port.val = printerPortChooseTv.getText().toString();
@@ -358,6 +383,15 @@ public class LocalSettingsActivity extends BaseActivity {
         Settings.System.putInt(getContentResolver(), android.provider.Settings.System.SCREEN_OFF_TIMEOUT, 60 * 1000 * Integer.parseInt(sleepTimeTv.getText().toString()));
         EventBus.getDefault().post(new BusEvent(BusEvent.SAVE_LOCAL_SUCCESS, true));
         showLoading("保存成功");
+    }
+
+    private void resetIp() {
+        RetrofitFactory.reSetServiceIp();
+        EventBus.getDefault().post(new BusEvent(BusEvent.GO_HOME_PAGE, true));
+        Intent intent = new Intent();
+        intent.setClass(this, HomeActivity.class);
+        intent.putExtra(IS_RE_BOOT, true);
+        startActivity(intent);
     }
 
     @Override
@@ -479,12 +513,12 @@ public class LocalSettingsActivity extends BaseActivity {
                 }).show();
                 break;
             case R.id.local_settings_server_ip_tv:
-                softBuilder.create(new SoftKeyborad.OnConfirmedListener() {
+               /* softBuilder.create(new SoftKeyborad.OnConfirmedListener() {
                     @Override
                     public void onConfirmed(String result) {
                         serverIPTv.setText(result);
                     }
-                }).show();
+                }).show();*/
                 break;
             case R.id.local_settings_data_days_tv:
                 softBuilder.create(new SoftKeyborad.OnConfirmedListener() {

@@ -51,8 +51,10 @@
                     android:id="@+id/commodity_management_search_et"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:textSize="25sp"
+                    android:padding="2dp"
+                    android:textSize="20sp"
                     android:paddingLeft="5dp"
+                    android:hint="  菜品名搜索"
                     android:background="@drawable/shape_white_btn_bg" />
 
                 <HorizontalScrollView
@@ -70,9 +72,9 @@
 
                         <TextView
                             android:id="@+id/commodity_management_class_titlte_all_tv"
-                            android:layout_width="100dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="match_parent"
-                            android:layout_weight="1"
+                            android:layout_marginLeft="10dp"
                             android:gravity="center"
                             android:text="全部"
                             android:tag="-1"

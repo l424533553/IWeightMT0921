@@ -33,6 +33,7 @@ import com.axecom.iweight.manager.BannerService;
 import com.axecom.iweight.net.RetrofitFactory;
 import com.axecom.iweight.ui.activity.HomeActivity;
 import com.axecom.iweight.ui.activity.MainActivity;
+import com.axecom.iweight.ui.uiutils.UIUtils;
 import com.axecom.iweight.ui.uiutils.ViewUtils;
 import com.axecom.iweight.utils.LogUtils;
 import com.axecom.iweight.utils.SPUtils;
@@ -301,7 +302,7 @@ public abstract class BaseActivity extends Activity implements View.OnClickListe
     }
 
     public void showLoading(String titleText,String confirmText) {
-        SweetAlertDialog mSweetAlertDialog = new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE);
+        mSweetAlertDialog = new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE);
         mSweetAlertDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
         mSweetAlertDialog.setTitleText(titleText);
         mSweetAlertDialog.setConfirmText(confirmText);
@@ -309,7 +310,18 @@ public abstract class BaseActivity extends Activity implements View.OnClickListe
         mSweetAlertDialog.setCancelable(true);
         mSweetAlertDialog.show();
     }
-    public void showLoading(String titleText) {
+
+    public void showLoading(String titleText,String confirmText,long times) {
+        showLoading(titleText,confirmText);
+        UIUtils.getMainThreadHandler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                closeLoading();
+            }
+        }, times);
+    }
+
+        public void showLoading(String titleText) {
         SweetAlertDialog mSweetAlertDialog = new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE);
         mSweetAlertDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
         mSweetAlertDialog.setTitleText(titleText);
@@ -473,11 +485,11 @@ public abstract class BaseActivity extends Activity implements View.OnClickListe
     @Subscribe
     public void onEventMainThread(BusEvent event) {
         LogUtils.d("main", this.getClass().getSimpleName());
-        if (event.getType() == BusEvent.GO_HOME_CODE || event.getType() == BusEvent.LOGIN_SUCCESS) {
+       /* if (event.getType() == BusEvent.GO_HOME_CODE || event.getType() == BusEvent.LOGIN_SUCCESS) {
             if (!(this instanceof MainActivity)) {
                 finish();
             }
-        }
+        }*/
         if (event.getType() == BusEvent.GO_HOME_PAGE) {
             if (!(this instanceof HomeActivity)) {
                 finish();

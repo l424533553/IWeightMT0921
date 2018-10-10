@@ -233,7 +233,7 @@ public interface RequestInterface {
      * @return
      */
     @GET("getVersion")
-    Observable<BaseEntity<VersionBean>> getVersion();
+    Observable<BaseEntity<VersionBean>> getVersion(@Query("id") String id);
 
     /**
      * 获取订单支付情况
