@@ -21,18 +21,17 @@ import com.bigkoo.convenientbanner.ConvenientBanner;
 import com.bigkoo.convenientbanner.holder.CBViewHolderCreator;
 import com.bigkoo.convenientbanner.holder.Holder;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by Administrator on 2018/7/20.
  */
-
 public class BannerActivity extends Presentation {
 
     public ConvenientBanner convenientBanner;
     private Context context;
-
 
     public TextView bannerTotalPriceTv,tvPayWay;
     public ImageView bannerQRCode;
@@ -134,10 +133,9 @@ public class BannerActivity extends Presentation {
             holder.weightTv.setText(goods.getGoods_weight());
             holder.priceTv.setText(goods.getGoods_price());
             holder.subtotalTv.setText(goods.getGoods_amount());
-
             return convertView;
         }
-
+        // 数据 功能
         class ViewHolder {
             TextView nameTv;
             TextView priceTv;

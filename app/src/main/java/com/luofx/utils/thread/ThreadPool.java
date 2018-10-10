@@ -42,6 +42,10 @@ public class ThreadPool {
         threadPoolExecutor = new ThreadPoolExecutor(CORE_POOL_SIZE, MAX_POOL_COUNTS, ALIVETIME, TimeUnit.SECONDS, mWorkQueue, threadFactory);
     }
 
+    /**
+     * 数据
+     * @return  获得线程池
+     */
     public static ThreadPoolExecutor getInstantiation() {
         if (threadPoolExecutor == null) {
            new ThreadPool();
@@ -51,7 +55,7 @@ public class ThreadPool {
 
     /**
      * @param threadCount  固定的核心线程数
-     * @return
+     * @return  返回线程池
      */
     public static ThreadPoolExecutor getFixedThreadPool(int threadCount ) {
         if (threadPoolExecutor == null) {
@@ -69,10 +73,14 @@ public class ThreadPool {
         }
     }
 
+    /**
+     * 停止线程
+     */
     public void stopThreadPool() {
         if (threadPoolExecutor != null) {
             threadPoolExecutor.shutdown();
             threadPoolExecutor = null;
         }
     }
+
 }

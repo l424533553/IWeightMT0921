@@ -59,6 +59,7 @@ import com.luofx.listener.VolleyListener;
 import com.luofx.listener.VolleyStringListener;
 import com.luofx.utils.PreferenceUtils;
 import com.luofx.utils.log.MyLog;
+
 import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.raizlabs.android.dbflow.structure.ModelAdapter;
@@ -152,6 +153,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         etPrice.requestFocus();
         etPrice.addTextChangedListener(new MoneyTextWatcher(etPrice));
         countEt.addTextChangedListener(countTextWatcher);
+
         disableShowInput(etPrice);
         disableShowInput(countEt);
         getLoginInfo();
@@ -815,13 +817,13 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                 print.PrintString(sb.toString());
 
                 try {
-                    if(bytes!=null){
+                    if (bytes != null) {
                         print.PrintltString("扫一扫获取追溯信息：");
                         print.printQR(bytes);
                         print.PrintltString("--------------------------------\n\n\n");
                     }
 
-                } catch (IOException |InterruptedException e) {
+                } catch (IOException | InterruptedException e) {
                     e.printStackTrace();
                 }
                 orderInfo.setItems(itemsBeans);

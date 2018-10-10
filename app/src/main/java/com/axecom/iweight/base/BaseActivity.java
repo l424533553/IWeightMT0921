@@ -38,7 +38,6 @@ import com.axecom.iweight.utils.LogUtils;
 import com.axecom.iweight.utils.SPUtils;
 import com.bigkoo.convenientbanner.holder.Holder;
 import com.bumptech.glide.Glide;
-import com.hoho.android.usbserial.driver.UsbSerialDriver;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -503,6 +502,10 @@ public abstract class BaseActivity extends Activity implements View.OnClickListe
         }
     }
 
+    /**
+     * 
+     * @param list
+     */
     public void submitOrders(List<SubOrderReqBean> list) {
         RetrofitFactory.getInstance().API()
                 .submitOrders(list)
