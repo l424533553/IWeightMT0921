@@ -138,6 +138,7 @@ public class SystemSettingsActivity extends BaseActivity {
         icCardSettlementCtv.setOnClickListener(this);
 
 
+
         loginTypeTv.setOnClickListener(this);
 
         return rootView;
@@ -265,7 +266,7 @@ public class SystemSettingsActivity extends BaseActivity {
                 stopAlipayCtv.setChecked(!stopCashCtv.isChecked());
                 break;
             case R.id.system_settings_stop_weichatpay_ctv:
-                stopweichatpayCtv.setChecked(!stopCashCtv.isChecked());
+                stopweichatpayCtv.setChecked(!stopweichatpayCtv.isChecked());
                 break;
             case R.id.system_settings_back_btn:
                 finish();

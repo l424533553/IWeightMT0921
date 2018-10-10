@@ -45,6 +45,7 @@ import com.axecom.iweight.bean.SubOrderBean;
 import com.axecom.iweight.bean.SubOrderReqBean;
 import com.axecom.iweight.manager.AccountManager;
 import com.axecom.iweight.manager.MacManager;
+import com.axecom.iweight.manager.SystemSettingManager;
 import com.axecom.iweight.manager.ThreadPool;
 import com.axecom.iweight.manager.UpdateManager;
 import com.axecom.iweight.my.adapter.CommodityAdapter;
@@ -191,6 +192,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
 
         weightTopTv.setOnClickListener(this);
         UpdateManager.getNewVersion(this);
+        SystemSettingManager.getSettingData(this);
         return rootView;
     }
 
@@ -695,6 +697,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                         }
                     }).start();
                 } else {
+                    clear(1);
                     if (stopPrint) {
                         return;
                     }
@@ -711,8 +714,6 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                             priceTotalTv.getText().toString(),
                             (List<HotKeyBean>) SPUtils.readObject(MainActivity.this, "selectedGoodList"));
                 }
-
-                clear(1);
             }
             if (event.getType() == BusEvent.PRINTER_NO_BITMAP) {
                 String title = "支付成功";
