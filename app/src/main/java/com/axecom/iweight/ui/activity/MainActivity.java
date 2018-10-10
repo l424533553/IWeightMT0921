@@ -298,13 +298,6 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                 etPrice.setText("");
                 etPrice.setHint(selectedGoods.price);
 
-//                priceEt.setFocusable(true);
-//                priceEt.setFocusableInTouchMode(true);
-//                priceEt.setSelection(0);
-//                priceEt.requestFocus();
-//                Selection.selectAll(priceEt.getText());
-
-
                 float count = 0;
                 if (!TextUtils.isEmpty(countEt.getText())) {
                     count = Float.parseFloat(countEt.getText().toString());
