@@ -19,6 +19,7 @@
 
     <ImageView
         android:background="@drawable/circle_trade"
+        android:id="@+id/img_tag"
         android:layout_width="14dp"
         android:layout_height="14dp" />
 </FrameLayout>

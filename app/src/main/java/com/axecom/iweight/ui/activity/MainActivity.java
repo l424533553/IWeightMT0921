@@ -759,7 +759,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
             if (event.getType() == BusEvent.LOGIN_OUT) {
                 finish();
             }
-            if(event.getType()==BusEvent.BIND_SELLER){
+            if(event.getType()==BusEvent.notifiySellerInfo){
                 getLoginInfo();
                 getGoodsData();
             }

@@ -13,12 +13,7 @@ import com.axecom.iweight.R;
 import com.axecom.iweight.base.BaseActivity;
 import com.axecom.iweight.base.BaseEntity;
 import com.axecom.iweight.base.BusEvent;
-import com.axecom.iweight.bean.ChooseBean;
 import com.axecom.iweight.bean.FastLoginInfo;
-import com.axecom.iweight.bean.LoginData;
-import com.axecom.iweight.bean.ScalesCategoryGoods;
-import com.axecom.iweight.bean.SettingDataBean;
-import com.axecom.iweight.conf.Constants;
 import com.axecom.iweight.manager.AccountManager;
 import com.axecom.iweight.manager.MacManager;
 import com.axecom.iweight.net.RetrofitFactory;
@@ -36,12 +31,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
-import io.reactivex.ObservableTransformer;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
 
 public class SystemSettingsActivity extends BaseActivity {
 
@@ -431,12 +422,12 @@ public class SystemSettingsActivity extends BaseActivity {
                         boolean success = fastLoginInfo.isSuccess();
                         if (success) {
                             Toast.makeText(SystemSettingsActivity.this,"绑定卖家成功",Toast.LENGTH_SHORT).show();
-                            instance.saveTokenTemporary(fastLoginInfo.getData().getToken());
+                            instance.saveToken(fastLoginInfo.getData().getToken());
                         }else{
-                            instance.cleanToken();
+                            instance.saveToken(AccountManager.getInstance().getAdminToken());
                             Toast.makeText(SystemSettingsActivity.this,"绑定卖家失败",Toast.LENGTH_SHORT).show();
                         }
-                        EventBus.getDefault().post(new BusEvent(BusEvent.BIND_SELLER,success));
+                        EventBus.getDefault().post(new BusEvent(BusEvent.notifiySellerInfo,success));
                     }
 
                     @Override

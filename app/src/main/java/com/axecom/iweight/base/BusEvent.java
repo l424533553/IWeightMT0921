@@ -22,7 +22,7 @@ public class BusEvent {
     public static final int LOGIN_OUT = 14;
 
     public static final int POSITION_PATCH22 = 15;
-    public static final int BIND_SELLER = 16;
+    public static final int notifiySellerInfo = 16;
 
 
     //图片下载完成
