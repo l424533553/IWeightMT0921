@@ -6,6 +6,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
 import android.net.Uri;
+import android.text.TextUtils;
 
 import com.axecom.iweight.R;
 import com.axecom.iweight.ui.uiutils.UIUtils;
@@ -348,18 +349,11 @@ public class CommonUtils {
         context.startActivity(intent);
     }
 
-    public static String getCorrectUrl(String url) {
-        if (url.contains("!")) {
-            return url.substring(0, url.indexOf("!"));
-        } else {
-            return url;
+    public static float parseFloat(String s){
+        if(TextUtils.isEmpty(s)){
+            s = "0";
         }
-    }
-
-    public static String formatMoenyWidthCommaKrw(int money) {
-        NumberFormat nf = NumberFormat.getInstance();
-        String ss = nf.format(money);
-        return "₩" + ss;
+        return Float.parseFloat(s);
     }
 
 }

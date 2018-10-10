@@ -14,6 +14,7 @@ public class AccountManager {
     private static final String IS_SAVE_PWD = "is_save_pwd";
     private static AccountManager accountManager ;
     private String adminToken;
+    private String mToken;
 
     private static Context mCtx;
     private int userType;
@@ -37,8 +38,21 @@ public class AccountManager {
     }
 
     public String getToken() {
+        if(mToken!=null){
+            return mToken;
+        }
         return SPUtils.getString(mCtx, Constants.USER_TOKEN, null);
     }
+
+    public void saveTokenTemporary(String token){
+        mToken = token;
+    }
+
+    public void cleanToken(){
+        mToken = null;
+    }
+
+
 
     public void saveToken(String token){
         SPUtils.putString(mCtx, Constants.USER_TOKEN, token);

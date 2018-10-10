@@ -86,6 +86,7 @@ import java.util.Objects;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 
+import static com.axecom.iweight.utils.CommonUtils.parseFloat;
 import static com.shangtongyin.tools.serialport.IConstants_ST.MARKET_ID;
 import static com.shangtongyin.tools.serialport.IConstants_ST.NOTIFY_WEIGHT;
 import static com.shangtongyin.tools.serialport.IConstants_ST.SELLER;
@@ -132,6 +133,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
     private MyRun mRun;
     private boolean flag = true;
     private TextView loginTypeName;
+    private boolean mNotPushRemote;
 
     @SuppressLint("InflateParams")
     @Override
@@ -300,17 +302,17 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
 
                 float count = 0;
                 if (!TextUtils.isEmpty(countEt.getText())) {
-                    count = Float.parseFloat(countEt.getText().toString());
+                    count = parseFloat(countEt.getText().toString());
                 } else if (!TextUtils.isEmpty(countEt.getHint())) {
-                    count = Float.parseFloat(countEt.getHint().toString());
+                    count = parseFloat(countEt.getHint().toString());
                 }
                 if (switchSimpleOrComplex) {
-                    tvgrandTotal.setText(String.format("%.2f", Float.parseFloat(selectedGoods.price) * count));
+                    tvgrandTotal.setText(String.format("%.2f", parseFloat(selectedGoods.price) * count));
                 } else {
                     if (weightTopTv.getText().toString().indexOf('.') == -1 || weightTopTv.getText().length() - (weightTopTv.getText().toString().indexOf(".") + 1) <= 1) {
-                        tvgrandTotal.setText(String.format("%.2f", Float.parseFloat(selectedGoods.price) * Float.parseFloat(weightTopTv.getText().toString()) / 1000));
+                        tvgrandTotal.setText(String.format("%.2f", parseFloat(selectedGoods.price) * parseFloat(weightTopTv.getText().toString()) / 1000));
                     } else {
-                        tvgrandTotal.setText(String.format("%.2f", Float.parseFloat(selectedGoods.price) * Float.parseFloat(weightTopTv.getText().toString())));
+                        tvgrandTotal.setText(String.format("%.2f", parseFloat(selectedGoods.price) * parseFloat(weightTopTv.getText().toString())));
                     }
                 }
 
@@ -480,29 +482,29 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         try {
             float count = 0;
             if (!TextUtils.isEmpty(countEt.getText())) {
-                count = Float.parseFloat(countEt.getText().toString());
+                count = parseFloat(countEt.getText().toString());
             } else if (!TextUtils.isEmpty(countEt.getHint())) {
-                count = Float.parseFloat(countEt.getHint().toString());
+                count = parseFloat(countEt.getHint().toString());
             }
             if (switchSimpleOrComplex) {
                 if (!TextUtils.isEmpty(etPrice.getText())) {
-                    tvgrandTotal.setText(String.format("%.2f", Float.parseFloat(etPrice.getText().toString()) * count));
+                    tvgrandTotal.setText(String.format("%.2f", parseFloat(etPrice.getText().toString()) * count));
                 } else if (!TextUtils.isEmpty(etPrice.getHint())) {
-                    tvgrandTotal.setText(String.format("%.2f", Float.parseFloat(etPrice.getHint().toString()) * count));
+                    tvgrandTotal.setText(String.format("%.2f", parseFloat(etPrice.getHint().toString()) * count));
                 }
 
             } else {
                 if (!TextUtils.isEmpty(etPrice.getText())) {
                     if (weightTopTv.getText().toString().indexOf('.') == -1 || weightTopTv.getText().length() - (weightTopTv.getText().toString().indexOf(".") + 1) <= 1) {
-                        tvgrandTotal.setText(String.format("%.2f", Float.parseFloat(etPrice.getText().toString()) * Float.parseFloat(weightTopTv.getText().toString()) / 1000));
+                        tvgrandTotal.setText(String.format("%.2f", parseFloat(etPrice.getText().toString()) * parseFloat(weightTopTv.getText().toString()) / 1000));
                     } else {
-                        tvgrandTotal.setText(String.format("%.2f", Float.parseFloat(etPrice.getText().toString()) * Float.parseFloat(weightTopTv.getText().toString())));
+                        tvgrandTotal.setText(String.format("%.2f", parseFloat(etPrice.getText().toString()) * parseFloat(weightTopTv.getText().toString())));
                     }
                 } else if (!TextUtils.isEmpty(etPrice.getHint())) {
                     if (weightTopTv.getText().toString().indexOf('.') == -1 || weightTopTv.getText().length() - (weightTopTv.getText().toString().indexOf(".") + 1) <= 1) {
-                        tvgrandTotal.setText(String.format("%.2f", Float.parseFloat(etPrice.getHint().toString()) * Float.parseFloat(weightTopTv.getText().toString()) / 1000));
+                        tvgrandTotal.setText(String.format("%.2f", parseFloat(etPrice.getHint().toString()) * parseFloat(weightTopTv.getText().toString()) / 1000));
                     } else {
-                        tvgrandTotal.setText(String.format("%.2f", Float.parseFloat(etPrice.getHint().toString()) * Float.parseFloat(weightTopTv.getText().toString())));
+                        tvgrandTotal.setText(String.format("%.2f", parseFloat(etPrice.getHint().toString()) * parseFloat(weightTopTv.getText().toString())));
                     }
                 }
             }
@@ -533,7 +535,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                 if (!ButtonUtils.isFastDoubleClick(R.id.main_cash_btn)) {
                     //结算时带上当前称重的记录
                     accumulative(true);
-                    if (Float.parseFloat(priceTotalTv.getText().toString()) > 0 || Float.parseFloat(tvgrandTotal.getText().toString()) > 0) {
+                    if (parseFloat(priceTotalTv.getText().toString()) > 0 || parseFloat(tvgrandTotal.getText().toString()) > 0) {
                         showDialog(v, true);
                     }
                 }
@@ -542,7 +544,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                 if (!ButtonUtils.isFastDoubleClick(R.id.main_scan_pay)) {
                     //结算时带上当前称重的记录
                     accumulative(true);
-                    if (Float.parseFloat(priceTotalTv.getText().toString()) > 0 || Float.parseFloat(tvgrandTotal.getText().toString()) > 0) {
+                    if (parseFloat(priceTotalTv.getText().toString()) > 0 || parseFloat(tvgrandTotal.getText().toString()) > 0) {
                         showDialog(v, false);
                     }
                 }
@@ -568,7 +570,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
 
     private void displayToBanner(SubOrderReqBean orderBean) {
         banner.bannerOrderLayout.setVisibility(View.VISIBLE);
-        banner.bannerTotalPriceTv.setText(getString(R.string.string_amount_txt3, Float.parseFloat(orderBean.getTotal_amount())));
+        banner.bannerTotalPriceTv.setText(getString(R.string.string_amount_txt3, parseFloat(orderBean.getTotal_amount())));
         banner.tvPayWay.setText("支付方式：现金支付");
         banner.bannerQRCode.setImageDrawable(this.getResources().getDrawable(R.drawable.logo));
         banner.goodsList.clear();
@@ -588,7 +590,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         if (TextUtils.isEmpty(etPrice.getText()) && TextUtils.isEmpty(etPrice.getHint().toString())) {
             return;
         }
-        if (Float.parseFloat(tvgrandTotal.getText().toString()) <= 0) {
+        if (parseFloat(tvgrandTotal.getText().toString()) <= 0) {
             return;
         }
         HotKeyBean selectedGoods = new HotKeyBean();
@@ -622,8 +624,8 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         for (int i = 0; i < seledtedGoodsList.size(); i++) {
             HotKeyBean goods = seledtedGoodsList.get(i);
             if (!TextUtils.isEmpty(goods.price)) {
-                weightTotalF += Float.parseFloat(goods.weight);
-                priceTotal += Float.parseFloat(goods.grandTotal);
+                weightTotalF += parseFloat(goods.weight);
+                priceTotal += parseFloat(goods.grandTotal);
             }
         }
 
@@ -756,6 +758,10 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
 
             if (event.getType() == BusEvent.LOGIN_OUT) {
                 finish();
+            }
+            if(event.getType()==BusEvent.BIND_SELLER){
+                getLoginInfo();
+                getGoodsData();
             }
         }
     }
@@ -1095,7 +1101,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
 //                            Glide.with(MainActivity.this).load(subOrderBeanBaseEntity.getData().getCode_img_url()).into(qrCodeIv);
 
                             banner.bannerOrderLayout.setVisibility(View.VISIBLE);
-                            banner.bannerTotalPriceTv.setText(getString(R.string.string_amount_txt3, Float.parseFloat(subOrderReqBean.getTotal_amount())));
+                            banner.bannerTotalPriceTv.setText(getString(R.string.string_amount_txt3, parseFloat(subOrderReqBean.getTotal_amount())));
 //                            imageLoader.displayImage(subOrderBeanBaseEntity.getData().getCode_img_url(), banner.bannerQRCode, options);
 
                             switch (subOrderReqBean.getPayment_id()) {
@@ -1180,17 +1186,19 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
     }
 
     public void getGoodsData() {
-        boolean notPushRemote = (boolean) SPUtils.get(this, CommodityManagementActivity.SelectedGoodsState.NOT_PUSH_REMOTE, false);
+        mNotPushRemote = (boolean) SPUtils.get(this, CommodityManagementActivity.SelectedGoodsState.NOT_PUSH_REMOTE, false);
         List<HotKeyBean> hotKeyGoods = (List<HotKeyBean>) FileUtils.readObject(MainActivity.this, CommodityManagementActivity.SelectedGoodsState.selectedGoods);
-
-        if (notPushRemote && NetworkUtil.isConnected(MainActivity.this)) {
+        boolean connected = NetworkUtil.isConnected(MainActivity.this);
+        showSelectedGoods(hotKeyGoods);
+        if(!connected)return;
+        if (mNotPushRemote) {
             requestPushStoreGoods(hotKeyGoods);
+        } else {
+            requestGoodsData();
         }
+    }
 
-        if (hotKeyGoods != null && !hotKeyGoods.isEmpty()) {
-            showSelectedGoods(hotKeyGoods);
-            return;
-        }
+    private void requestGoodsData() {
         RetrofitFactory.getInstance().API()
                 .getGoodsData(AccountManager.getInstance().getToken(), MacManager.getInstace(this).getMac())
                 .compose(this.<BaseEntity<ScalesCategoryGoods>>setThread())
@@ -1224,6 +1232,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
     }
 
     private void showSelectedGoods(List<HotKeyBean> hotKeyGoods) {
+        if(hotKeyGoods==null)return;
         HotKeyBeanList.clear();
         HotKeyBeanList.addAll(hotKeyGoods);
         HotKeyBean hotKey = new HotKeyBean();
@@ -1238,12 +1247,17 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
             hotKey.price = goods.price;
             hotKey.traceable_code = goods.traceable_code;
             hotKey.weight = goods.weight;
+            hotKey.batch_code = goods.batch_code;
             modelAdapter.insert(hotKey);
         }
         goodMenuAdapter.notifyDataSetChanged();
     }
 
     public void requestPushStoreGoods(List<HotKeyBean> hotKeyGoods) {
+        if (hotKeyGoods==null){
+            requestGoodsData();
+            return;
+        }
         SaveGoodsReqBean goodsReqBean = new SaveGoodsReqBean();
         List<SaveGoodsReqBean.Goods> goodsList = new ArrayList<>();
         SaveGoodsReqBean.Goods good;
@@ -1271,16 +1285,14 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
 
                     @Override
                     public void onNext(BaseEntity baseEntity) {
-                        if (baseEntity.isSuccess()) {
+                        if(mNotPushRemote&&baseEntity.isSuccess()){
                             SPUtils.put(MainActivity.this, CommodityManagementActivity.SelectedGoodsState.NOT_PUSH_REMOTE, false);
-                        } else {
-                            SPUtils.put(MainActivity.this, CommodityManagementActivity.SelectedGoodsState.NOT_PUSH_REMOTE, true);
                         }
+                        requestGoodsData();
                     }
 
                     @Override
                     public void onError(Throwable e) {
-
                     }
 
                     @Override

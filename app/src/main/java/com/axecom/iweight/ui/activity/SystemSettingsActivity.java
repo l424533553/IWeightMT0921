@@ -7,11 +7,16 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.axecom.iweight.R;
 import com.axecom.iweight.base.BaseActivity;
 import com.axecom.iweight.base.BaseEntity;
+import com.axecom.iweight.base.BusEvent;
 import com.axecom.iweight.bean.ChooseBean;
+import com.axecom.iweight.bean.FastLoginInfo;
+import com.axecom.iweight.bean.LoginData;
+import com.axecom.iweight.bean.ScalesCategoryGoods;
 import com.axecom.iweight.bean.SettingDataBean;
 import com.axecom.iweight.conf.Constants;
 import com.axecom.iweight.manager.AccountManager;
@@ -19,8 +24,11 @@ import com.axecom.iweight.manager.MacManager;
 import com.axecom.iweight.net.RetrofitFactory;
 import com.axecom.iweight.ui.view.ChooseDialog;
 import com.axecom.iweight.ui.view.SoftKeyborad;
+import com.axecom.iweight.utils.NetworkUtil;
 import com.axecom.iweight.utils.SPUtils;
 import com.google.gson.internal.LinkedTreeMap;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,8 +36,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
+import io.reactivex.ObservableTransformer;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 
 public class SystemSettingsActivity extends BaseActivity {
 
@@ -214,6 +226,10 @@ public class SystemSettingsActivity extends BaseActivity {
                 }).show();
                 break;
             case R.id.system_settings_default_seller_number_tv:
+                if (!NetworkUtil.isConnected(this)) {
+                    Toast.makeText(this, "请先连接网络", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 softBuilder.create(new SoftKeyborad.OnConfirmedListener() {
                     @Override
                     public void onConfirmed(String result) {
@@ -271,6 +287,12 @@ public class SystemSettingsActivity extends BaseActivity {
     }
 
     public void saveSettingsToSP() {
+
+        String sellerNumber = sellerNumberTv.getText().toString();
+        if (!TextUtils.isEmpty(sellerNumber)) {
+            requestBindSeller(sellerNumber);
+        }
+
         if (valueMap == null)
             return;
 
@@ -314,7 +336,7 @@ public class SystemSettingsActivity extends BaseActivity {
 
         LinkedHashMap sellerNumberMap = new LinkedHashMap();
         sellerNumberMap.put("update_time", System.currentTimeMillis());
-        sellerNumberMap.put("val", sellerNumberTv.getText().toString());
+        sellerNumberMap.put("val", sellerNumber);
         valueMap.put("default_seller_number", sellerNumberMap);
         SPUtils.saveObject(this, KEY_SELLER_NUMBER, valueMap.get("default_seller_number"));
 
@@ -391,6 +413,44 @@ public class SystemSettingsActivity extends BaseActivity {
         SPUtils.saveObject(this, KEY_STOP_CASH, valueMap.get("disable_cash_mode"));
 
         showLoading("保存成功");
+    }
+
+    private void requestBindSeller(String sellerNumber) {
+        RetrofitFactory.getInstance().API()
+                .fastLogin(AccountManager.getInstance().getScalesId(), sellerNumber)
+                .compose(this.<BaseEntity<FastLoginInfo>>setThread())
+                .subscribe(new Observer<BaseEntity<FastLoginInfo>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(final BaseEntity<FastLoginInfo> fastLoginInfo) {
+                        AccountManager instance = AccountManager.getInstance();
+                        boolean success = fastLoginInfo.isSuccess();
+                        if (success) {
+                            Toast.makeText(SystemSettingsActivity.this,"绑定卖家成功",Toast.LENGTH_SHORT).show();
+                            instance.saveTokenTemporary(fastLoginInfo.getData().getToken());
+                        }else{
+                            instance.cleanToken();
+                            Toast.makeText(SystemSettingsActivity.this,"绑定卖家失败",Toast.LENGTH_SHORT).show();
+                        }
+                        EventBus.getDefault().post(new BusEvent(BusEvent.BIND_SELLER,success));
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+
+
     }
 
     public void getSettingData() {

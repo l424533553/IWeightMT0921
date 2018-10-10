@@ -205,7 +205,7 @@ public class CommodityManagementActivity extends Activity implements View.OnClic
                 for (CommodityBean bean : hotKeyList) {
                     list.add(bean.getHotKeyBean());
                 }
-                requestSaveSelectedGoods(list);
+                saveSelectedGoods(list);
                 break;
             case R.id.commodity_management_back_btn:
                 finish();
@@ -213,7 +213,7 @@ public class CommodityManagementActivity extends Activity implements View.OnClic
         }
     }
 
-    public void requestSaveSelectedGoods(List<HotKeyBean> dataList) {
+    public void saveSelectedGoods(List<HotKeyBean> dataList) {
         SaveGoodsReqBean goodsReqBean = new SaveGoodsReqBean();
         List<SaveGoodsReqBean.Goods> goodsList = new ArrayList<>();
         SaveGoodsReqBean.Goods good;

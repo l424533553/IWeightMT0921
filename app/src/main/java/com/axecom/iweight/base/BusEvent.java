@@ -6,22 +6,23 @@ package com.axecom.iweight.base;
 
 public class BusEvent {
 
-    public static final int GO_HOME_CODE = 34;
-    public static final int LOGIN_SUCCESS = 10;
-    public static final int GO_HOME_PAGE = 42;
-    public static final int USB_NEW_DATA = 1;
-    public static final int PRINTER_LABEL = 2;
-    public static final int NET_WORK_AVAILABLE = 3;
-    public static final int SUB_ORDER_SUCCESS = 4;
-    public static final int REPORT_DEVICE_IS_ONLINE = 5;
-    public static final int SAVE_COMMODITY_SUCCESS = 6;
-    public static final int SAVE_LOCAL_SUCCESS = 7;
-    public static final int POSITION_PATCH = 9;
-    public static final int PRINTER_NO_BITMAP = 10;
-    public static final int BLUETOOTH_CONNECTED = 11;
-    public static final int LOGIN_OUT = 12;
+    public static final int GO_HOME_CODE = 1;
+    public static final int LOGIN_SUCCESS = 2;
+    public static final int GO_HOME_PAGE = 3;
+    public static final int USB_NEW_DATA = 4;
+    public static final int PRINTER_LABEL = 5;
+    public static final int NET_WORK_AVAILABLE = 6;
+    public static final int SUB_ORDER_SUCCESS = 7;
+    public static final int REPORT_DEVICE_IS_ONLINE =8;
+    public static final int SAVE_COMMODITY_SUCCESS = 9;
+    public static final int SAVE_LOCAL_SUCCESS = 10;
+    public static final int POSITION_PATCH = 11;
+    public static final int PRINTER_NO_BITMAP = 12;
+    public static final int BLUETOOTH_CONNECTED = 13;
+    public static final int LOGIN_OUT = 14;
 
-    public static final int POSITION_PATCH22 = 99;
+    public static final int POSITION_PATCH22 = 15;
+    public static final int BIND_SELLER = 16;
 
 
     //图片下载完成

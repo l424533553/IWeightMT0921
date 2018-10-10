@@ -32,6 +32,8 @@ public class HotKeyBean extends BaseModel implements Serializable {
     @Column
     public String weight;
     @Column
+    public String batch_code;
+    @Column
     public String grandTotal;
 
     public String count;
@@ -114,5 +116,13 @@ public class HotKeyBean extends BaseModel implements Serializable {
 
     public void setCount(String count) {
         this.count = count;
+    }
+
+    public String getBatch_code() {
+        return batch_code;
+    }
+
+    public void setBatch_code(String batch_code) {
+        this.batch_code = batch_code;
     }
 }

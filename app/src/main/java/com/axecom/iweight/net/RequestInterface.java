@@ -4,6 +4,7 @@ package com.axecom.iweight.net;
 import com.axecom.iweight.base.BaseEntity;
 import com.axecom.iweight.bean.Advertis;
 import com.axecom.iweight.bean.CalibrationBean;
+import com.axecom.iweight.bean.FastLoginInfo;
 import com.axecom.iweight.bean.LocalSettingsBean;
 import com.axecom.iweight.bean.LoginData;
 import com.axecom.iweight.bean.LoginInfo;
@@ -83,6 +84,16 @@ public interface RequestInterface {
      */
     @POST("staffMemberLogin")
     Observable<BaseEntity<LoginData>> staffMemberLogin(@Query("scales_id") String scalesId, @Query("serial_number") String serialNumber, @Query("password") String password);
+
+
+    /**
+     * 快捷登录
+     * @param scalesId
+     * @param client_id
+     * @return
+     */
+    @POST("fastLogin")
+    Observable<BaseEntity<FastLoginInfo>> fastLogin(@Query("scales_id") String scalesId, @Query("client_id") String client_id);
 
     /**
      * 标定记录
