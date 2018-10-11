@@ -86,6 +86,7 @@ public class SubOrderReqBean implements Serializable{
         private String goods_number;
         private String goods_weight;
         private String amount;
+        private String batch_code;
 
         public String getGoods_id() {
             return goods_id;
@@ -133,6 +134,14 @@ public class SubOrderReqBean implements Serializable{
 
         public void setGoods_weight(String goods_weight) {
             this.goods_weight = goods_weight;
+        }
+
+        public String getBatch_code() {
+            return batch_code;
+        }
+
+        public void setBatch_code(String batch_code) {
+            this.batch_code = batch_code;
         }
     }
 }

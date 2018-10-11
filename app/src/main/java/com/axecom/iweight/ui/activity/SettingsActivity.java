@@ -186,7 +186,7 @@ public class SettingsActivity extends BaseActivity {
                     startDDMActivity(LocalSettingsActivity.class, false);
                     break;
                 case POSITION_SYSTEM:
-                    startDDMActivity(SystemSettingsActivity.class, false);
+                    startDDMActivity(SystemSettingsActivity2.class, false);
                     break;
                 case POSITION_RE_BOOT:
                     EventBus.getDefault().post(new BusEvent(BusEvent.GO_HOME_PAGE, true));

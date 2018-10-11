@@ -601,6 +601,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         selectedGoods.name = MainActivity.this.selectedGoods.name;
         selectedGoods.traceable_code = MainActivity.this.selectedGoods.traceable_code;
         selectedGoods.is_default = MainActivity.this.selectedGoods.is_default;
+        selectedGoods.batch_code = MainActivity.this.selectedGoods.batch_code;
 
         selectedGoods.weight = weightTopTv.getText().toString();
         selectedGoods.price = TextUtils.isEmpty(etPrice.getText().toString()) ? etPrice.getHint().toString() : etPrice.getText().toString();
@@ -921,6 +922,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
             weightTopTv.setText("0.000");
             weightTv.setText("");
             etPrice.setHint("0");
+            etPrice.setText("");
             weightTotalTv.setText("0");
             tvgrandTotal.setText("0.00");
             priceTotalTv.setText("0.00");
@@ -968,6 +970,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
             good.setGoods_number(countEt.getText().toString());
             good.setGoods_weight(HotKeyBean.weight);
             good.setGoods_amount(HotKeyBean.grandTotal);
+            good.setBatch_code(HotKeyBean.batch_code);
             goodsList.add(good);
         }
         subOrderReqBean.setToken(AccountManager.getInstance().getToken());

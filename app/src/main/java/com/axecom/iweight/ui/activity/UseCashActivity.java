@@ -286,7 +286,9 @@ public class UseCashActivity extends BaseActivity implements View.OnClickListene
                     public void onNext(final BaseEntity<SubOrderBean> subOrderBeanBaseEntity) {
                         if (subOrderBeanBaseEntity.isSuccess()) {
 //                            imageLoader.displayImage(subOrderBeanBaseEntity.getData().getCode_img_url(), qrCodeIv, options);
-                            Glide.with(UseCashActivity.this).load(subOrderBeanBaseEntity.getData().getCode_img_url()).into(qrCodeIv);
+                            Glide.with(UseCashActivity.this)
+                                    .load(subOrderBeanBaseEntity.getData().getCode_img_url())
+                                    .into(qrCodeIv);
 
                             banner.bannerOrderLayout.setVisibility(View.VISIBLE);
                             banner.bannerTotalPriceTv.setText(getString(R.string.string_amount_txt3, Float.parseFloat(orderBean.getTotal_amount())));

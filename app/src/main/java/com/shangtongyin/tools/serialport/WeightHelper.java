@@ -190,7 +190,7 @@ public class WeightHelper implements IConstants_ST {
                                     int index = str.indexOf("kg");
                                     str = str.substring(0, index).trim().replace(" ", "");
                                     if (!TextUtils.isEmpty(str)) {
-                                        MyLog.myInfo("收到的数据" + str);
+//                                        MyLog.myInfo("收到的数据" + str);
                                         Message msg = handler.obtainMessage(NOTIFY_WEIGHT, str);
                                         handler.sendMessage(msg);
                                     }

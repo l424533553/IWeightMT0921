@@ -32,6 +32,7 @@ import com.axecom.iweight.bean.User_Table;
 import com.axecom.iweight.bean.WeightBean;
 import com.axecom.iweight.manager.AccountManager;
 import com.axecom.iweight.manager.MacManager;
+import com.axecom.iweight.manager.SystemSettingManager;
 import com.axecom.iweight.manager.UpdateManager;
 import com.axecom.iweight.my.LogActivity;
 import com.axecom.iweight.my.entity.LogBean;
@@ -74,6 +75,7 @@ import static com.axecom.iweight.ui.activity.SystemSettingsActivity.KEY_DEFAULT_
 public class HomeActivity extends BaseActivity implements VolleyListener, IConstants_ST {
 
     private static final String AUTO_LOGIN = "auto_login";
+    private static final String WEIGHT_ID = "weight_id";
     private TextView cardNumberTv;
     private TextView pwdTv;
 
@@ -153,9 +155,9 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
     public void initView() {
         context = this;
         if (NetworkUtil.isConnected(this)) {
-            getScalesIdByMac(MacManager.getInstace(this).getMac());
             getSettingData(MacManager.getInstace(this).getMac());
         }
+        getScalesIdByMac(MacManager.getInstace(this).getMac());
         SysApplication application = (SysApplication) getApplication();
         NetHelper netHelper = new NetHelper(application, this);
         netHelper.getUserInfo(netHelper.getIMEI(HomeActivity.this), 1);
@@ -268,6 +270,7 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
                     if (valueMap != null) {
                         value = valueMap.get("val").toString();
                     }
+                    loginType = SystemSettingManager.default_login_type();
                     if (TextUtils.equals(loginType, "卖方卡") || TextUtils.equals(loginType, "3.0") || TextUtils.isEmpty(loginType)) {
                         clientLogin(weightId + "", serialNumber, password);
                     } else {
@@ -338,36 +341,18 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
     }
 
     public void getSettingData(String mac) {
-        RetrofitFactory.getInstance().API()
-                .getSettingData("", mac)
-                .compose(this.<BaseEntity>setThread())
-                .subscribe(new Observer<BaseEntity>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-
-                    }
-
-                    @Override
-                    public void onNext(BaseEntity baseEntity) {
-                        if (baseEntity.isSuccess()) {
-                            LinkedTreeMap valueMap = (LinkedTreeMap) ((LinkedTreeMap) baseEntity.getData()).get("value");
-                            loginType = (((LinkedTreeMap) valueMap.get("default_login_type")).get("val")).toString();
-                        }
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });
+        SystemSettingManager.getSettingData(this);
     }
 
     public void getScalesIdByMac(String mac) {
+        final AccountManager instance = AccountManager.getInstance();
+
+        String scalesId = instance.getScalesId();
+        if(scalesId !=null){
+            weightTv.setText(scalesId);
+            weightId = Integer.valueOf(scalesId);
+            return;
+        }
         RetrofitFactory.getInstance().API()
                 .getScalesIdByMac(mac)
                 .compose(this.<BaseEntity<WeightBean>>setThread())
@@ -384,7 +369,7 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
                                 public void run() {
                                     weightId = baseEntity.getData().getId();
                                     weightTv.setText(weightId + "");
-                                    AccountManager.getInstance().saveScalesId(weightId + "");
+                                    instance.saveScalesId(weightId + "");
                                 }
                             });
                         } else {
