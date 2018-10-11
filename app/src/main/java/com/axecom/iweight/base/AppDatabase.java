@@ -14,6 +14,19 @@ import com.raizlabs.android.dbflow.sql.migration.AlterTableMigration;
 public final class AppDatabase {
     public static final String NAME = "AppDatabase";
 
-    public static final int VERSION = 1;
+    public static final int VERSION = 2;
+
+    @Migration(version = 2, database = AppDatabase.class)
+    public static class Migration2PS extends AlterTableMigration<HotKeyBean> {
+
+        public Migration2PS(Class<HotKeyBean> table) {
+            super(table);
+        }
+
+        @Override
+        public void onPreMigrate() {
+            addColumn(SQLiteType.TEXT, "batch_code");
+        }
+    }
 
 }

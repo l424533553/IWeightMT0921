@@ -5,6 +5,7 @@ import com.axecom.iweight.base.BaseEntity;
 import com.axecom.iweight.base.SysApplication;
 import com.axecom.iweight.net.RetrofitFactory;
 import com.axecom.iweight.utils.FileUtils;
+import com.axecom.iweight.utils.SPUtils;
 import com.google.gson.internal.LinkedTreeMap;
 
 import java.util.HashMap;
@@ -23,7 +24,7 @@ public class SystemSettingManager {
     private static LinkedHashMap mSetting;
 
     public static void getSettingData(final BaseActivity context) {
-        mSetting = (LinkedHashMap) FileUtils.readObject(context, SYS_SETTING);
+        mSetting = (LinkedHashMap) SPUtils.readObject(context,SYS_SETTING);
         if (mSetting != null) {
             return;
         }
@@ -38,8 +39,9 @@ public class SystemSettingManager {
                     @Override
                     public void onNext(BaseEntity settingDataBeanBaseEntity) {
                         if (settingDataBeanBaseEntity.isSuccess()) {
-                            LinkedHashMap map = (LinkedHashMap) settingDataBeanBaseEntity.getData();
-                            FileUtils.saveObject(SysApplication.getContext(), map, SYS_SETTING);
+                            LinkedTreeMap map = (LinkedTreeMap) settingDataBeanBaseEntity.getData();
+//                            FileUtils.saveObject(SysApplication.getContext(), map, );
+                            SPUtils.saveObject(SysApplication.getContext(),SYS_SETTING,map);
                         } else {
 
                         }
