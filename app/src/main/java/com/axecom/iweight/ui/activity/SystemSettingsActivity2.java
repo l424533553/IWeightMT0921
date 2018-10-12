@@ -338,6 +338,7 @@ public class SystemSettingsActivity2 extends BaseActivity {
     }
 
     public void getSettingData() {
+
         loginTypeTv.setText(SystemSettingManager.default_login_type());
         printerTv.setText(SystemSettingManager.printer_configuration());
         buyerNumberTv.setText(SystemSettingManager.default_buyer_number());
@@ -346,6 +347,8 @@ public class SystemSettingsActivity2 extends BaseActivity {
         weightRoundingTv.setText(SystemSettingManager.rounding_weight());
         sellerNumberTv.setText(SystemSettingManager.default_seller_number());
         weightUnitTv.setText(SystemSettingManager.screen_unit_display());
+
+
         notClearPriceCtv.setChecked(SystemSettingManager.price_after_saving());
         saveWeightCtv.setChecked(SystemSettingManager.confirm_the_preservation());
         autoObtainCtv.setChecked(SystemSettingManager.buyers_and_sellers_by_default());

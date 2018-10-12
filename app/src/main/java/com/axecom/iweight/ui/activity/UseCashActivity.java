@@ -176,7 +176,11 @@ public class UseCashActivity extends BaseActivity implements View.OnClickListene
     @Override
     protected void onResume() {
         super.onResume();
-        aliPayBtn.callOnClick();
+        if(wechatPayBtn.getVisibility()==View.VISIBLE){
+            wechatPayBtn.callOnClick();
+        }else if(wechatPayBtn.getVisibility()==View.GONE&&aliPayBtn.getVisibility()==View.VISIBLE){
+            aliPayBtn.callOnClick();
+        }
     }
 
     @Override

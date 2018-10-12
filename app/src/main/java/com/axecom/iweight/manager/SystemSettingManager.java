@@ -77,7 +77,14 @@ public class SystemSettingManager {
 
     public static String getOptionName(List<Map<String, String>> defaultList,String key){
         HashMap<String,String> mapSet = new HashMap<>();
-        for(Map map :defaultList){
+        for(Map<String,String> map :defaultList){
+            for(String kk:map.keySet()){
+                mapSet.put(kk,map.get(kk));
+            }
+        }
+        String name = mapSet.get(key);
+        if(name!=null){
+            return name;
         }
         return "";
     }
