@@ -2,12 +2,8 @@ package com.axecom.iweight.ui.activity;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.hardware.display.DisplayManager;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.text.TextUtils;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -22,35 +18,23 @@ import android.widget.TextView;
 
 import com.axecom.iweight.R;
 import com.axecom.iweight.base.BaseActivity;
-import com.axecom.iweight.base.BaseEntity;
 import com.axecom.iweight.base.BusEvent;
-import com.axecom.iweight.base.SysApplication;
-import com.axecom.iweight.bean.PayNoticeBean;
-import com.axecom.iweight.bean.SubOrderBean;
 import com.axecom.iweight.bean.SubOrderReqBean;
 import com.axecom.iweight.manager.PayCheckManage;
-import com.axecom.iweight.net.RetrofitFactory;
 import com.axecom.iweight.ui.uiutils.ImageLoaderHelper;
 import com.axecom.iweight.ui.view.SoftKey;
-import com.axecom.iweight.utils.LogUtils;
 import com.axecom.iweight.utils.MoneyTextWatcher;
 import com.axecom.iweight.utils.NetworkUtil;
 import com.axecom.iweight.utils.SPUtils;
-import com.bumptech.glide.Glide;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
-
-import io.reactivex.Observer;
-import io.reactivex.disposables.Disposable;
 
 /**
  * Created by Administrator on 2018-5-15.
@@ -80,6 +64,7 @@ public class UseCashActivity extends BaseActivity implements View.OnClickListene
     private String bitmap;
     private boolean flag = true;
     public BannerActivity banner = null;
+    private PayCheckManage mPayCheckManage;
 
     @Override
     public View setInitView() {
@@ -236,8 +221,12 @@ public class UseCashActivity extends BaseActivity implements View.OnClickListene
     public void setOrderBean(String payId) {
         orderBean.setPayment_id(payId);
         if (NetworkUtil.isConnected(this)) {
-//            submitOrder(orderBean);
-            new PayCheckManage(this,banner,qrCodeIv,orderBean,payId);
+            if(mPayCheckManage!=null){
+                mPayCheckManage.setCancelCheck(true);
+                mPayCheckManage = null;
+            }
+            mPayCheckManage = new PayCheckManage(this, banner, qrCodeIv, orderBean, payId);
+            mPayCheckManage.submitOrder();
         } else {
             List<SubOrderReqBean> orders = (List<SubOrderReqBean>) SPUtils.readObject(this, "local_order");
             if (orders != null) {
@@ -261,4 +250,13 @@ public class UseCashActivity extends BaseActivity implements View.OnClickListene
         }
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(mPayCheckManage!=null){
+            mPayCheckManage.setCancelCheck(true);
+            mPayCheckManage = null;
+        }
+
+    }
 }

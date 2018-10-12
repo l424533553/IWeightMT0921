@@ -219,13 +219,6 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
     }
 
 
-    /*    *//**
-     * 清除  按键
-     *//*
-    private void eliminate() {
-        tvgrandTotal.setHint("0");
-        tvgrandTotal.setText("0.00");
-    }*/
 
     /**
      * 初始化结算列表
@@ -675,7 +668,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
 
 //                bitmap = (Bitmap) event.getParam();
                 bitmap = event.getQrString();
-                if (bitmap == null) {
+                if (TextUtils.isEmpty(bitmap)) {
                     String bmpUrl = SPUtils.getString(MainActivity.this, "print_bitmap", "");
                     String price = SPUtils.getString(MainActivity.this, "print_price", "");
                     String orderNo = SPUtils.getString(MainActivity.this, "print_orderno", "");
@@ -1005,7 +998,6 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                 localOrder.add(orderBean);
                 SPUtils.saveObject(this, "local_order", localOrder);
             }
-
             EventBus.getDefault().post(new BusEvent(BusEvent.PRINTER_NO_BITMAP, "", payId, ""));
         }
     }

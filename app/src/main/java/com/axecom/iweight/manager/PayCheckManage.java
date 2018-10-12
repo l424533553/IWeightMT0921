@@ -2,6 +2,7 @@ package com.axecom.iweight.manager;
 
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.axecom.iweight.R;
 import com.axecom.iweight.base.BaseActivity;
@@ -20,6 +21,9 @@ import com.axecom.iweight.utils.SPUtils;
 import com.bumptech.glide.Glide;
 
 import org.greenrobot.eventbus.EventBus;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
@@ -40,18 +44,18 @@ public class PayCheckManage {
     private final SubOrderReqBean orderBean;
     private final String payId;
     BaseActivity content;
+    private boolean cancelCheck;
+    private int mRunCount = 20;
 
-    public PayCheckManage(BaseActivity content, BannerActivity banner, ImageView qrCodeIv,SubOrderReqBean orderBean,String payId) {
+    public PayCheckManage(BaseActivity content, BannerActivity banner, ImageView qrCodeIv, SubOrderReqBean orderBean, String payId) {
         this.banner = banner;
         this.content = content;
-        this.qrCodeIv=qrCodeIv;
+        this.qrCodeIv = qrCodeIv;
         this.orderBean = orderBean;
         this.payId = payId;
     }
 
     private int requestCount;
-
-
 
 
     public void submitOrder() {
@@ -68,13 +72,15 @@ public class PayCheckManage {
                     public void onNext(final BaseEntity<SubOrderBean> subOrderBeanBaseEntity) {
                         if (subOrderBeanBaseEntity.isSuccess()) {
                             SubOrderBean data = subOrderBeanBaseEntity.getData();
-                            Glide.with(content)
-                                    .load(data.getCode_img_url())
-                                    .into(qrCodeIv);
-                            Glide.with(content)
-                                    .load(data.getCode_img_url())
-                                    .into(banner.bannerQRCode);
-                            switch (payId){
+                            if (qrCodeIv != null) {
+                                Glide.with(content)
+                                        .load(data.getCode_img_url())
+                                        .into(qrCodeIv);
+                                Glide.with(content)
+                                        .load(data.getCode_img_url())
+                                        .into(banner.bannerQRCode);
+                            }
+                            switch (payId) {
                                 case "1":
                                     banner.tvPayWay.setText("支付方式：微信支付");
                                     break;
@@ -88,7 +94,7 @@ public class PayCheckManage {
                             SPUtils.putString(SysApplication.getContext(), "print_bitmap", data.getPrint_code_img());
 
                             content.showInfoToBanner(orderBean);
-                            getPayNotice(data.getOrder_no(),data.getPrint_code_img(),true);
+                            getPayNotice(data.getOrder_no(), data.getPrint_code_img(), true);
                         } else {
                             content.showLoading(subOrderBeanBaseEntity.getMsg());
                         }
@@ -96,7 +102,7 @@ public class PayCheckManage {
 
                     @Override
                     public void onError(Throwable e) {
-                       content.closeLoading();
+                        content.closeLoading();
                         e.printStackTrace();
                     }
 
@@ -108,11 +114,21 @@ public class PayCheckManage {
     }
 
 
-
     public void getPayNotice(final String order_no, final String qrCode, boolean first) {
         if (first) requestCount = 0;
         requestCount++;
-        if (requestCount >= 10) return;
+        if (cancelCheck || requestCount >= mRunCount) {
+            if (requestCount == mRunCount && content instanceof UseCashActivity) {
+                UIUtils.postTaskSafely(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(content, "支付超时", Toast.LENGTH_SHORT).show();
+                        content.finish();
+                    }
+                });
+            }
+            return;
+        }
         RetrofitFactory.getInstance().API()
                 .getPayNotice(order_no)
                 .compose(this.<BaseEntity<PayNoticeBean>>setThread())
@@ -126,15 +142,17 @@ public class PayCheckManage {
                     public void onNext(final BaseEntity<PayNoticeBean> payNoticeBeanBaseEntity) {
                         if (payNoticeBeanBaseEntity.isSuccess()) {
                             if (payNoticeBeanBaseEntity.getData().flag == 0) {
-                                EventBus.getDefault().post(new BusEvent(BusEvent.PRINTER_LABEL, qrCode, order_no,payId, qrCode));
+                                EventBus.getDefault().post(new BusEvent(BusEvent.PRINTER_LABEL, qrCode, order_no, payId, qrCode));
+                                if (content instanceof UseCashActivity) content.finish();
                             } else {
 //                              轮循获取支付结果
-                                UIUtils.postTaskSafelyDelayed(new Runnable() {
-                                    @Override
+                                Timer timer = new Timer();//实例化Timer类
+                                timer.schedule(new TimerTask() {
                                     public void run() {
-                                        getPayNotice(order_no, qrCode,false);
+                                        getPayNotice(order_no, qrCode, false);
+                                        this.cancel();
                                     }
-                                }, 1000);
+                                }, 3000);//五百毫秒
                             }
                             LogUtils.d(payNoticeBeanBaseEntity.getData().msg);
                         }
@@ -152,12 +170,15 @@ public class PayCheckManage {
                 });
     }
 
+    public void setCancelCheck(boolean cancelCheck) {
+        this.cancelCheck = cancelCheck;
+    }
 
     public <T> ObservableTransformer<T, T> setThread() {
         return new ObservableTransformer<T, T>() {
             @Override
             public ObservableSource<T> apply(Observable<T> upstream) {
-                return upstream.subscribeOn(Schedulers.io()).observeOn(Schedulers.io());
+                return upstream.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
             }
         };
     }
