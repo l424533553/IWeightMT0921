@@ -450,7 +450,7 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
                     @Override
                     public void onNext(BaseEntity<LoginData> loginDataBaseEntity) {
                         if (loginDataBaseEntity.isSuccess()) {
-                            AccountManager.getInstance().saveToken(loginDataBaseEntity.getData().getAdminToken());
+//                            AccountManager.getInstance().saveToken(loginDataBaseEntity.getData().getAdminToken());
                             if (savePwdCtv.isChecked()) {
                                 AccountManager.getInstance().savePwd(serialNumber, password);
                             } else {

@@ -425,7 +425,7 @@ public class SystemSettingsActivity extends BaseActivity {
                             Toast.makeText(SystemSettingsActivity.this,"绑定卖家成功",Toast.LENGTH_SHORT).show();
                             instance.saveToken(fastLoginInfo.getData().getToken());
                         }else{
-                            instance.saveToken(AccountManager.getInstance().getAdminToken());
+//                            instance.saveToken(AccountManager.getInstance().getAdminToken());
                             Toast.makeText(SystemSettingsActivity.this,"绑定卖家失败",Toast.LENGTH_SHORT).show();
                         }
                         EventBus.getDefault().post(new BusEvent(BusEvent.notifiySellerInfo,success));

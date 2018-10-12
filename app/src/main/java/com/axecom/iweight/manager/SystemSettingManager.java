@@ -38,7 +38,7 @@ public class SystemSettingManager {
                     @Override
                     public void onNext(BaseEntity settingDataBeanBaseEntity) {
                         if (settingDataBeanBaseEntity.isSuccess()) {
-                            LinkedHashMap map = (LinkedHashMap) settingDataBeanBaseEntity.getData();
+                            LinkedTreeMap map = (LinkedTreeMap) settingDataBeanBaseEntity.getData();
                             FileUtils.saveObject(SysApplication.getContext(), map, SYS_SETTING);
                         } else {
 
