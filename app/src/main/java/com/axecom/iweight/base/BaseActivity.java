@@ -594,7 +594,7 @@ public abstract class BaseActivity extends Activity implements View.OnClickListe
         }
     }
 
-    protected void share() {
+    public void showInfoToBanner(SubOrderReqBean bean) {
 
     }
 

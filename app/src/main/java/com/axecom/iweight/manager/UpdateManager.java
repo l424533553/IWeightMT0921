@@ -77,6 +77,7 @@ public class UpdateManager {
 
                                     );
                             builder.setForceRedownload(true);
+//                                    .setSilentDownload(true);
                             builder.excuteMission(context);
 
                         }
