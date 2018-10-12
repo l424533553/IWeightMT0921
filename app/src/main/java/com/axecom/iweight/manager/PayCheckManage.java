@@ -73,6 +73,7 @@ public class PayCheckManage {
                         if (subOrderBeanBaseEntity.isSuccess()) {
                             SubOrderBean data = subOrderBeanBaseEntity.getData();
                             if (qrCodeIv != null) {
+                                content.closeLoading();
                                 Glide.with(content)
                                         .load(data.getCode_img_url())
                                         .into(qrCodeIv);
@@ -108,7 +109,7 @@ public class PayCheckManage {
 
                     @Override
                     public void onComplete() {
-                        content.closeLoading();
+//                        content.closeLoading();
                     }
                 });
     }
