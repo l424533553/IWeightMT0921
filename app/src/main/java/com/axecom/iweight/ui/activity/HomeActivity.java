@@ -43,6 +43,7 @@ import com.axecom.iweight.net.RetrofitFactory;
 import com.axecom.iweight.ui.view.CustomDialog;
 import com.axecom.iweight.ui.view.SoftKeyborad;
 import com.axecom.iweight.utils.ButtonUtils;
+import com.axecom.iweight.utils.CommonUtils;
 import com.axecom.iweight.utils.LogUtils;
 import com.axecom.iweight.utils.NetworkUtil;
 import com.axecom.iweight.utils.SPUtils;
@@ -92,6 +93,7 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
     private boolean cancelAutoLogin;
     private Button confirmBtn;
     private boolean reBoot;
+    private TextView versionTv;
 
     /****************************************************************************************/
 
@@ -103,6 +105,8 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
         try {
             rootView = LayoutInflater.from(this).inflate(R.layout.activity_home, null);
             confirmBtn = rootView.findViewById(R.id.home_confirm_btn);
+            versionTv = rootView.findViewById(R.id.tv_version);
+            versionTv.setText("V"+CommonUtils.getVersionName(this));
             cardNumberTv = rootView.findViewById(R.id.home_card_number_tv);
             pwdTv = rootView.findViewById(R.id.home_pwd_tv);
             TextView loginTv = rootView.findViewById(R.id.home_login_tv);
@@ -143,6 +147,7 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
             logBean.setLocation(getLocalClassName());
             sysApplication.getBaseDao().insert(logBean);
         }
+        UpdateManager.getNewVersion(this);
         return rootView;
     }
 
@@ -348,7 +353,7 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
         final AccountManager instance = AccountManager.getInstance();
 
         String scalesId = instance.getScalesId();
-        if(scalesId !=null){
+        if(!TextUtils.isEmpty(scalesId)){
             weightTv.setText(scalesId);
             weightId = Integer.valueOf(scalesId);
             return;
@@ -450,7 +455,7 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
                     @Override
                     public void onNext(BaseEntity<LoginData> loginDataBaseEntity) {
                         if (loginDataBaseEntity.isSuccess()) {
-                            AccountManager.getInstance().saveToken(loginDataBaseEntity.getData().getAdminToken());
+//                            AccountManager.getInstance().saveToken(loginDataBaseEntity.getData().getAdminToken());
                             if (savePwdCtv.isChecked()) {
                                 AccountManager.getInstance().savePwd(serialNumber, password);
                             } else {
@@ -504,6 +509,7 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
                 editor.putInt(SELLER_ID, userInfo.getSellerid());
                 editor.putString(SELLER, userInfo.getSeller());
                 editor.apply();
+                UpdateManager.getNewVersion(HomeActivity.this);
             }
         }
     }

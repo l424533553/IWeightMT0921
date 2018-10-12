@@ -26,6 +26,7 @@ import com.axecom.iweight.base.BaseActivity;
 import com.axecom.iweight.base.BusEvent;
 import com.axecom.iweight.bean.SettingsBean;
 import com.axecom.iweight.manager.AccountManager;
+import com.axecom.iweight.manager.SystemSettingManager;
 import com.axecom.iweight.ui.view.BTHelperDialog;
 import com.axecom.iweight.utils.SPUtils;
 
@@ -221,6 +222,8 @@ public class SettingsActivity extends BaseActivity {
                     break;
                 case POSITION_UPDATE:
                     showLoading();
+                    SystemSettingManager.updateData(SettingsActivity.this);
+
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {

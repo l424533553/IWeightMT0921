@@ -13,7 +13,7 @@ public class AccountManager {
     private static final String LAST_SERIALNUMBER = "last_serialnumber";
     private static final String IS_SAVE_PWD = "is_save_pwd";
     private static AccountManager accountManager ;
-    private String adminToken;
+    private String adminToken; 
     private String mToken;
 
     private static Context mCtx;

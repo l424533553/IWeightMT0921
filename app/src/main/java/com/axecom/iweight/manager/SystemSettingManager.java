@@ -5,11 +5,14 @@ import com.axecom.iweight.base.BaseEntity;
 import com.axecom.iweight.base.SysApplication;
 import com.axecom.iweight.net.RetrofitFactory;
 import com.axecom.iweight.utils.FileUtils;
-import com.axecom.iweight.utils.SPUtils;
 import com.google.gson.internal.LinkedTreeMap;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
@@ -24,10 +27,14 @@ public class SystemSettingManager {
     private static LinkedHashMap mSetting;
 
     public static void getSettingData(final BaseActivity context) {
-        mSetting = (LinkedHashMap) SPUtils.readObject(context,SYS_SETTING);
+        mSetting = (LinkedHashMap) FileUtils.readObject(context, SYS_SETTING);
         if (mSetting != null) {
             return;
         }
+        requestData(context);
+    }
+
+    private static void requestData(final BaseActivity context) {
         RetrofitFactory.getInstance().API()
                 .getSettingData("", MacManager.getInstace(context).getMac())
                 .compose(context.<BaseEntity>setThread())
@@ -40,8 +47,9 @@ public class SystemSettingManager {
                     public void onNext(BaseEntity settingDataBeanBaseEntity) {
                         if (settingDataBeanBaseEntity.isSuccess()) {
                             LinkedTreeMap map = (LinkedTreeMap) settingDataBeanBaseEntity.getData();
-//                            FileUtils.saveObject(SysApplication.getContext(), map, );
-                            SPUtils.saveObject(SysApplication.getContext(),SYS_SETTING,map);
+                            FileUtils.saveObject(SysApplication.getContext(), map, SYS_SETTING);
+                            mSetting = null;
+                            mSetting = (LinkedHashMap) FileUtils.readObject(context, SYS_SETTING);
                         } else {
 
                         }
@@ -62,7 +70,21 @@ public class SystemSettingManager {
         if (map != null) {
             Long valueDate = ((Double) map.get("update_time")).longValue();
             Object val = map.get("val");
-            return val==null?"":val.toString();
+            return val == null ? "" : val.toString();
+        }
+        return "";
+    }
+
+    public static String getOptionName(List<Map<String, String>> defaultList,String key){
+        HashMap<String,String> mapSet = new HashMap<>();
+        for(Map<String,String> map :defaultList){
+            for(String kk:map.keySet()){
+                mapSet.put(kk,map.get(kk));
+            }
+        }
+        String name = mapSet.get(key);
+        if(name!=null){
+            return name;
         }
         return "";
     }
@@ -75,7 +97,7 @@ public class SystemSettingManager {
         }
     }
 
-    public static boolean disable_cash_mode() {
+        public static boolean disable_cash_mode() {
         LinkedHashMap map = getValueMap("disable_cash_mode");
         if (map != null) {
             Long valueDate = ((Double) map.get("update_time")).longValue();
@@ -117,7 +139,7 @@ public class SystemSettingManager {
         if (map != null) {
             Long valueDate = ((Double) map.get("update_time")).longValue();
             Object val = map.get("val");
-            return val==null?"":val.toString();
+            return val == null ? "" : val.toString();
         }
         return "";
     }
@@ -136,7 +158,7 @@ public class SystemSettingManager {
         if (map != null) {
             Long valueDate = ((Double) map.get("update_time")).longValue();
             Object val = map.get("val");
-            return val==null?"":val.toString();
+            return val == null ? "" : val.toString();
         }
         return "";
     }
@@ -155,7 +177,7 @@ public class SystemSettingManager {
         if (map != null) {
             Long valueDate = ((Double) map.get("update_time")).longValue();
             Object val = map.get("val");
-            return val==null?"":val.toString();
+            return val == null ? "" : val.toString();
         }
         return "";
     }
@@ -175,7 +197,7 @@ public class SystemSettingManager {
         if (map != null) {
             Long valueDate = ((Double) map.get("update_time")).longValue();
             Object val = map.get("val");
-            return val==null?"":val.toString();
+            return val == null ? "" : val.toString();
         }
         return "";
     }
@@ -189,17 +211,17 @@ public class SystemSettingManager {
     }
 
 
-
     //    重量取整
     public static String rounding_weight() {
         LinkedHashMap map = getValueMap("rounding_weight");
         if (map != null) {
             Long valueDate = ((Double) map.get("update_time")).longValue();
             Object val = map.get("val");
-            return val==null?"":val.toString();
+            return val == null ? "" : val.toString();
         }
         return "";
     }
+
     public static void rounding_weight_save(String type) {
         LinkedHashMap map = getValueMap("rounding_weight");
         if (map != null) {
@@ -214,7 +236,7 @@ public class SystemSettingManager {
         if (map != null) {
             Long valueDate = ((Double) map.get("update_time")).longValue();
             Object val = map.get("val");
-            return val==null?"":val.toString();
+            return val == null ? "" : val.toString();
         }
         return "";
     }
@@ -232,7 +254,7 @@ public class SystemSettingManager {
         if (map != null) {
             Long valueDate = ((Double) map.get("update_time")).longValue();
             Object val = map.get("val");
-            return val==null?"":val.toString();
+            return val == null ? "" : val.toString();
         }
         return "";
     }
@@ -255,15 +277,14 @@ public class SystemSettingManager {
         }
         return false;
     }
+
     public static void price_after_saving_save(boolean b) {
         LinkedHashMap map = getValueMap("price_after_saving");
         if (map != null) {
             Long valueDate = ((Double) map.get("update_time")).longValue();
-            map.put("val",b);
+            map.put("val", b);
         }
     }
-
-
 
 
     //    重量稳定后才能确认保存
@@ -276,11 +297,12 @@ public class SystemSettingManager {
         }
         return false;
     }
+
     public static void confirm_the_preservation_save(boolean b) {
         LinkedHashMap map = getValueMap("confirm_the_preservation");
         if (map != null) {
             Long valueDate = ((Double) map.get("update_time")).longValue();
-            map.put("val",b);
+            map.put("val", b);
         }
     }
 
@@ -295,11 +317,12 @@ public class SystemSettingManager {
         }
         return false;
     }
+
     public static void buyers_and_sellers_by_default_save(boolean b) {
         LinkedHashMap map = getValueMap("buyers_and_sellers_by_default");
         if (map != null) {
             Long valueDate = ((Double) map.get("update_time")).longValue();
-            map.put("val",b);
+            map.put("val", b);
         }
     }
 
@@ -319,7 +342,7 @@ public class SystemSettingManager {
         LinkedHashMap map = getValueMap("online_settlement");
         if (map != null) {
             Long valueDate = ((Double) map.get("update_time")).longValue();
-            map.put("val",b);
+            map.put("val", b);
         }
     }
 
@@ -334,11 +357,12 @@ public class SystemSettingManager {
         }
         return false;
     }
+
     public static void buyers_and_sellers_after_weighing_save(boolean b) {
         LinkedHashMap map = getValueMap("buyers_and_sellers_after_weighing");
         if (map != null) {
             Long valueDate = ((Double) map.get("update_time")).longValue();
-            map.put("val",b);
+            map.put("val", b);
         }
     }
 
@@ -353,11 +377,12 @@ public class SystemSettingManager {
         }
         return false;
     }
+
     public static void card_settlement_save(boolean b) {
         LinkedHashMap map = getValueMap("card_settlement");
         if (map != null) {
             Long valueDate = ((Double) map.get("update_time")).longValue();
-            map.put("val",b);
+            map.put("val", b);
         }
     }
 
@@ -372,11 +397,12 @@ public class SystemSettingManager {
         }
         return false;
     }
+
     public static void disable_printing_save(boolean b) {
         LinkedHashMap map = getValueMap("disable_printing");
         if (map != null) {
             Long valueDate = ((Double) map.get("update_time")).longValue();
-            map.put("val",b);
+            map.put("val", b);
         }
     }
 
@@ -396,7 +422,7 @@ public class SystemSettingManager {
         LinkedHashMap map = getValueMap("allow_batchless_settlement");
         if (map != null) {
             Long valueDate = ((Double) map.get("update_time")).longValue();
-            map.put("val",b);
+            map.put("val", b);
         }
     }
 
@@ -410,11 +436,12 @@ public class SystemSettingManager {
         }
         return false;
     }
+
     public static void cash_change_rounding_save(boolean b) {
         LinkedHashMap map = getValueMap("cash_change_rounding");
         if (map != null) {
             Long valueDate = ((Double) map.get("update_time")).longValue();
-            map.put("val",b);
+            map.put("val", b);
         }
     }
 
@@ -432,18 +459,18 @@ public class SystemSettingManager {
         String key = "disable_alipay_mode";
 
         LinkedHashMap map = getValueMap(key);
-        if(map==null){
+        if (map == null) {
             map = new LinkedHashMap<>();
-            putValueMap(key,map);
+            putValueMap(key, map);
         }
         if (map != null) {
-            map.put("val",b);
+            map.put("val", b);
         }
     }
 
     //    停用微信支付
     public static boolean disable_weixin_mode() {
-        LinkedHashMap map = getValueMap("disable_alipay_mode");
+        LinkedHashMap map = getValueMap("disable_weixin_mode");
         if (map != null) {
             Object val = map.get("val");
             return val != null && (boolean) val;
@@ -452,15 +479,55 @@ public class SystemSettingManager {
     }
 
     public static void disable_weixin_mode_save(boolean b) {
-        String key = "disable_alipay_mode";
+        String key = "disable_weixin_mode";
         LinkedHashMap map = getValueMap(key);
-        if(map==null){
+        if (map == null) {
             map = new LinkedHashMap<>();
             putValueMap(key, map);
         }
         if (map != null) {
-            map.put("val",b);
+            map.put("val", b);
         }
+    }
+
+
+    public static List<Map<String, String>> getLoginTypeList() {
+        String key = "default_login_type";
+        return getOptionList(key);
+    }
+
+    public static List<Map<String, String>> getDefaultPricingTypeList() {
+        String key = "default_pricing_model";
+        return getOptionList(key);
+    }
+
+    public static List<Map<String, String>> getPrinterConfigurationList() {
+        String key = "printer_configuration";
+        return getOptionList(key);
+    }
+
+    public static List<Map<String, String>> getRoundingWeightOptions() {
+        String key = "rounding_weight";
+        return getOptionList(key);
+    }
+
+    public static List<Map<String, String>> getScreenUnitDisplayOptions() {
+        String key = "screen_unit_display";
+        return getOptionList(key);
+    }
+
+    public static List<Map<String, String>> getBalanceRoundingOptions() {
+        String key = "balance_rounding";
+        return getOptionList(key);
+    }
+
+    public static List<Map<String, String>> getOptionList(String key) {
+        List<Map<String, String>> array = new ArrayList<Map<String, String>>();
+        LinkedHashMap setting = getmSetting();
+        if (setting != null) {
+            array.addAll((Collection<? extends Map<String, String>>) setting.get(key));
+        }
+        return array;
     }
 
     private static LinkedHashMap getValueMap(String key) {
@@ -469,10 +536,12 @@ public class SystemSettingManager {
             return (LinkedHashMap) valueMap.get(key);
         }
         return null;
-    } private static void putValueMap(String key,Object obj) {
+    }
+
+    private static void putValueMap(String key, Object obj) {
         if (mSetting != null) {
             LinkedHashMap valueMap = (LinkedHashMap) mSetting.get("value");
-            valueMap.put(key,obj);
+            valueMap.put(key, obj);
         }
     }
 
@@ -481,8 +550,12 @@ public class SystemSettingManager {
         return mSetting;
     }
 
-    private static void save(){
+    private static void save() {
         FileUtils.saveObject(SysApplication.getContext(), mSetting, SYS_SETTING);
     }
 
+    public static void updateData(BaseActivity activity) {
+        mSetting = null;
+        requestData(activity);
+    }
 }

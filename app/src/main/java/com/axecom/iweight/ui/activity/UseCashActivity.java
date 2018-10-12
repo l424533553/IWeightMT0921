@@ -28,6 +28,7 @@ import com.axecom.iweight.base.SysApplication;
 import com.axecom.iweight.bean.PayNoticeBean;
 import com.axecom.iweight.bean.SubOrderBean;
 import com.axecom.iweight.bean.SubOrderReqBean;
+import com.axecom.iweight.manager.PayCheckManage;
 import com.axecom.iweight.net.RetrofitFactory;
 import com.axecom.iweight.ui.uiutils.ImageLoaderHelper;
 import com.axecom.iweight.ui.view.SoftKey;
@@ -75,7 +76,6 @@ public class UseCashActivity extends BaseActivity implements View.OnClickListene
     private Intent intent;
     private Bundle bundle;
     private SoftKey softKey;
-    private MyRun mRun;
     private String payId;
     private String bitmap;
     private boolean flag = true;
@@ -127,24 +127,6 @@ public class UseCashActivity extends BaseActivity implements View.OnClickListene
     @Override
     public void initView() {
         LinkedHashMap valueMap = (LinkedHashMap) SPUtils.readObject(this, SystemSettingsActivity.KEY_STOP_CASH);
-        if (valueMap != null) {
-            /*boolean b = (boolean) valueMap.get("val");
-            if (!b) {
-                cashPayBtn.setVisibility(View.VISIBLE);
-                cashPayLayout.setVisibility(View.VISIBLE);
-            } else {
-                cashPayBtn.setVisibility(View.GONE);
-                aliPayBtn.setBackground(this.getResources().getDrawable(R.drawable.shape_green_bg2));
-                aliPayBtn.setTextColor(this.getResources().getColor(R.color.white));
-                wechatPayBtn.setBackground(this.getResources().getDrawable(R.drawable.shape_white_btn_bg));
-                wechatPayBtn.setTextColor(this.getResources().getColor(R.color.black));
-                cashPayLayout.setVisibility(View.GONE);
-                qrCodeIv.setVisibility(View.VISIBLE);
-                payId = "2";
-                setOrderBean(payId);
-            }*/
-        }
-
         if (NetworkUtil.isConnected(this)) {
             aliPayBtn.setEnabled(true);
             wechatPayBtn.setEnabled(true);
@@ -166,24 +148,32 @@ public class UseCashActivity extends BaseActivity implements View.OnClickListene
 
             }
         });
+        showInfoToBanner(orderBean);
+    }
+
+    public void showInfoToBanner(SubOrderReqBean bean) {
         banner.bannerOrderLayout.setVisibility(View.VISIBLE);
-        banner.bannerTotalPriceTv.setText(getString(R.string.string_amount_txt3, Float.parseFloat(orderBean.getTotal_amount())));
+        banner.bannerTotalPriceTv.
+                setText(getString(R.string.string_amount_txt3, Float.parseFloat(bean.getTotal_amount())));
         banner.goodsList.clear();
-        banner.goodsList.addAll(orderBean.getGoods());
+        banner.goodsList.addAll(bean.getGoods());
         banner.adapter.notifyDataSetChanged();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        aliPayBtn.callOnClick();
+        if(wechatPayBtn.getVisibility()==View.VISIBLE){
+            wechatPayBtn.callOnClick();
+        }else if(wechatPayBtn.getVisibility()==View.GONE&&aliPayBtn.getVisibility()==View.VISIBLE){
+            aliPayBtn.callOnClick();
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         flag = false;
-        mHandler.removeCallbacks(mRun);
         banner.bannerOrderLayout.setVisibility(View.GONE);
     }
 
@@ -246,7 +236,8 @@ public class UseCashActivity extends BaseActivity implements View.OnClickListene
     public void setOrderBean(String payId) {
         orderBean.setPayment_id(payId);
         if (NetworkUtil.isConnected(this)) {
-            submitOrder(orderBean);
+//            submitOrder(orderBean);
+            new PayCheckManage(this,banner,qrCodeIv,orderBean,payId);
         } else {
             List<SubOrderReqBean> orders = (List<SubOrderReqBean>) SPUtils.readObject(this, "local_order");
             if (orders != null) {
@@ -257,8 +248,6 @@ public class UseCashActivity extends BaseActivity implements View.OnClickListene
                 localOrder.add(orderBean);
                 SPUtils.saveObject(this, "local_order", localOrder);
             }
-
-
             EventBus.getDefault().post(new BusEvent(BusEvent.PRINTER_NO_BITMAP, "", payId, ""));
             finish();
         }
@@ -272,139 +261,4 @@ public class UseCashActivity extends BaseActivity implements View.OnClickListene
         }
     }
 
-    public void submitOrder(SubOrderReqBean subOrderReqBean) {
-        RetrofitFactory.getInstance().API()
-                .submitOrder(subOrderReqBean)
-                .compose(this.<BaseEntity<SubOrderBean>>setThread())
-                .subscribe(new Observer<BaseEntity<SubOrderBean>>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                        showLoading();
-                    }
-
-                    @Override
-                    public void onNext(final BaseEntity<SubOrderBean> subOrderBeanBaseEntity) {
-                        if (subOrderBeanBaseEntity.isSuccess()) {
-//                            imageLoader.displayImage(subOrderBeanBaseEntity.getData().getCode_img_url(), qrCodeIv, options);
-                            Glide.with(UseCashActivity.this)
-                                    .load(subOrderBeanBaseEntity.getData().getCode_img_url())
-                                    .into(qrCodeIv);
-
-                            banner.bannerOrderLayout.setVisibility(View.VISIBLE);
-                            banner.bannerTotalPriceTv.setText(getString(R.string.string_amount_txt3, Float.parseFloat(orderBean.getTotal_amount())));
-                            imageLoader.displayImage(subOrderBeanBaseEntity.getData().getCode_img_url(), banner.bannerQRCode, options);
-
-                            switch (payId){
-                                case "1":
-                                    banner.tvPayWay.setText("支付方式：微信支付");
-                                    break;
-                                case "2":
-                                    banner.tvPayWay.setText("支付方式：支付宝支付");
-                                    break;
-                                case "4":
-                                    banner.tvPayWay.setText("支付方式：现金支付");
-                                    break;
-                            }
-
-//                            Glide.with(UseCashActivity.this).load(subOrderBeanBaseEntity.getData().getCode_img_url()).into(banner.bannerQRCode);
-                            SPUtils.putString(SysApplication.getContext(), "print_bitmap", subOrderBeanBaseEntity.getData().getPrint_code_img());
-
-                            banner.goodsList.clear();
-                            banner.goodsList.addAll(orderBean.getGoods());
-                            banner.adapter.notifyDataSetChanged();
-
-
-
-                                        bitmap = (subOrderBeanBaseEntity.getData().getPrint_code_img());
-
-
-
-                            mRun = new MyRun(subOrderBeanBaseEntity);
-                            mHandler.postDelayed(mRun, 1000);
-                        } else {
-                            showLoading(subOrderBeanBaseEntity.getMsg());
-                        }
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        closeLoading();
-                        e.printStackTrace();
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        closeLoading();
-                    }
-                });
-    }
-
-    class MyRun implements Runnable {
-
-        private BaseEntity<SubOrderBean> subOrderBeanBaseEntity;
-
-        public MyRun(BaseEntity<SubOrderBean> subOrderBeanBaseEntity) {
-            this.subOrderBeanBaseEntity = subOrderBeanBaseEntity;
-        }
-
-        @Override
-        public void run() {
-            if (flag) {
-                Message msg = Message.obtain();
-                msg.obj = subOrderBeanBaseEntity.getData();
-                mHandler.sendMessage(msg);
-                mHandler.postDelayed(this, 1000 * 3);//延迟5秒,再次执行task本身,实现了循环的效果
-            }
-
-        }
-    }
-
-    private Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            SubOrderBean subOrderBeanBaseEntity = (SubOrderBean) msg.obj;
-
-            String order_no = subOrderBeanBaseEntity.getOrder_no();
-            String qrCode = subOrderBeanBaseEntity.getPrint_code_img();
-            getPayNotice(order_no, qrCode);
-        }
-    };
-
-    public void getPayNotice(final String order_no, final String qrCode) {
-        RetrofitFactory.getInstance().API()
-                .getPayNotice(order_no)
-                .compose(this.<BaseEntity<PayNoticeBean>>setThread())
-                .subscribe(new Observer<BaseEntity<PayNoticeBean>>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-
-                    }
-
-                    @Override
-                    public void onNext(final BaseEntity<PayNoticeBean> payNoticeBeanBaseEntity) {
-                        if (payNoticeBeanBaseEntity.isSuccess()) {
-                            if (payNoticeBeanBaseEntity.getData().flag == 0) {
-                                flag = false;
-                                mHandler.removeCallbacks(mRun);
-//                                Toast.makeText(UseCashActivity.this, "支付成功", Toast.LENGTH_SHORT).show();
-                                banner.bannerOrderLayout.setVisibility(View.GONE);
-                                EventBus.getDefault().post(new BusEvent(BusEvent.PRINTER_LABEL, bitmap, order_no, payId, qrCode));
-                                finish();
-                            }
-                            LogUtils.d(payNoticeBeanBaseEntity.getData().msg);
-                        }
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });
-    }
 }
