@@ -39,10 +39,8 @@ import com.axecom.iweight.bean.Advertis;
 import com.axecom.iweight.bean.HotKeyBean;
 import com.axecom.iweight.bean.HotKeyBean_Table;
 import com.axecom.iweight.bean.LoginInfo;
-import com.axecom.iweight.bean.PayNoticeBean;
 import com.axecom.iweight.bean.SaveGoodsReqBean;
 import com.axecom.iweight.bean.ScalesCategoryGoods;
-import com.axecom.iweight.bean.SubOrderBean;
 import com.axecom.iweight.bean.SubOrderReqBean;
 import com.axecom.iweight.manager.AccountManager;
 import com.axecom.iweight.manager.MacManager;
@@ -57,10 +55,8 @@ import com.axecom.iweight.my.helper.HeartBeatServcice;
 import com.axecom.iweight.my.helper.HttpHelper;
 import com.axecom.iweight.net.RetrofitFactory;
 import com.axecom.iweight.ui.adapter.GoodMenuAdapter;
-import com.axecom.iweight.ui.uiutils.UIUtils;
 import com.axecom.iweight.utils.ButtonUtils;
 import com.axecom.iweight.utils.FileUtils;
-import com.axecom.iweight.utils.LogUtils;
 import com.axecom.iweight.utils.MoneyTextWatcher;
 import com.axecom.iweight.utils.NetworkUtil;
 import com.axecom.iweight.utils.SPUtils;
@@ -125,7 +121,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
     private String bitmap;
 
 
-    public BannerActivity banner = null;
+    public  BannerActivity banner = null;
     boolean switchSimpleOrComplex;
     boolean stopPrint;
 
@@ -184,6 +180,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
 //        LogUtils.d("------------: " + presentationDisplays.length + "  --- " + presentationDisplays[1].getName());
         if (presentationDisplays.length > 1) {
             banner = new BannerActivity(this.getApplicationContext(), presentationDisplays[1]);
+            SysApplication.bannerActivity = banner;
             Objects.requireNonNull(banner.getWindow()).setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
             banner.show();
         }
@@ -217,7 +214,6 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
             }
         });
     }
-
 
 
     /**
@@ -534,7 +530,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                     //结算时带上当前称重的记录
                     appendCurrentGood();
                     if (parseFloat(priceTotalTv.getText().toString()) > 0 || parseFloat(tvgrandTotal.getText().toString()) > 0) {
-                        showDialog(v, true);
+                        charge(true);
                     }
                 }
                 break;
@@ -543,7 +539,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                     //结算时带上当前称重的记录
                     appendCurrentGood();
                     if (parseFloat(priceTotalTv.getText().toString()) > 0 || parseFloat(tvgrandTotal.getText().toString()) > 0) {
-                        showDialog(v, false);
+                        charge(false);
                     }
                 }
                 break;
@@ -571,15 +567,6 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
             accumulative(true);
     }
 
-    private void displayToBanner(SubOrderReqBean orderBean) {
-        banner.bannerOrderLayout.setVisibility(View.VISIBLE);
-        banner.bannerTotalPriceTv.setText(getString(R.string.string_amount_txt3, parseFloat(orderBean.getTotal_amount())));
-        banner.tvPayWay.setText("支付方式：现金支付");
-        banner.bannerQRCode.setImageDrawable(this.getResources().getDrawable(R.drawable.logo));
-        banner.goodsList.clear();
-        banner.goodsList.addAll(orderBean.getGoods());
-        banner.adapter.notifyDataSetChanged();
-    }
 
     /**
      * 累计 菜品价格
@@ -610,6 +597,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         selectedGoods.count = countEt.getText().toString();
         seledtedGoodsList.add(selectedGoods);
         commodityAdapter.notifyDataSetChanged();
+        banner.showSelectedGoods(seledtedGoodsList);
 
         SQLite.update(HotKeyBean.class)
                 .set(HotKeyBean_Table.price.eq(selectedGoods.price))
@@ -620,6 +608,8 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         if (clean)
             clear(3, false);
     }
+
+
 
     @SuppressLint("DefaultLocale")
     public void calculatePrice() {
@@ -875,25 +865,6 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         }.execute();
     }
 
-//    public void btnReceiptPrint(final Bitmap bitmap, final String orderNo, final String payId, final String operator, final String price, final List<HotKeyBean> seledtedGoodsList) {
-//        threadPool = ThreadPool.getInstantiation();
-//        threadPool.addTask(new Runnable() {
-//            @Override
-//            public void run() {
-//                printerManager.printer(orderNo, payId, operator, price, bitmap, seledtedGoodsList);
-//            }
-//        });
-//    }
-//
-//    public void btnLabelPrint(final Bitmap bitmap, final String orderNo, final String payId, final String operator, final String price, final List<HotKeyBean> seledtedGoodsList) {
-//        threadPool = ThreadPool.getInstantiation();
-//        threadPool.addTask(new Runnable() {
-//            @Override
-//            public void run() {
-//                printerManager.sendLabel(orderNo, payId, operator, price, bitmap, seledtedGoodsList);
-//            }
-//        });
-//    }
 
 
     @SuppressLint("SetTextI18n")
@@ -935,7 +906,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         }
     }
 
-    public void showDialog(View v, boolean useCash) {
+    public void charge(boolean useCash) {
 
         if (seledtedGoodsList.size() < 1) {
             accumulative(true);
@@ -975,19 +946,19 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         if (useCash) {
             payCashDirect(subOrderReqBean);
         } else {
+            banner.showPayAmount( subOrderReqBean.getTotal_amount(), "");
             startActivity(intent);
         }
     }
 
     public void payCashDirect(SubOrderReqBean orderBean) {
 //        现金直接支付
-
-        displayToBanner(orderBean);
+        banner.showPayAmount(orderBean.getTotal_amount(), "支付方式：现金支付");
         String payId = "4";
         orderBean.setPayment_id(payId);
         if (NetworkUtil.isConnected(this)) {
 //            submitOrder(orderBean);
-            new PayCheckManage(this,banner,null,orderBean,payId).submitOrder();
+            new PayCheckManage(this, banner, null, orderBean, payId).submitOrder();
         } else {
             List<SubOrderReqBean> orders = (List<SubOrderReqBean>) SPUtils.readObject(this, "local_order");
             if (orders != null) {
@@ -1001,106 +972,6 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
             EventBus.getDefault().post(new BusEvent(BusEvent.PRINTER_NO_BITMAP, "", payId, ""));
         }
     }
-
-    int requestCount;
-
-/*
-    public void getPayNotice(final String order_no, final String qrCode, boolean first) {
-        if (first) requestCount = 0;
-        requestCount++;
-        if (requestCount >= 10) return;
-        RetrofitFactory.getInstance().API()
-                .getPayNotice(order_no)
-                .compose(this.<BaseEntity<PayNoticeBean>>setThread())
-                .subscribe(new Observer<BaseEntity<PayNoticeBean>>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-
-                    }
-
-                    @Override
-                    public void onNext(final BaseEntity<PayNoticeBean> payNoticeBeanBaseEntity) {
-                        if (payNoticeBeanBaseEntity.isSuccess()) {
-                            if (payNoticeBeanBaseEntity.getData().flag == 0) {
-                                EventBus.getDefault().post(new BusEvent(BusEvent.PRINTER_LABEL, bitmap, order_no, "4", qrCode));
-                            } else {
-//                              轮循获取支付结果
-                                UIUtils.postTaskSafelyDelayed(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        getPayNotice(order_no, qrCode,false);
-                                    }
-                                }, 1000);
-                            }
-                            LogUtils.d(payNoticeBeanBaseEntity.getData().msg);
-                        }
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });
-    }
-*/
-
-    /*public void submitOrder(final SubOrderReqBean subOrderReqBean) {
-        RetrofitFactory.getInstance().API()
-                .submitOrder(subOrderReqBean)
-                .compose(this.<BaseEntity<SubOrderBean>>setThread())
-                .subscribe(new Observer<BaseEntity<SubOrderBean>>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                        showLoading();
-                    }
-
-                    @Override
-                    public void onNext(final BaseEntity<SubOrderBean> subOrderBeanBaseEntity) {
-                        if (subOrderBeanBaseEntity.isSuccess()) {
-                            switch (subOrderReqBean.getPayment_id()) {
-                                case "1":
-                                    banner.tvPayWay.setText("支付方式：微信支付");
-                                    break;
-                                case "2":
-                                    banner.tvPayWay.setText("支付方式：支付宝支付");
-                                    break;
-                                case "4":
-                                    banner.tvPayWay.setText("支付方式：现金支付");
-                                    break;
-                            }
-                            SubOrderBean data = subOrderBeanBaseEntity.getData();
-                            SPUtils.putString(SysApplication.getContext(), "print_bitmap", data.getPrint_code_img());
-
-                           *//* banner.bannerOrderLayout.setVisibility(View.VISIBLE);
-                            banner.bannerTotalPriceTv.setText(getString(R.string.string_amount_txt3, parseFloat(subOrderReqBean.getTotal_amount())));
-                            banner.goodsList.clear();
-                            banner.goodsList.addAll(subOrderReqBean.getGoods());
-                            banner.adapter.notifyDataSetChanged();
-                            bitmap = (data.getPrint_code_img());*//*
-                            getPayNotice(data.getOrder_no(), data.getPrint_code_img(), true);
-                        } else {
-                            showLoading(subOrderBeanBaseEntity.getMsg());
-                        }
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        closeLoading();
-                        e.printStackTrace();
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        closeLoading();
-                    }
-                });
-    }
-*/
 
     public void getLoginInfo() {
         RetrofitFactory.getInstance().API()
@@ -1256,16 +1127,6 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                     public void onComplete() {
                     }
                 });
-    }
-
-
-    public void showInfoToBanner(SubOrderReqBean bean) {
-        banner.bannerOrderLayout.setVisibility(View.VISIBLE);
-        banner.bannerTotalPriceTv.
-                setText(getString(R.string.string_amount_txt3, Float.parseFloat(bean.getTotal_amount())));
-        banner.goodsList.clear();
-        banner.goodsList.addAll(bean.getGoods());
-        banner.adapter.notifyDataSetChanged();
     }
 
 

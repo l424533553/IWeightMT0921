@@ -604,10 +604,6 @@ public abstract class BaseActivity extends Activity implements View.OnClickListe
         }
     }
 
-    public void showInfoToBanner(SubOrderReqBean bean) {
-
-    }
-
     public <T> ObservableTransformer<T, T> setThread() {
         return new ObservableTransformer<T, T>() {
             @Override

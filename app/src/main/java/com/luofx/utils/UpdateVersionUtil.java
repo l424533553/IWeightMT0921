@@ -149,7 +149,7 @@ package com.luofx.utils;//package com.luofx.utils;//package com.coolshow.mybmobt
 //     * @param context     上下文
 //     * @param versionInfo 更新内容
 //     */
-//    public  void showDialog(final Context context, final OutputInfo versionInfo) {
+//    public  void charge(final Context context, final OutputInfo versionInfo) {
 //        if (dialog != null) {
 //            dialog = null;
 //        }

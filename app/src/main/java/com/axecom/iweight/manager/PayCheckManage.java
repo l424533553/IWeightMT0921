@@ -81,20 +81,20 @@ public class PayCheckManage {
                                         .load(data.getCode_img_url())
                                         .into(banner.bannerQRCode);
                             }
+                            String payMethod = "";
                             switch (payId) {
                                 case "1":
-                                    banner.tvPayWay.setText("支付方式：微信支付");
+                                    payMethod = "支付方式：微信支付";
                                     break;
                                 case "2":
-                                    banner.tvPayWay.setText("支付方式：支付宝支付");
+                                    payMethod ="支付方式：支付宝支付";
                                     break;
                                 case "4":
-                                    banner.tvPayWay.setText("支付方式：现金支付");
+                                    payMethod ="支付方式：现金支付";
                                     break;
                             }
                             SPUtils.putString(SysApplication.getContext(), "print_bitmap", data.getPrint_code_img());
-
-                            content.showInfoToBanner(orderBean);
+                            banner.showPayAmount(orderBean.getTotal_amount(),payMethod);
                             getPayNotice(data.getOrder_no(), data.getPrint_code_img(), true);
                         } else {
                             content.showLoading(subOrderBeanBaseEntity.getMsg());
@@ -144,7 +144,11 @@ public class PayCheckManage {
                         if (payNoticeBeanBaseEntity.isSuccess()) {
                             if (payNoticeBeanBaseEntity.getData().flag == 0) {
                                 EventBus.getDefault().post(new BusEvent(BusEvent.PRINTER_LABEL, qrCode, order_no, payId, qrCode));
-                                if (content instanceof UseCashActivity) content.finish();
+                                if (content instanceof UseCashActivity){
+                                    content.finish();
+                                    banner.showPayAmount(orderBean.getTotal_amount(),"");
+                                    banner.showSelectedGoodsResult(orderBean.getGoods());
+                                }
                             } else {
 //                              轮循获取支付结果
                                 Timer timer = new Timer();//实例化Timer类

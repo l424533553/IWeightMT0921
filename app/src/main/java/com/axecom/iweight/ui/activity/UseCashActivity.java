@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.axecom.iweight.R;
 import com.axecom.iweight.base.BaseActivity;
 import com.axecom.iweight.base.BusEvent;
+import com.axecom.iweight.base.SysApplication;
 import com.axecom.iweight.bean.SubOrderReqBean;
 import com.axecom.iweight.manager.PayCheckManage;
 import com.axecom.iweight.ui.uiutils.ImageLoaderHelper;
@@ -55,15 +56,8 @@ public class UseCashActivity extends BaseActivity implements View.OnClickListene
     private SubOrderReqBean orderBean;
     private LinearLayout cashPayLayout;
     private ImageView qrCodeIv;
-    private ImageLoader imageLoader;
-    private DisplayImageOptions options;
-    private Intent intent;
-    private Bundle bundle;
     private SoftKey softKey;
     private String payId;
-    private String bitmap;
-    private boolean flag = true;
-    public BannerActivity banner = null;
     private PayCheckManage mPayCheckManage;
 
     @Override
@@ -85,22 +79,8 @@ public class UseCashActivity extends BaseActivity implements View.OnClickListene
         cashEt.requestFocus();
         cashEt.addTextChangedListener(new MoneyTextWatcher(cashEt));
         orderBean = (SubOrderReqBean) getIntent().getExtras().getSerializable("orderBean");
-        DisplayManager displayManager = (DisplayManager) getSystemService(Context.DISPLAY_SERVICE);
-        Display[] presentationDisplays = displayManager.getDisplays();
-        if (presentationDisplays.length > 1) {
-            if (banner == null) {
-                banner = new BannerActivity(this.getApplicationContext(), presentationDisplays[1]);
-            }
-
-            Objects.requireNonNull(banner.getWindow()).setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
-            banner.show();
-        }
-
         priceTotalTv.setText(orderBean.getTotal_amount());
         priceRoundTv.setText(String.format("%.1f", Double.parseDouble(orderBean.getTotal_amount())));
-
-        imageLoader = ImageLoader.getInstance();
-        options = ImageLoaderHelper.getInstance(this).getDisplayOptions();
         confirmBtn.setOnClickListener(this);
         cancelBtn.setOnClickListener(this);
         cashPayBtn.setOnClickListener(this);
@@ -133,16 +113,7 @@ public class UseCashActivity extends BaseActivity implements View.OnClickListene
 
             }
         });
-        showInfoToBanner(orderBean);
-    }
-
-    public void showInfoToBanner(SubOrderReqBean bean) {
-        banner.bannerOrderLayout.setVisibility(View.VISIBLE);
-        banner.bannerTotalPriceTv.
-                setText(getString(R.string.string_amount_txt3, Float.parseFloat(bean.getTotal_amount())));
-        banner.goodsList.clear();
-        banner.goodsList.addAll(bean.getGoods());
-        banner.adapter.notifyDataSetChanged();
+//        showInfoToBanner(orderBean);
     }
 
     @Override
@@ -153,13 +124,6 @@ public class UseCashActivity extends BaseActivity implements View.OnClickListene
         }else if(wechatPayBtn.getVisibility()==View.GONE&&aliPayBtn.getVisibility()==View.VISIBLE){
             aliPayBtn.callOnClick();
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        flag = false;
-        banner.bannerOrderLayout.setVisibility(View.GONE);
     }
 
     @Override
@@ -181,13 +145,6 @@ public class UseCashActivity extends BaseActivity implements View.OnClickListene
                 wechatPayBtn.setTextColor(this.getResources().getColor(R.color.black));
                 cashPayLayout.setVisibility(View.VISIBLE);
                 qrCodeIv.setVisibility(View.GONE);
-                banner.bannerOrderLayout.setVisibility(View.VISIBLE);
-                banner.bannerTotalPriceTv.setText(getString(R.string.string_amount_txt3, Float.parseFloat(orderBean.getTotal_amount())));
-                banner.tvPayWay.setText("支付方式：现金支付");
-                banner.bannerQRCode.setImageDrawable(this.getResources().getDrawable(R.drawable.logo));
-                banner.goodsList.clear();
-                banner.goodsList.addAll(orderBean.getGoods());
-                banner.adapter.notifyDataSetChanged();
                 break;
             case R.id.cash_dialog_alipay_btn:
                 cashPayBtn.setBackground(this.getResources().getDrawable(R.drawable.shape_white_btn_bg));
@@ -198,7 +155,6 @@ public class UseCashActivity extends BaseActivity implements View.OnClickListene
                 wechatPayBtn.setTextColor(this.getResources().getColor(R.color.black));
                 cashPayLayout.setVisibility(View.GONE);
                 qrCodeIv.setVisibility(View.VISIBLE);
-                banner.tvPayWay.setText("支付方式：支付宝支付");
                 payId = "2";
                 setOrderBean(payId);
                 break;
@@ -211,7 +167,6 @@ public class UseCashActivity extends BaseActivity implements View.OnClickListene
                 wechatPayBtn.setTextColor(this.getResources().getColor(R.color.white));
                 cashPayLayout.setVisibility(View.GONE);
                 qrCodeIv.setVisibility(View.VISIBLE);
-                banner.tvPayWay.setText("支付方式：微信支付");
                 payId = "1";
                 setOrderBean(payId);
                 break;
@@ -225,7 +180,7 @@ public class UseCashActivity extends BaseActivity implements View.OnClickListene
                 mPayCheckManage.setCancelCheck(true);
                 mPayCheckManage = null;
             }
-            mPayCheckManage = new PayCheckManage(this, banner, qrCodeIv, orderBean, payId);
+            mPayCheckManage = new PayCheckManage(this, SysApplication.bannerActivity, qrCodeIv, orderBean, payId);
             mPayCheckManage.submitOrder();
         } else {
             List<SubOrderReqBean> orders = (List<SubOrderReqBean>) SPUtils.readObject(this, "local_order");
@@ -242,13 +197,6 @@ public class UseCashActivity extends BaseActivity implements View.OnClickListene
         }
     }
 
-    @Override
-    public void onEventMainThread(BusEvent event) {
-        super.onEventMainThread(event);
-        if (event != null) {
-
-        }
-    }
 
     @Override
     protected void onPause() {
@@ -257,6 +205,5 @@ public class UseCashActivity extends BaseActivity implements View.OnClickListene
             mPayCheckManage.setCancelCheck(true);
             mPayCheckManage = null;
         }
-
     }
 }
