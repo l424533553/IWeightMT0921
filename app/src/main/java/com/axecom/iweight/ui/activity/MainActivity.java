@@ -27,6 +27,7 @@ import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.VolleyError;
 import com.axecom.iweight.R;
@@ -534,6 +535,10 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.main_cash_btn:
+                if(SystemSettingManager.disable_cash_mode()){
+                    Toast.makeText(this,"已停用现金模式",Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 if (!ButtonUtils.isFastDoubleClick(R.id.main_cash_btn)) {
                     //结算时带上当前称重的记录
                     accumulative(true);

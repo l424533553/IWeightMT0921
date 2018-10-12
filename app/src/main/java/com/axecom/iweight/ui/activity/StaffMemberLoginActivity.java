@@ -23,9 +23,11 @@ import com.axecom.iweight.base.BaseEntity;
 import com.axecom.iweight.base.BusEvent;
 import com.axecom.iweight.base.SysApplication;
 import com.axecom.iweight.bean.LoginData;
+import com.axecom.iweight.bean.LoginInfo;
 import com.axecom.iweight.bean.User;
 import com.axecom.iweight.bean.User_Table;
 import com.axecom.iweight.manager.AccountManager;
+import com.axecom.iweight.my.entity.UserInfo;
 import com.axecom.iweight.net.RetrofitFactory;
 import com.axecom.iweight.ui.view.SoftKey;
 import com.axecom.iweight.utils.LogUtils;
@@ -166,9 +168,12 @@ public class StaffMemberLoginActivity extends BaseActivity {
                     @Override
                     public void onNext(BaseEntity<LoginData> loginDataBaseEntity) {
                         if (loginDataBaseEntity.isSuccess()) {
-//                            AccountManager.getInstance().saveToken(loginDataBaseEntity.getData().getToken());
-                            AccountManager.getInstance().setAdminToken(loginDataBaseEntity.getData().getToken());
-                            AccountManager.getInstance().setUserType(loginDataBaseEntity.getData().getUser_type());
+                            LoginData data = loginDataBaseEntity.getData();
+                            if(data.getUser_type()== LoginInfo.TYPE_seller){
+                                AccountManager.getInstance().saveToken(loginDataBaseEntity.getData().getToken());
+                            }
+                            AccountManager.getInstance().setAdminToken(data.getToken());
+                            AccountManager.getInstance().setUserType(data.getUser_type());
                             setResult(RESULT_OK);
                             EventBus.getDefault().post(new BusEvent(BusEvent.notifiySellerInfo,true));
                             finish();

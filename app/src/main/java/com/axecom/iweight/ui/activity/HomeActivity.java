@@ -348,7 +348,7 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
         final AccountManager instance = AccountManager.getInstance();
 
         String scalesId = instance.getScalesId();
-        if(scalesId !=null){
+        if(!TextUtils.isEmpty(scalesId)){
             weightTv.setText(scalesId);
             weightId = Integer.valueOf(scalesId);
             return;

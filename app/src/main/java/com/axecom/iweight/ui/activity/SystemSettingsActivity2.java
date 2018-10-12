@@ -45,14 +45,13 @@ public class SystemSettingsActivity2 extends BaseActivity {
     private CheckedTextView notClearPriceCtv, saveWeightCtv, autoObtainCtv, cashEttlementCtv, distinguishCtv, icCardSettlementCtv, stopPrintCtv, noPatchSettlementCtv, autoPrevCtv, cashRoundingCtv, stopCashCtv, stopAlipayCtv, stopweichatpayCtv;
 
 
-    List<Map<String, String>> loginTypeList = new ArrayList<>();
-    List<Map<String, String>> pricingModelList = new ArrayList<>();
-    List<Map<String, String>> printerList = new ArrayList<>();
-    List<Map<String, String>> roundingWeightList = new ArrayList<>();
-    List<Map<String, String>> screenUnitList = new ArrayList<>();
-    List<Map<String, String>> balanceRoundingList = new ArrayList<>();
+    List<Map<String, String>> loginTypeList = SystemSettingManager.getLoginTypeList();
+    List<Map<String, String>> pricingModelList = SystemSettingManager.getDefaultPricingTypeList();
+    List<Map<String, String>> printerList = SystemSettingManager.getPrinterConfigurationList();
+    List<Map<String, String>> roundingWeightList =SystemSettingManager.getRoundingWeightOptions();
+    List<Map<String, String>> screenUnitList = SystemSettingManager.getScreenUnitDisplayOptions();
+    List<Map<String, String>> balanceRoundingList = SystemSettingManager.getBalanceRoundingOptions();
     private int loginTypePos = 0, printerPos = 0, balanceRoundingPos = 0, priceingMethodPos = 0, weightRoundingPos = 0, weightUnitPos = 0;
-    LinkedTreeMap valueMap;
 
     @Override
     public View setInitView() {
@@ -138,7 +137,9 @@ public class SystemSettingsActivity2 extends BaseActivity {
                     @Override
                     public void onSelected(AdapterView<?> parent, View view, int position, long id) {
                         loginTypePos = position;
-                        loginTypeTv.setText(((Map<String, String>) parent.getAdapter().getItem(position)).get(position + 1 + ""));
+                        String optionKey = position + 1 + "";
+                        loginTypeTv.setText(((Map<String, String>) parent.getAdapter().getItem(position)).get(optionKey));
+                        loginTypeTv.setTag(position);
                     }
                 }).show();
                 break;
@@ -147,7 +148,9 @@ public class SystemSettingsActivity2 extends BaseActivity {
                     @Override
                     public void onSelected(AdapterView<?> parent, View view, int position, long id) {
                         printerPos = position;
-                        printerTv.setText(((Map<String, String>) parent.getAdapter().getItem(position)).get(position + 1 + ""));
+                        String optionKey = position + 1 + "";
+                        printerTv.setText(((Map<String, String>) parent.getAdapter().getItem(position)).get(optionKey));
+                        printerTv.setTag(optionKey);
                     }
                 }).show();
                 break;
@@ -156,7 +159,9 @@ public class SystemSettingsActivity2 extends BaseActivity {
                     @Override
                     public void onSelected(AdapterView<?> parent, View view, int position, long id) {
                         balanceRoundingPos = position;
-                        balanceRoundingTv.setText(((Map<String, String>) parent.getAdapter().getItem(position)).get(position + 1 + ""));
+                        String optionKey = position + 1 + "";
+                        balanceRoundingTv.setText(((Map<String, String>) parent.getAdapter().getItem(position)).get(optionKey));
+                        balanceRoundingTv.setTag(optionKey);
                     }
                 }).show();
                 break;
@@ -166,7 +171,9 @@ public class SystemSettingsActivity2 extends BaseActivity {
                     public void onSelected(AdapterView<?> parent, View view, int position, long id) {
                         priceingMethodPos = position;
                         SPUtils.put(SystemSettingsActivity2.this, SettingsActivity.KET_SWITCH_SIMPLE_OR_COMPLEX, position == 0 ? false : true);
-                        priceingMethodTv.setText(((Map<String, String>) parent.getAdapter().getItem(position)).get(position + 1 + ""));
+                        String optionKey = position + 1 + "";
+                        priceingMethodTv.setText(((Map<String, String>) parent.getAdapter().getItem(position)).get(optionKey));
+                        priceingMethodTv.setTag(optionKey);
                     }
                 }).show();
                 break;
@@ -175,7 +182,9 @@ public class SystemSettingsActivity2 extends BaseActivity {
                     @Override
                     public void onSelected(AdapterView<?> parent, View view, int position, long id) {
                         weightRoundingPos = position;
-                        weightRoundingTv.setText(((Map<String, String>) parent.getAdapter().getItem(position)).get(position + 1 + ""));
+                        String optionKey = position + 1 + "";
+                        weightRoundingTv.setText(((Map<String, String>) parent.getAdapter().getItem(position)).get(optionKey));
+                        weightRoundingTv.setTag(optionKey);
                     }
                 }).show();
                 break;
@@ -184,7 +193,9 @@ public class SystemSettingsActivity2 extends BaseActivity {
                     @Override
                     public void onSelected(AdapterView<?> parent, View view, int position, long id) {
                         weightUnitPos = position;
-                        weightUnitTv.setText(((Map<String, String>) parent.getAdapter().getItem(position)).get(position + 1 + ""));
+                        String key = position + 1 + "";
+                        weightUnitTv.setText(((Map<String, String>) parent.getAdapter().getItem(position)).get(key));
+                        weightUnitTv.setTag(key);
                     }
                 }).show();
                 break;
