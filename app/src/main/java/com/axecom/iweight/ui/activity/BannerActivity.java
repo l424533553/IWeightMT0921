@@ -88,7 +88,7 @@ public class BannerActivity extends Presentation {
 
     public void showPayResult(String titleText,String confirmText,long times) {
         bannerOrderLayout.setVisibility(View.VISIBLE);
-        Glide.with(context).asDrawable().into(bannerQRCode);
+        Glide.with(context).load(R.drawable.logo).into(bannerQRCode);
         titleTv.setText(titleText);
         messageBtn.setText(confirmText);
         alertView.setVisibility(View.VISIBLE);
