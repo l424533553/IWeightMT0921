@@ -45,6 +45,7 @@ import com.axecom.iweight.bean.SubOrderReqBean;
 import com.axecom.iweight.manager.AccountManager;
 import com.axecom.iweight.manager.MacManager;
 import com.axecom.iweight.manager.PayCheckManage;
+import com.axecom.iweight.manager.RecordManage;
 import com.axecom.iweight.manager.SystemSettingManager;
 import com.axecom.iweight.manager.ThreadPool;
 import com.axecom.iweight.my.adapter.CommodityAdapter;
@@ -64,6 +65,7 @@ import com.bigkoo.convenientbanner.holder.CBViewHolderCreator;
 import com.luofx.listener.VolleyListener;
 import com.luofx.listener.VolleyStringListener;
 import com.luofx.utils.PreferenceUtils;
+import com.luofx.utils.ToastUtils;
 import com.luofx.utils.log.MyLog;
 import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
@@ -539,7 +541,10 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                     //结算时带上当前称重的记录
                     appendCurrentGood();
                     if (parseFloat(priceTotalTv.getText().toString()) > 0 || parseFloat(tvgrandTotal.getText().toString()) > 0) {
-                        charge(false);
+                        if(!NetworkUtil.isConnected(this)){
+                            ToastUtils.showToast(this,"使用第三方支付需要连接网络！");
+                            charge(false);
+                        }
                     }
                 }
                 break;
@@ -671,9 +676,6 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                             priceTotalTv.getText().toString(),
                             (List<HotKeyBean>) SPUtils.readObject(MainActivity.this, "selectedGoodList"));
                 } else {
-                    if (stopPrint) {
-                        return;
-                    }
                     String orderNo = event.getStrParam();
                     String payId = event.getStrParam02();
                     SPUtils.putString(this, "print_orderno", orderNo);
@@ -695,9 +697,10 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                 int delayTimes = 2000;
                 showLoading(title, message, delayTimes);
                 banner.showPayResult(title, message, delayTimes);
+                banner.showSelectedGoods(seledtedGoodsList);
 
 
-//                orderNo = (Math.random() * 9 + 1) * 100000 + getCurrentTime("yyyyMMddHHmmss");
+//                orderNo = (Math.random() * 9 + 1r) * 100000 + getCurrentTime("yyyyMMddHHmmss");
                 int random = (int) (Math.random() * 9 + 1) * 100;
                 String orderNo = "AX" + getCurrentTime("yyyyMMddHHmmss") + random;
                 String payId = event.getStrParam02();
@@ -754,11 +757,30 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
      */
     @SuppressLint("StaticFieldLeak")
     public void btnShangtongPrint(final String bitmap, final String orderNo, final String payId, final String operator, final String price, final List<HotKeyBean> seledtedGoodsList) {
+        final String companyName = "深圳市安鑫宝科技发展有限公司";
+        final String stallNumber2 = stallNumberTv.getText().toString();//摊位号
+
+
+        RecordManage.record(companyName,
+                bitmap,
+                orderNo,
+                seller,
+                sellerid,
+                tid,
+                marketId,
+                payId,
+                operator,
+                price,
+                stallNumber2,
+                seledtedGoodsList);
+
+        if (stopPrint) { //设置关闭打印
+            return;
+        }
         threadPool = ThreadPool.getInstantiation();
         SysApplication application = (SysApplication) MainActivity.this.getApplication();
         final Print print = application.getPrint();
         final HttpHelper helper = new HttpHelper(this, application);
-        final String stallNumber2 = stallNumberTv.getText().toString();//摊位号
 
         // 还需要传订单信息
         final OrderInfo orderInfo = new OrderInfo();
@@ -776,7 +798,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                 List<ItemsBean> itemsBeans = new ArrayList<>();
 
                 StringBuilder sb = new StringBuilder();
-                sb.append("深圳市安鑫宝科技发展有限公司\n");
+                sb.append(companyName + "\n");
                 String stallNumber;
                 if (TextUtils.isEmpty(stallNumber2)) {
                     stallNumber = " ";
@@ -957,7 +979,6 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         String payId = "4";
         orderBean.setPayment_id(payId);
         if (NetworkUtil.isConnected(this)) {
-//            submitOrder(orderBean);
             new PayCheckManage(this, banner, null, orderBean, payId).submitOrder();
         } else {
             List<SubOrderReqBean> orders = (List<SubOrderReqBean>) SPUtils.readObject(this, "local_order");

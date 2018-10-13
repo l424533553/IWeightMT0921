@@ -365,7 +365,6 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {
                     }
-
                     @Override
                     public void onNext(final BaseEntity<WeightBean> baseEntity) {
                         if (baseEntity.isSuccess()) {

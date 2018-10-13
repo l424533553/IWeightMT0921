@@ -1,5 +1,7 @@
 package com.axecom.iweight.manager;
 
+import android.os.SystemClock;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -9,6 +11,8 @@ import com.axecom.iweight.base.BaseActivity;
 import com.axecom.iweight.base.BaseEntity;
 import com.axecom.iweight.base.BusEvent;
 import com.axecom.iweight.base.SysApplication;
+//import com.axecom.iweight.bean.OrderLocal;
+import com.axecom.iweight.bean.OrderLocal;
 import com.axecom.iweight.bean.PayNoticeBean;
 import com.axecom.iweight.bean.SubOrderBean;
 import com.axecom.iweight.bean.SubOrderReqBean;
@@ -19,9 +23,11 @@ import com.axecom.iweight.ui.uiutils.UIUtils;
 import com.axecom.iweight.utils.LogUtils;
 import com.axecom.iweight.utils.SPUtils;
 import com.bumptech.glide.Glide;
+import com.raizlabs.android.dbflow.sql.language.SQLite;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -46,6 +52,8 @@ public class PayCheckManage {
     BaseActivity content;
     private boolean cancelCheck;
     private int mRunCount = 20;
+    private String order_no;
+    private String print_code_img;
 
     public PayCheckManage(BaseActivity content, BannerActivity banner, ImageView qrCodeIv, SubOrderReqBean orderBean, String payId) {
         this.banner = banner;
@@ -95,7 +103,9 @@ public class PayCheckManage {
                             }
                             SPUtils.putString(SysApplication.getContext(), "print_bitmap", data.getPrint_code_img());
                             banner.showPayAmount(orderBean.getTotal_amount(),payMethod);
-                            getPayNotice(data.getOrder_no(), data.getPrint_code_img(), true);
+                            order_no = data.getOrder_no();
+                            print_code_img = data.getPrint_code_img();
+                            getPayNotice(order_no, print_code_img, true);
                         } else {
                             content.showLoading(subOrderBeanBaseEntity.getMsg());
                         }
@@ -144,6 +154,7 @@ public class PayCheckManage {
                         if (payNoticeBeanBaseEntity.isSuccess()) {
                             if (payNoticeBeanBaseEntity.getData().flag == 0) {
                                 EventBus.getDefault().post(new BusEvent(BusEvent.PRINTER_LABEL, qrCode, order_no, payId, qrCode));
+                                recodeOrder();
                                 if (content instanceof UseCashActivity){
                                     content.finish();
                                     banner.showPayAmount(orderBean.getTotal_amount(),"");
@@ -173,6 +184,10 @@ public class PayCheckManage {
 
                     }
                 });
+    }
+
+    private void recodeOrder() {
+
     }
 
     public void setCancelCheck(boolean cancelCheck) {

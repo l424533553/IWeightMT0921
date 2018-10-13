@@ -1,6 +1,7 @@
 package com.axecom.iweight.ui.activity;
 
 import android.content.Context;
+import android.os.SystemClock;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,7 +16,9 @@ import com.axecom.iweight.R;
 import com.axecom.iweight.base.BaseActivity;
 import com.axecom.iweight.base.BaseEntity;
 import com.axecom.iweight.bean.LocalSettingsBean;
+import com.axecom.iweight.bean.OrderGoods;
 import com.axecom.iweight.bean.OrderListResultBean;
+import com.axecom.iweight.bean.OrderLocal;
 import com.axecom.iweight.bean.ReportResultBean;
 import com.axecom.iweight.manager.AccountManager;
 import com.axecom.iweight.manager.MacManager;
@@ -24,9 +27,12 @@ import com.axecom.iweight.manager.ThreadPool;
 import com.axecom.iweight.net.RetrofitFactory;
 import com.axecom.iweight.utils.LogUtils;
 import com.axecom.iweight.utils.SPUtils;
+import com.raizlabs.android.dbflow.sql.language.SQLite;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
@@ -387,6 +393,39 @@ public class DataSummaryActivity extends BaseActivity {
                 }
             }
         });
+    }
+
+    public void insert(View view) {
+        String uuid = UUID.randomUUID().toString();
+        OrderLocal orderLocal = new OrderLocal();
+                orderLocal.companyName = "teset";
+                orderLocal.orderTime = new Date(System.currentTimeMillis());
+                orderLocal.orderNumber = uuid;
+        orderLocal.save();
+
+        for(int i=0;i<10;i++){
+            OrderGoods goods =new OrderGoods();
+            goods.name = "good"+i;
+            goods.orderNumber = uuid;
+            goods.save();
+        }
+    }
+
+
+
+    public void read(View view) {
+        List<OrderGoods> goods = SQLite.select().from(OrderGoods.class).queryList();
+        for(OrderGoods goods1 :goods){
+            LogUtils.d(goods1.toString());
+        }
+    }
+
+    public void readGoods(View view) {
+        List<OrderLocal> orderLocals = SQLite.select().from(OrderLocal.class).queryList();
+        for(OrderLocal orderLocal :orderLocals){
+            LogUtils.d(orderLocal.toString());
+        }
+//        SQLite.select().from(OrderGoods.class).groupBy()
     }
 
     class DataAdapter extends BaseAdapter {
