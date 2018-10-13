@@ -147,7 +147,7 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
             logBean.setLocation(getLocalClassName());
             sysApplication.getBaseDao().insert(logBean);
         }
-        UpdateManager.getNewVersion(this);
+//        UpdateManager.getNewVersion(this);
         return rootView;
     }
 
@@ -508,7 +508,7 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
                 editor.putInt(SELLER_ID, userInfo.getSellerid());
                 editor.putString(SELLER, userInfo.getSeller());
                 editor.apply();
-                UpdateManager.getNewVersion(HomeActivity.this);
+//                UpdateManager.getNewVersion(HomeActivity.this);
             }
         }
     }

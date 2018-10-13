@@ -36,7 +36,7 @@ public class RecordManage {
         orderLocal.operator = operator;
         orderLocal.stallNumber = stallNumber;
         orderLocal.totalAmount = parseDouble(price);
-        orderLocal.orderTime = new Date(System.currentTimeMillis());
+//        orderLocal.orderTime = new Date(System.currentTimeMillis());
         orderLocal.save();
 
         for (HotKeyBean bean :

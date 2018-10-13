@@ -14,44 +14,37 @@ import java.util.List;
 
 //import java.util.Date;
 
-@Table(database = AppDatabase.class)
 public class OrderLocal extends BaseModel {
-    @PrimaryKey(autoincrement = true)//ID自增
     public long id;
-    @Column
     public String companyName;
-    @Column
-    public java.util.Date orderTime;
-    @Column
+    public String orderTime;
     public String orderNumber;
-    @Column
     public String stallNumber;
     public String qrCode;
-    @Column
     public String seller;
-    @Column
     public int sellerid;
-    @Column
     public int tid;
-    @Column
     public int marketId;
-    @Column
     public String payId;
-    @Column
     public String operator;
-    @Column
     public double totalAmount;
 
-    public List<OrderGoods> goods;
-
-    @OneToMany(methods = {OneToMany.Method.ALL}, variableName = "goods")
-    public List<OrderGoods> getGoods() {
-        if (goods == null || goods.isEmpty()) {
-            goods = SQLite.select()
-                    .from(OrderGoods.class)
-                    .where(OrderGoods_Table.orderNumber.eq(orderNumber))
-                    .queryList();
-        }
-        return goods;
+    public static class Entry {
+        public static final String TABLE_NAME = "OrderLocal";
+        public static final String id = "id";
+        public static final String companyName = "companyName";
+        public static final String orderTime = "orderTime";
+        public static final String orderNumber = "orderNumber";
+        public static final String stallNumber = "stallNumber";
+        public static final String qrCode = "qrCode";
+        public static final String seller = "seller";
+        public static final String sellerid = "sellerid";
+        public static final String tid = "tid";
+        public static final String marketId = "marketId";
+        public static final String payId = "payId";
+        public static final String operator = "operator";
+        public static final String totalAmount = "totalAmount";
     }
+
+
 }

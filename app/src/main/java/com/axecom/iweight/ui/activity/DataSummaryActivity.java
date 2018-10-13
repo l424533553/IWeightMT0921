@@ -399,7 +399,7 @@ public class DataSummaryActivity extends BaseActivity {
         String uuid = UUID.randomUUID().toString();
         OrderLocal orderLocal = new OrderLocal();
                 orderLocal.companyName = "teset";
-                orderLocal.orderTime = new Date(System.currentTimeMillis());
+//                orderLocal.orderTime = new Date(System.currentTimeMillis());
                 orderLocal.orderNumber = uuid;
         orderLocal.save();
 
@@ -418,6 +418,14 @@ public class DataSummaryActivity extends BaseActivity {
         for(OrderGoods goods1 :goods){
             LogUtils.d(goods1.toString());
         }
+//        select DATE_FORMAT(start_time,'%Y%m') months,count(product_no) count from test group bymonths;
+
+//        SQLite.select(count(Employee_Table.name), sum(Employee_Table.salary))
+//                .from(Employee.class)
+//        SELECT COUNT(`name`), SUM(`salary`) FROM `Employee`;
+
+
+
     }
 
     public void readGoods(View view) {
@@ -425,7 +433,7 @@ public class DataSummaryActivity extends BaseActivity {
         for(OrderLocal orderLocal :orderLocals){
             LogUtils.d(orderLocal.toString());
         }
-//        SQLite.select().from(OrderGoods.class).groupBy()
+//        SQLite.select().from(Goo)
     }
 
     class DataAdapter extends BaseAdapter {
