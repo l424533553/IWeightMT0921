@@ -147,7 +147,14 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
             logBean.setLocation(getLocalClassName());
             sysApplication.getBaseDao().insert(logBean);
         }
-//        UpdateManager.getNewVersion(this);
+        UpdateManager.getNewVersion(this, new UpdateManager.UpdateResult() {
+            @Override
+            public void onResult(boolean hasUpdate) {
+                if(!hasUpdate){
+                    initAutoLogin();
+                }
+            }
+        });
         return rootView;
     }
 
@@ -178,7 +185,14 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
         intentFilter.addAction("android.hardware.usb.action.USB_DEVICE_ATTACHED");
         registerReceiver(usbReceiver, intentFilter);
 
-        initAutoLogin();
+        String lastSerialNumber = AccountManager.getInstance().getLastSerialNumber();
+        boolean serialNumberEmpty = TextUtils.isEmpty(lastSerialNumber);
+        String pwd ="";
+        if(!serialNumberEmpty){
+            pwd = AccountManager.getInstance().getPwdBySerialNumber(lastSerialNumber);
+            cardNumberTv.setText(lastSerialNumber);
+            pwdTv.setText(pwd);
+        }
     }
 
     private void initAutoLogin() {
@@ -512,4 +526,5 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
             }
         }
     }
+
 }

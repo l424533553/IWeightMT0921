@@ -56,6 +56,7 @@ import com.axecom.iweight.my.helper.HeartBeatServcice;
 import com.axecom.iweight.my.helper.HttpHelper;
 import com.axecom.iweight.net.RetrofitFactory;
 import com.axecom.iweight.ui.adapter.GoodMenuAdapter;
+import com.axecom.iweight.ui.uiutils.UIUtils;
 import com.axecom.iweight.utils.ButtonUtils;
 import com.axecom.iweight.utils.FileUtils;
 import com.axecom.iweight.utils.MoneyTextWatcher;
@@ -82,6 +83,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
@@ -509,6 +512,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
     protected void onDestroy() {
         unbindService(mConnection);
         weighUtils.closeSerialPort();
+        FileUtils.saveObject(this, (Serializable) HotKeyBeanList, CommodityManagementActivity.SelectedGoodsState.selectedGoods);
         super.onDestroy();
     }
 
@@ -543,6 +547,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                     if (parseFloat(priceTotalTv.getText().toString()) > 0 || parseFloat(tvgrandTotal.getText().toString()) > 0) {
                         if(!NetworkUtil.isConnected(this)){
                             ToastUtils.showToast(this,"使用第三方支付需要连接网络！");
+                        }else {
                             charge(false);
                         }
                     }
@@ -582,7 +587,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
 
 
         }
-        if (TextUtils.isEmpty(etPrice.getText()) && TextUtils.isEmpty(etPrice.getHint().toString())) {
+        if (TextUtils.isEmpty(etPrice.getText()) && TextUtils.isEmpty(etPrice.getHint())) {
             return;
         }
         if (parseFloat(tvgrandTotal.getText().toString()) <= 0) {
@@ -759,9 +764,9 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
     public void btnShangtongPrint(final String bitmap, final String orderNo, final String payId, final String operator, final String price, final List<HotKeyBean> seledtedGoodsList) {
         final String companyName = "深圳市安鑫宝科技发展有限公司";
         final String stallNumber2 = stallNumberTv.getText().toString();//摊位号
+        final String currentTime = getCurrentTime();
 
-
-        RecordManage.record(companyName,
+        RecordManage.record(true,companyName,
                 bitmap,
                 orderNo,
                 seller,
@@ -772,6 +777,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                 operator,
                 price,
                 stallNumber2,
+                currentTime,
                 seledtedGoodsList);
 
         if (stopPrint) { //设置关闭打印
@@ -794,7 +800,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                 orderInfo.setSellerid(sellerid);
                 orderInfo.setTerid(tid);
                 orderInfo.setMarketid(marketId);
-                orderInfo.setTime(getCurrentTime());
+                orderInfo.setTime(currentTime);
                 List<ItemsBean> itemsBeans = new ArrayList<>();
 
                 StringBuilder sb = new StringBuilder();
@@ -806,7 +812,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                     stallNumber = stallNumber2;
                 }
 
-                sb.append("交易日期：").append(getCurrentTime()).append("\n");
+                sb.append("交易日期：").append(currentTime).append("\n");
                 sb.append("交易单号：").append(orderNo).append("\n");
 
                 if (TextUtils.equals(payId, "1")) {
@@ -907,6 +913,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
 
             commodityAdapter = new CommodityAdapter(this, seledtedGoodsList);
             commoditysListView.setAdapter(commodityAdapter);
+            selectedGoods = null;
 
             goodMenuAdapter.cleanCheckedPosition();
             goodMenuAdapter.notifyDataSetChanged();
@@ -1176,5 +1183,23 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
     @Override
     public void onResponse(String response, int flag) {
         MyLog.myInfo("成功" + response);
+    }
+
+    int pressCount = 0;
+    @Override
+    public void onBackPressed() {
+        if(pressCount==0){
+            ToastUtils.showToast(this,"再次点击退出！");
+            pressCount++;
+            Timer timer = new Timer();//实例化Timer类
+            timer.schedule(new TimerTask() {
+                public void run() {
+                    pressCount=0;
+                    this.cancel();
+                }
+            }, 2000);//五百毫秒
+            return;
+        }
+        super.onBackPressed();
     }
 }

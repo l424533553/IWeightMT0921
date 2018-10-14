@@ -23,10 +23,14 @@ import android.widget.Toast;
 
 import com.axecom.iweight.R;
 import com.axecom.iweight.base.BaseActivity;
+import com.axecom.iweight.base.BaseEntity;
 import com.axecom.iweight.base.BusEvent;
 import com.axecom.iweight.bean.SettingsBean;
+import com.axecom.iweight.bean.WeightBean;
 import com.axecom.iweight.manager.AccountManager;
+import com.axecom.iweight.manager.MacManager;
 import com.axecom.iweight.manager.SystemSettingManager;
+import com.axecom.iweight.net.RetrofitFactory;
 import com.axecom.iweight.ui.view.BTHelperDialog;
 import com.axecom.iweight.utils.SPUtils;
 
@@ -41,6 +45,9 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Observer;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
 import top.wuhaojie.bthelper.BtHelperClient;
 
 /**
@@ -223,6 +230,7 @@ public class SettingsActivity extends BaseActivity {
                 case POSITION_UPDATE:
                     showLoading();
                     SystemSettingManager.updateData(SettingsActivity.this);
+                    updateScalesId();
 
                     new Handler().postDelayed(new Runnable() {
                         @Override
@@ -253,6 +261,35 @@ public class SettingsActivity extends BaseActivity {
             }
         }
     };
+
+    private void updateScalesId() {
+        RetrofitFactory.getInstance().API()
+                .getScalesIdByMac(MacManager.getInstace(this).getMac())
+                .compose(this.<BaseEntity<WeightBean>>setThread())
+                .subscribe(new Observer<BaseEntity<WeightBean>>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                    }
+                    @Override
+                    public void onNext(final BaseEntity<WeightBean> baseEntity) {
+                        if (baseEntity.isSuccess()) {
+                            AccountManager.getInstance().saveScalesId(baseEntity.getData().getId() + "");
+                        } else {
+                            showLoading(baseEntity.getMsg());
+                        }
+                    }
+
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        closeLoading();
+                    }
+                });
+    }
 
     private BroadcastReceiver netWorkReceiver = new BroadcastReceiver() {
 

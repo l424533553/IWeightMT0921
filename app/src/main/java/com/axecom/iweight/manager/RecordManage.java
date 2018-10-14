@@ -5,9 +5,7 @@ import android.text.TextUtils;
 import com.axecom.iweight.bean.HotKeyBean;
 import com.axecom.iweight.bean.OrderGoods;
 import com.axecom.iweight.bean.OrderLocal;
-import com.axecom.iweight.utils.CommonUtils;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -16,13 +14,16 @@ import java.util.List;
 
 public class RecordManage {
     public static void record(
+            boolean record,
             String companyName,
             String bitmap, String orderNo,
             String seller,
             int sellerid, int tid,
             int marketId, String payId,
             String operator, String price,
-            String stallNumber, List<HotKeyBean> seledtedGoodsList) {
+            String stallNumber, String time,
+            List<HotKeyBean> seledtedGoodsList) {
+        if(!record)return;
 
         OrderLocal orderLocal = new OrderLocal();
         orderLocal.companyName = companyName;
@@ -36,8 +37,7 @@ public class RecordManage {
         orderLocal.operator = operator;
         orderLocal.stallNumber = stallNumber;
         orderLocal.totalAmount = parseDouble(price);
-//        orderLocal.orderTime = new Date(System.currentTimeMillis());
-        orderLocal.save();
+        orderLocal.orderTime = time;
 
         for (HotKeyBean bean :
                 seledtedGoodsList) {
@@ -47,8 +47,6 @@ public class RecordManage {
             goods.weight = parseFloat(bean.weight);
             goods.price = parseFloat(bean.price);
             goods.amount =parseDouble(bean.grandTotal);
-//            goods.countType =bean.
-            goods.save();
         }
     }
 
