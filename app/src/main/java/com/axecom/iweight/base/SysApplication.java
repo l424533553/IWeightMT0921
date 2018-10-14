@@ -12,6 +12,7 @@ import android.telephony.TelephonyManager;
 
 import com.axecom.iweight.R;
 import com.axecom.iweight.manager.GPprinterManager;
+import com.axecom.iweight.ui.activity.BannerActivity;
 import com.axecom.iweight.utils.LogUtils;
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -42,35 +43,18 @@ public class SysApplication extends ShangTongApp {
     public static long mMainThreadId;
     public static SysApplication instance;
     private List<String> mSerachHistoryList;
-    private int qtyCount;
-    private String orderNumber;
-    private int shippingScheme;
-    private int paymentRequestCode;
-    private String giftCardOrderNo;
-    private long giftCardOrderId;
-    private long parcelId;
-    private int orderType;
-    public static String machineCode;
     public static int mWidthPixels;
     public static int mHeightPixels;
-    public GPprinterManager gPprinterManager;
     private UsbSerialDriver gpDriver;
     private UsbDevice usbDevice;
+    public static BannerActivity bannerActivity;
 
     private static DisplayImageOptions options02;
 
 
-    //    当前发起付款的包裹
-//    public static String mCurrentPaingParcel = "";
-
-    public static int uIn;
-
-    //    device_token
-    public static String mDeviceToken = "";
     private static ImageLoader mImageLoader;
 
-    //    当前请求支付的页面
-    public static String mCurrentRequestPayment = "";
+
 
     public static Context getContext() {
         return mContext;

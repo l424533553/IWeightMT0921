@@ -27,6 +27,7 @@ import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.VolleyError;
 import com.axecom.iweight.R;
@@ -38,15 +39,15 @@ import com.axecom.iweight.bean.Advertis;
 import com.axecom.iweight.bean.HotKeyBean;
 import com.axecom.iweight.bean.HotKeyBean_Table;
 import com.axecom.iweight.bean.LoginInfo;
-import com.axecom.iweight.bean.PayNoticeBean;
 import com.axecom.iweight.bean.SaveGoodsReqBean;
 import com.axecom.iweight.bean.ScalesCategoryGoods;
-import com.axecom.iweight.bean.SubOrderBean;
 import com.axecom.iweight.bean.SubOrderReqBean;
 import com.axecom.iweight.manager.AccountManager;
 import com.axecom.iweight.manager.MacManager;
+import com.axecom.iweight.manager.PayCheckManage;
+import com.axecom.iweight.manager.RecordManage;
+import com.axecom.iweight.manager.SystemSettingManager;
 import com.axecom.iweight.manager.ThreadPool;
-import com.axecom.iweight.manager.UpdateManager;
 import com.axecom.iweight.my.adapter.CommodityAdapter;
 import com.axecom.iweight.my.adapter.DigitalAdapter;
 import com.axecom.iweight.my.entity.ItemsBean;
@@ -55,9 +56,9 @@ import com.axecom.iweight.my.helper.HeartBeatServcice;
 import com.axecom.iweight.my.helper.HttpHelper;
 import com.axecom.iweight.net.RetrofitFactory;
 import com.axecom.iweight.ui.adapter.GoodMenuAdapter;
+import com.axecom.iweight.ui.uiutils.UIUtils;
 import com.axecom.iweight.utils.ButtonUtils;
 import com.axecom.iweight.utils.FileUtils;
-import com.axecom.iweight.utils.LogUtils;
 import com.axecom.iweight.utils.MoneyTextWatcher;
 import com.axecom.iweight.utils.NetworkUtil;
 import com.axecom.iweight.utils.SPUtils;
@@ -65,8 +66,8 @@ import com.bigkoo.convenientbanner.holder.CBViewHolderCreator;
 import com.luofx.listener.VolleyListener;
 import com.luofx.listener.VolleyStringListener;
 import com.luofx.utils.PreferenceUtils;
+import com.luofx.utils.ToastUtils;
 import com.luofx.utils.log.MyLog;
-
 import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.raizlabs.android.dbflow.structure.ModelAdapter;
@@ -82,10 +83,13 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 
+import static com.axecom.iweight.utils.CommonUtils.parseFloat;
 import static com.shangtongyin.tools.serialport.IConstants_ST.MARKET_ID;
 import static com.shangtongyin.tools.serialport.IConstants_ST.NOTIFY_WEIGHT;
 import static com.shangtongyin.tools.serialport.IConstants_ST.SELLER;
@@ -122,16 +126,16 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
     private String bitmap;
 
 
-    public BannerActivity banner = null;
+    public  BannerActivity banner = null;
     boolean switchSimpleOrComplex;
     boolean stopPrint;
 
     /************************************************************************************/
     private SysApplication application;
     private ThreadPool threadPool;  //线程池 管理
-    private MyRun mRun;
     private boolean flag = true;
     private TextView loginTypeName;
+    private boolean mNotPushRemote;
 
     @SuppressLint("InflateParams")
     @Override
@@ -181,6 +185,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
 //        LogUtils.d("------------: " + presentationDisplays.length + "  --- " + presentationDisplays[1].getName());
         if (presentationDisplays.length > 1) {
             banner = new BannerActivity(this.getApplicationContext(), presentationDisplays[1]);
+            SysApplication.bannerActivity = banner;
             Objects.requireNonNull(banner.getWindow()).setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
             banner.show();
         }
@@ -188,7 +193,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         advertising();
 
         weightTopTv.setOnClickListener(this);
-        UpdateManager.getNewVersion(this);
+        SystemSettingManager.getSettingData(this);
         return rootView;
     }
 
@@ -215,14 +220,6 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         });
     }
 
-
-    /*    *//**
-     * 清除  按键
-     *//*
-    private void eliminate() {
-        tvgrandTotal.setHint("0");
-        tvgrandTotal.setText("0.00");
-    }*/
 
     /**
      * 初始化结算列表
@@ -300,17 +297,17 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
 
                 float count = 0;
                 if (!TextUtils.isEmpty(countEt.getText())) {
-                    count = Float.parseFloat(countEt.getText().toString());
+                    count = parseFloat(countEt.getText().toString());
                 } else if (!TextUtils.isEmpty(countEt.getHint())) {
-                    count = Float.parseFloat(countEt.getHint().toString());
+                    count = parseFloat(countEt.getHint().toString());
                 }
                 if (switchSimpleOrComplex) {
-                    tvgrandTotal.setText(String.format("%.2f", Float.parseFloat(selectedGoods.price) * count));
+                    tvgrandTotal.setText(String.format("%.2f", parseFloat(selectedGoods.price) * count));
                 } else {
                     if (weightTopTv.getText().toString().indexOf('.') == -1 || weightTopTv.getText().length() - (weightTopTv.getText().toString().indexOf(".") + 1) <= 1) {
-                        tvgrandTotal.setText(String.format("%.2f", Float.parseFloat(selectedGoods.price) * Float.parseFloat(weightTopTv.getText().toString()) / 1000));
+                        tvgrandTotal.setText(String.format("%.2f", parseFloat(selectedGoods.price) * parseFloat(weightTopTv.getText().toString()) / 1000));
                     } else {
-                        tvgrandTotal.setText(String.format("%.2f", Float.parseFloat(selectedGoods.price) * Float.parseFloat(weightTopTv.getText().toString())));
+                        tvgrandTotal.setText(String.format("%.2f", parseFloat(selectedGoods.price) * parseFloat(weightTopTv.getText().toString())));
                     }
                 }
 
@@ -477,29 +474,29 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         try {
             float count = 0;
             if (!TextUtils.isEmpty(countEt.getText())) {
-                count = Float.parseFloat(countEt.getText().toString());
+                count = parseFloat(countEt.getText().toString());
             } else if (!TextUtils.isEmpty(countEt.getHint())) {
-                count = Float.parseFloat(countEt.getHint().toString());
+                count = parseFloat(countEt.getHint().toString());
             }
             if (switchSimpleOrComplex) {
                 if (!TextUtils.isEmpty(etPrice.getText())) {
-                    tvgrandTotal.setText(String.format("%.2f", Float.parseFloat(etPrice.getText().toString()) * count));
+                    tvgrandTotal.setText(String.format("%.2f", parseFloat(etPrice.getText().toString()) * count));
                 } else if (!TextUtils.isEmpty(etPrice.getHint())) {
-                    tvgrandTotal.setText(String.format("%.2f", Float.parseFloat(etPrice.getHint().toString()) * count));
+                    tvgrandTotal.setText(String.format("%.2f", parseFloat(etPrice.getHint().toString()) * count));
                 }
 
             } else {
                 if (!TextUtils.isEmpty(etPrice.getText())) {
                     if (weightTopTv.getText().toString().indexOf('.') == -1 || weightTopTv.getText().length() - (weightTopTv.getText().toString().indexOf(".") + 1) <= 1) {
-                        tvgrandTotal.setText(String.format("%.2f", Float.parseFloat(etPrice.getText().toString()) * Float.parseFloat(weightTopTv.getText().toString()) / 1000));
+                        tvgrandTotal.setText(String.format("%.2f", parseFloat(etPrice.getText().toString()) * parseFloat(weightTopTv.getText().toString()) / 1000));
                     } else {
-                        tvgrandTotal.setText(String.format("%.2f", Float.parseFloat(etPrice.getText().toString()) * Float.parseFloat(weightTopTv.getText().toString())));
+                        tvgrandTotal.setText(String.format("%.2f", parseFloat(etPrice.getText().toString()) * parseFloat(weightTopTv.getText().toString())));
                     }
                 } else if (!TextUtils.isEmpty(etPrice.getHint())) {
                     if (weightTopTv.getText().toString().indexOf('.') == -1 || weightTopTv.getText().length() - (weightTopTv.getText().toString().indexOf(".") + 1) <= 1) {
-                        tvgrandTotal.setText(String.format("%.2f", Float.parseFloat(etPrice.getHint().toString()) * Float.parseFloat(weightTopTv.getText().toString()) / 1000));
+                        tvgrandTotal.setText(String.format("%.2f", parseFloat(etPrice.getHint().toString()) * parseFloat(weightTopTv.getText().toString()) / 1000));
                     } else {
-                        tvgrandTotal.setText(String.format("%.2f", Float.parseFloat(etPrice.getHint().toString()) * Float.parseFloat(weightTopTv.getText().toString())));
+                        tvgrandTotal.setText(String.format("%.2f", parseFloat(etPrice.getHint().toString()) * parseFloat(weightTopTv.getText().toString())));
                     }
                 }
             }
@@ -514,6 +511,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
             unbindService(mConnection);
         }
         weighUtils.closeSerialPort();
+        FileUtils.saveObject(this, (Serializable) HotKeyBeanList, CommodityManagementActivity.SelectedGoodsState.selectedGoods);
         super.onDestroy();
     }
 
@@ -529,20 +527,28 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.main_cash_btn:
+                if (SystemSettingManager.disable_cash_mode()) {
+                    Toast.makeText(this, "已停用现金模式", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 if (!ButtonUtils.isFastDoubleClick(R.id.main_cash_btn)) {
                     //结算时带上当前称重的记录
-                    accumulative(true);
-                    if (Float.parseFloat(priceTotalTv.getText().toString()) > 0 || Float.parseFloat(tvgrandTotal.getText().toString()) > 0) {
-                        showDialog(v, true);
+                    appendCurrentGood();
+                    if (parseFloat(priceTotalTv.getText().toString()) > 0 || parseFloat(tvgrandTotal.getText().toString()) > 0) {
+                        charge(true);
                     }
                 }
                 break;
             case R.id.main_scan_pay:
                 if (!ButtonUtils.isFastDoubleClick(R.id.main_scan_pay)) {
                     //结算时带上当前称重的记录
-                    accumulative(true);
-                    if (Float.parseFloat(priceTotalTv.getText().toString()) > 0 || Float.parseFloat(tvgrandTotal.getText().toString()) > 0) {
-                        showDialog(v, false);
+                    appendCurrentGood();
+                    if (parseFloat(priceTotalTv.getText().toString()) > 0 || parseFloat(tvgrandTotal.getText().toString()) > 0) {
+                        if(!NetworkUtil.isConnected(this)){
+                            ToastUtils.showToast(this,"使用第三方支付需要连接网络！");
+                        }else {
+                            charge(false);
+                        }
                     }
                 }
                 break;
@@ -554,10 +560,10 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                 }
                 break;
             case R.id.main_clear_btn:
-                clear(0);
+                clear(0, false);
                 break;
             case R.id.main_digital_clear_btn:
-                clear(1);
+                clear(1, false);
                 break;
             case R.id.main_digital_add_btn:
                 accumulative(false);
@@ -565,15 +571,11 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         }
     }
 
-    private void displayToBanner(SubOrderReqBean orderBean) {
-        banner.bannerOrderLayout.setVisibility(View.VISIBLE);
-        banner.bannerTotalPriceTv.setText(getString(R.string.string_amount_txt3, Float.parseFloat(orderBean.getTotal_amount())));
-        banner.tvPayWay.setText("支付方式：现金支付");
-        banner.bannerQRCode.setImageDrawable(this.getResources().getDrawable(R.drawable.logo));
-        banner.goodsList.clear();
-        banner.goodsList.addAll(orderBean.getGoods());
-        banner.adapter.notifyDataSetChanged();
+    private void appendCurrentGood() {
+        if (seledtedGoodsList.size() == 0)
+            accumulative(true);
     }
+
 
     /**
      * 累计 菜品价格
@@ -582,10 +584,10 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         if (selectedGoods == null) {
             return;
         }
-        if (TextUtils.isEmpty(etPrice.getText()) && TextUtils.isEmpty(etPrice.getHint().toString())) {
+        if (TextUtils.isEmpty(etPrice.getText()) && TextUtils.isEmpty(etPrice.getHint())) {
             return;
         }
-        if (Float.parseFloat(tvgrandTotal.getText().toString()) <= 0) {
+        if (parseFloat(tvgrandTotal.getText().toString()) <= 0) {
             return;
         }
         HotKeyBean selectedGoods = new HotKeyBean();
@@ -594,6 +596,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         selectedGoods.name = MainActivity.this.selectedGoods.name;
         selectedGoods.traceable_code = MainActivity.this.selectedGoods.traceable_code;
         selectedGoods.is_default = MainActivity.this.selectedGoods.is_default;
+        selectedGoods.batch_code = MainActivity.this.selectedGoods.batch_code;
 
         selectedGoods.weight = weightTopTv.getText().toString();
         selectedGoods.price = TextUtils.isEmpty(etPrice.getText().toString()) ? etPrice.getHint().toString() : etPrice.getText().toString();
@@ -601,6 +604,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         selectedGoods.count = countEt.getText().toString();
         seledtedGoodsList.add(selectedGoods);
         commodityAdapter.notifyDataSetChanged();
+        banner.showSelectedGoods(seledtedGoodsList);
 
         SQLite.update(HotKeyBean.class)
                 .set(HotKeyBean_Table.price.eq(selectedGoods.price))
@@ -609,8 +613,10 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         MainActivity.this.selectedGoods.price = selectedGoods.price;
         calculatePrice();
         if (clean)
-            clear(3);
+            clear(3, false);
     }
+
+
 
     @SuppressLint("DefaultLocale")
     public void calculatePrice() {
@@ -619,8 +625,8 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         for (int i = 0; i < seledtedGoodsList.size(); i++) {
             HotKeyBean goods = seledtedGoodsList.get(i);
             if (!TextUtils.isEmpty(goods.price)) {
-                weightTotalF += Float.parseFloat(goods.weight);
-                priceTotal += Float.parseFloat(goods.grandTotal);
+                weightTotalF += parseFloat(goods.weight);
+                priceTotal += parseFloat(goods.grandTotal);
             }
         }
 
@@ -634,26 +640,18 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         super.onEventMainThread(event);
         if (event != null) {
             if (event.getType() == BusEvent.POSITION_PATCH22) {  //补打上一笔 交易
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
+                String bmpUrl = SPUtils.getString(MainActivity.this, "print_bitmap", "");
+                String price = SPUtils.getString(MainActivity.this, "print_price", "");
+                String orderNo = SPUtils.getString(MainActivity.this, "print_orderno", "");
+                String payId = SPUtils.getString(MainActivity.this, "print_payid", "");
+                String priceTotal = SPUtils.getString(MainActivity.this, "print_price", "");
+                btnShangtongPrint(bmpUrl,
+                        orderNo,
+                        payId,
+                        operatorTv.getText().toString(),
+                        priceTotalTv.getText().toString(),
+                        (List<HotKeyBean>) SPUtils.readObject(MainActivity.this, "selectedGoodList"));
 
-                        String bmpUrl = SPUtils.getString(MainActivity.this, "print_bitmap", "");
-                        String price = SPUtils.getString(MainActivity.this, "print_price", "");
-                        String orderNo = SPUtils.getString(MainActivity.this, "print_orderno", "");
-                        String payId = SPUtils.getString(MainActivity.this, "print_payid", "");
-                        String priceTotal = SPUtils.getString(MainActivity.this, "print_price", "");
-//                            bitmap = BitmapFactory.decodeStream(new URL(bmpUrl).openStream());
-//                            btnPrint2(bitmap, orderNo, payId, operatorTv.getText().toString(), priceTotal, (List<HotKeyBean>) SPUtils.readObject(MainActivity.this, "selectedGoodList"));
-
-                        btnShangtongPrint(bmpUrl,
-                                orderNo,
-                                payId,
-                                operatorTv.getText().toString(),
-                                priceTotalTv.getText().toString(),
-                                (List<HotKeyBean>) SPUtils.readObject(MainActivity.this, "selectedGoodList"));
-                    }
-                }).start();
             }
 
             if (event.getType() == BusEvent.PRINTER_LABEL || event.getType() == BusEvent.POSITION_PATCH) {
@@ -667,32 +665,19 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
 
 //                bitmap = (Bitmap) event.getParam();
                 bitmap = event.getQrString();
-                if (bitmap == null) {
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-
-                            String bmpUrl = SPUtils.getString(MainActivity.this, "print_bitmap", "");
-                            String price = SPUtils.getString(MainActivity.this, "print_price", "");
-                            String orderNo = SPUtils.getString(MainActivity.this, "print_orderno", "");
-                            String payId = SPUtils.getString(MainActivity.this, "print_payid", "");
-                            String priceTotal = SPUtils.getString(MainActivity.this, "print_price", "");
-//                                bitmap = BitmapFactory.decodeStream(new URL(bmpUrl).openStream());
-//                                btnPrint(qrString, orderNo, payId, operatorTv.getText().toString(), priceTotalTv.getText().toString(), (List<HotKeyBean>) SPUtils.readObject(MainActivity.this, "selectedGoodList"));
-
-                            btnShangtongPrint(bmpUrl,
-                                    orderNo,
-                                    payId,
-                                    operatorTv.getText().toString(),
-                                    priceTotalTv.getText().toString(),
-                                    (List<HotKeyBean>) SPUtils.readObject(MainActivity.this, "selectedGoodList"));
-
-                        }
-                    }).start();
+                if (TextUtils.isEmpty(bitmap)) {
+                    String bmpUrl = SPUtils.getString(MainActivity.this, "print_bitmap", "");
+                    String price = SPUtils.getString(MainActivity.this, "print_price", "");
+                    String orderNo = SPUtils.getString(MainActivity.this, "print_orderno", "");
+                    String payId = SPUtils.getString(MainActivity.this, "print_payid", "");
+                    String priceTotal = SPUtils.getString(MainActivity.this, "print_price", "");
+                    btnShangtongPrint(bmpUrl,
+                            orderNo,
+                            payId,
+                            operatorTv.getText().toString(),
+                            priceTotalTv.getText().toString(),
+                            (List<HotKeyBean>) SPUtils.readObject(MainActivity.this, "selectedGoodList"));
                 } else {
-                    if (stopPrint) {
-                        return;
-                    }
                     String orderNo = event.getStrParam();
                     String payId = event.getStrParam02();
                     SPUtils.putString(this, "print_orderno", orderNo);
@@ -705,9 +690,8 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                             operatorTv.getText().toString(),
                             priceTotalTv.getText().toString(),
                             (List<HotKeyBean>) SPUtils.readObject(MainActivity.this, "selectedGoodList"));
+                    clear(1, true);
                 }
-
-                clear(1);
             }
             if (event.getType() == BusEvent.PRINTER_NO_BITMAP) {
                 String title = "支付成功";
@@ -715,9 +699,10 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                 int delayTimes = 2000;
                 showLoading(title, message, delayTimes);
                 banner.showPayResult(title, message, delayTimes);
+                banner.showSelectedGoods(seledtedGoodsList);
 
 
-//                orderNo = (Math.random() * 9 + 1) * 100000 + getCurrentTime("yyyyMMddHHmmss");
+//                orderNo = (Math.random() * 9 + 1r) * 100000 + getCurrentTime("yyyyMMddHHmmss");
                 int random = (int) (Math.random() * 9 + 1) * 100;
                 String orderNo = "AX" + getCurrentTime("yyyyMMddHHmmss") + random;
                 String payId = event.getStrParam02();
@@ -730,7 +715,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                         priceTotalTv.getText().toString(),
                         (List<HotKeyBean>) SPUtils.readObject(MainActivity.this, "selectedGoodList"));
 
-                clear(1);
+                clear(1, true);
             }
             if (event.getType() == BusEvent.NET_WORK_AVAILABLE) {
                 boolean available = event.getBooleanParam();
@@ -754,6 +739,10 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
             if (event.getType() == BusEvent.LOGIN_OUT) {
                 finish();
             }
+            if (event.getType() == BusEvent.notifiySellerInfo) {
+                getLoginInfo();
+                getGoodsData();
+            }
         }
     }
 
@@ -770,11 +759,31 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
      */
     @SuppressLint("StaticFieldLeak")
     public void btnShangtongPrint(final String bitmap, final String orderNo, final String payId, final String operator, final String price, final List<HotKeyBean> seledtedGoodsList) {
+        final String companyName = "深圳市安鑫宝科技发展有限公司";
+        final String stallNumber2 = stallNumberTv.getText().toString();//摊位号
+        final String currentTime = getCurrentTime();
+
+        RecordManage.record(true,companyName,
+                bitmap,
+                orderNo,
+                seller,
+                sellerid,
+                tid,
+                marketId,
+                payId,
+                operator,
+                price,
+                stallNumber2,
+                currentTime,
+                seledtedGoodsList);
+
+        if (stopPrint) { //设置关闭打印
+            return;
+        }
         threadPool = ThreadPool.getInstantiation();
         SysApplication application = (SysApplication) MainActivity.this.getApplication();
         final Print print = application.getPrint();
         final HttpHelper helper = new HttpHelper(this, application);
-        final String stallNumber2 = stallNumberTv.getText().toString();//摊位号
 
         // 还需要传订单信息
         final OrderInfo orderInfo = new OrderInfo();
@@ -787,11 +796,11 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                 orderInfo.setSellerid(sellerid);
                 orderInfo.setTerid(tid);
                 orderInfo.setMarketid(marketId);
-                orderInfo.setTime(getCurrentTime());
+                orderInfo.setTime(currentTime);
                 List<ItemsBean> itemsBeans = new ArrayList<>();
 
                 StringBuilder sb = new StringBuilder();
-                sb.append("深圳市安鑫宝科技发展有限公司\n");
+                sb.append(companyName + "\n");
                 String stallNumber;
                 if (TextUtils.isEmpty(stallNumber2)) {
                     stallNumber = " ";
@@ -799,7 +808,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                     stallNumber = stallNumber2;
                 }
 
-                sb.append("交易日期：").append(getCurrentTime()).append("\n");
+                sb.append("交易日期：").append(currentTime).append("\n");
                 sb.append("交易单号：").append(orderNo).append("\n");
 
                 if (TextUtils.equals(payId, "1")) {
@@ -884,29 +893,10 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         }.execute();
     }
 
-//    public void btnReceiptPrint(final Bitmap bitmap, final String orderNo, final String payId, final String operator, final String price, final List<HotKeyBean> seledtedGoodsList) {
-//        threadPool = ThreadPool.getInstantiation();
-//        threadPool.addTask(new Runnable() {
-//            @Override
-//            public void run() {
-//                printerManager.printer(orderNo, payId, operator, price, bitmap, seledtedGoodsList);
-//            }
-//        });
-//    }
-//
-//    public void btnLabelPrint(final Bitmap bitmap, final String orderNo, final String payId, final String operator, final String price, final List<HotKeyBean> seledtedGoodsList) {
-//        threadPool = ThreadPool.getInstantiation();
-//        threadPool.addTask(new Runnable() {
-//            @Override
-//            public void run() {
-//                printerManager.sendLabel(orderNo, payId, operator, price, bitmap, seledtedGoodsList);
-//            }
-//        });
-//    }
 
 
     @SuppressLint("SetTextI18n")
-    public void clear(int type) {
+    public void clear(int type, boolean b) {
         if (type == 0) {
             weighUtils.resetBalance();
         }
@@ -914,6 +904,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
             weightTopTv.setText("0.000");
             weightTv.setText("");
             etPrice.setHint("0");
+            etPrice.setText("");
             weightTotalTv.setText("0");
             tvgrandTotal.setText("0.00");
             priceTotalTv.setText("0.00");
@@ -922,6 +913,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
 
             commodityAdapter = new CommodityAdapter(this, seledtedGoodsList);
             commoditysListView.setAdapter(commodityAdapter);
+            selectedGoods = null;
 
             goodMenuAdapter.cleanCheckedPosition();
             goodMenuAdapter.notifyDataSetChanged();
@@ -943,7 +935,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         }
     }
 
-    public void showDialog(View v, boolean useCash) {
+    public void charge(boolean useCash) {
 
         if (seledtedGoodsList.size() < 1) {
             accumulative(true);
@@ -961,6 +953,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
             good.setGoods_number(countEt.getText().toString());
             good.setGoods_weight(HotKeyBean.weight);
             good.setGoods_amount(HotKeyBean.grandTotal);
+            good.setBatch_code(HotKeyBean.batch_code);
             goodsList.add(good);
         }
         subOrderReqBean.setToken(AccountManager.getInstance().getToken());
@@ -982,18 +975,18 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         if (useCash) {
             payCashDirect(subOrderReqBean);
         } else {
+            banner.showPayAmount( subOrderReqBean.getTotal_amount(), "");
             startActivity(intent);
         }
     }
 
     public void payCashDirect(SubOrderReqBean orderBean) {
 //        现金直接支付
-
-        displayToBanner(orderBean);
+        banner.showPayAmount(orderBean.getTotal_amount(), "支付方式：现金支付");
         String payId = "4";
         orderBean.setPayment_id(payId);
         if (NetworkUtil.isConnected(this)) {
-            submitOrder(orderBean);
+            new PayCheckManage(this, banner, null, orderBean, payId).submitOrder();
         } else {
             List<SubOrderReqBean> orders = (List<SubOrderReqBean>) SPUtils.readObject(this, "local_order");
             if (orders != null) {
@@ -1004,140 +997,9 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                 localOrder.add(orderBean);
                 SPUtils.saveObject(this, "local_order", localOrder);
             }
-
             EventBus.getDefault().post(new BusEvent(BusEvent.PRINTER_NO_BITMAP, "", payId, ""));
         }
     }
-
-    class MyRun implements Runnable {
-
-        private BaseEntity<SubOrderBean> subOrderBeanBaseEntity;
-
-        public MyRun(BaseEntity<SubOrderBean> subOrderBeanBaseEntity) {
-            this.subOrderBeanBaseEntity = subOrderBeanBaseEntity;
-        }
-
-        @Override
-        public void run() {
-            if (flag) {
-                Message msg = Message.obtain();
-                msg.obj = subOrderBeanBaseEntity.getData();
-                mHandler.sendMessage(msg);
-                mHandler.postDelayed(this, 1000 * 3);//延迟5秒,再次执行task本身,实现了循环的效果
-            }
-
-        }
-    }
-
-    private Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            SubOrderBean subOrderBeanBaseEntity = (SubOrderBean) msg.obj;
-
-            String order_no = subOrderBeanBaseEntity.getOrder_no();
-            String qrCode = subOrderBeanBaseEntity.getPrint_code_img();
-            getPayNotice(order_no, qrCode);
-        }
-    };
-
-    public void getPayNotice(final String order_no, final String qrCode) {
-        RetrofitFactory.getInstance().API()
-                .getPayNotice(order_no)
-                .compose(this.<BaseEntity<PayNoticeBean>>setThread())
-                .subscribe(new Observer<BaseEntity<PayNoticeBean>>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-
-                    }
-
-                    @Override
-                    public void onNext(final BaseEntity<PayNoticeBean> payNoticeBeanBaseEntity) {
-                        if (payNoticeBeanBaseEntity.isSuccess()) {
-                            if (payNoticeBeanBaseEntity.getData().flag == 0) {
-                                flag = false;
-                                mHandler.removeCallbacks(mRun);
-                                flag = true;//轮循停止设置初始值
-//                                Toast.makeText(UseCashActivity.this, "支付成功", Toast.LENGTH_SHORT).show();
-//                                banner.bannerOrderLayout.setVisibility(View.GONE);
-                                EventBus.getDefault().post(new BusEvent(BusEvent.PRINTER_LABEL, bitmap, order_no, "4", qrCode));
-                            }
-                            LogUtils.d(payNoticeBeanBaseEntity.getData().msg);
-                        }
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });
-    }
-
-    public void submitOrder(final SubOrderReqBean subOrderReqBean) {
-        RetrofitFactory.getInstance().API()
-                .submitOrder(subOrderReqBean)
-                .compose(this.<BaseEntity<SubOrderBean>>setThread())
-                .subscribe(new Observer<BaseEntity<SubOrderBean>>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                        showLoading();
-                    }
-
-                    @Override
-                    public void onNext(final BaseEntity<SubOrderBean> subOrderBeanBaseEntity) {
-                        if (subOrderBeanBaseEntity.isSuccess()) {
-//                            imageLoader.displayImage(subOrderBeanBaseEntity.getData().getCode_img_url(), qrCodeIv, options);
-//                            Glide.with(MainActivity.this).load(subOrderBeanBaseEntity.getData().getCode_img_url()).into(qrCodeIv);
-
-                            banner.bannerOrderLayout.setVisibility(View.VISIBLE);
-                            banner.bannerTotalPriceTv.setText(getString(R.string.string_amount_txt3, Float.parseFloat(subOrderReqBean.getTotal_amount())));
-//                            imageLoader.displayImage(subOrderBeanBaseEntity.getData().getCode_img_url(), banner.bannerQRCode, options);
-
-                            switch (subOrderReqBean.getPayment_id()) {
-                                case "1":
-                                    banner.tvPayWay.setText("支付方式：微信支付");
-                                    break;
-                                case "2":
-                                    banner.tvPayWay.setText("支付方式：支付宝支付");
-                                    break;
-                                case "4":
-                                    banner.tvPayWay.setText("支付方式：现金支付");
-                                    break;
-                            }
-
-//                            Glide.with(UseCashActivity.this).load(subOrderBeanBaseEntity.getData().getCode_img_url()).into(banner.bannerQRCode);
-                            SPUtils.putString(SysApplication.getContext(), "print_bitmap", subOrderBeanBaseEntity.getData().getPrint_code_img());
-
-                            banner.goodsList.clear();
-                            banner.goodsList.addAll(subOrderReqBean.getGoods());
-                            banner.adapter.notifyDataSetChanged();
-                            bitmap = (subOrderBeanBaseEntity.getData().getPrint_code_img());
-
-                            mRun = new MyRun(subOrderBeanBaseEntity);
-                            mHandler.postDelayed(mRun, 1000);
-                        } else {
-                            showLoading(subOrderBeanBaseEntity.getMsg());
-                        }
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        closeLoading();
-                        e.printStackTrace();
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        closeLoading();
-                    }
-                });
-    }
-
 
     public void getLoginInfo() {
         RetrofitFactory.getInstance().API()
@@ -1180,17 +1042,19 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
     }
 
     public void getGoodsData() {
-        boolean notPushRemote = (boolean) SPUtils.get(this, CommodityManagementActivity.SelectedGoodsState.NOT_PUSH_REMOTE, false);
+        mNotPushRemote = (boolean) SPUtils.get(this, CommodityManagementActivity.SelectedGoodsState.NOT_PUSH_REMOTE, false);
         List<HotKeyBean> hotKeyGoods = (List<HotKeyBean>) FileUtils.readObject(MainActivity.this, CommodityManagementActivity.SelectedGoodsState.selectedGoods);
-
-        if (notPushRemote && NetworkUtil.isConnected(MainActivity.this)) {
+        boolean connected = NetworkUtil.isConnected(MainActivity.this);
+        showSelectedGoods(hotKeyGoods);
+        if (!connected) return;
+        if (mNotPushRemote) {
             requestPushStoreGoods(hotKeyGoods);
+        } else {
+            requestGoodsData();
         }
+    }
 
-        if (hotKeyGoods != null && !hotKeyGoods.isEmpty()) {
-            showSelectedGoods(hotKeyGoods);
-            return;
-        }
+    private void requestGoodsData() {
         RetrofitFactory.getInstance().API()
                 .getGoodsData(AccountManager.getInstance().getToken(), MacManager.getInstace(this).getMac())
                 .compose(this.<BaseEntity<ScalesCategoryGoods>>setThread())
@@ -1224,6 +1088,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
     }
 
     private void showSelectedGoods(List<HotKeyBean> hotKeyGoods) {
+        if (hotKeyGoods == null) return;
         HotKeyBeanList.clear();
         HotKeyBeanList.addAll(hotKeyGoods);
         HotKeyBean hotKey = new HotKeyBean();
@@ -1238,12 +1103,17 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
             hotKey.price = goods.price;
             hotKey.traceable_code = goods.traceable_code;
             hotKey.weight = goods.weight;
+            hotKey.batch_code = goods.batch_code;
             modelAdapter.insert(hotKey);
         }
         goodMenuAdapter.notifyDataSetChanged();
     }
 
     public void requestPushStoreGoods(List<HotKeyBean> hotKeyGoods) {
+        if (hotKeyGoods == null) {
+            requestGoodsData();
+            return;
+        }
         SaveGoodsReqBean goodsReqBean = new SaveGoodsReqBean();
         List<SaveGoodsReqBean.Goods> goodsList = new ArrayList<>();
         SaveGoodsReqBean.Goods good;
@@ -1271,16 +1141,14 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
 
                     @Override
                     public void onNext(BaseEntity baseEntity) {
-                        if (baseEntity.isSuccess()) {
+                        if (mNotPushRemote && baseEntity.isSuccess()) {
                             SPUtils.put(MainActivity.this, CommodityManagementActivity.SelectedGoodsState.NOT_PUSH_REMOTE, false);
-                        } else {
-                            SPUtils.put(MainActivity.this, CommodityManagementActivity.SelectedGoodsState.NOT_PUSH_REMOTE, true);
                         }
+                        requestGoodsData();
                     }
 
                     @Override
                     public void onError(Throwable e) {
-
                     }
 
                     @Override
@@ -1315,5 +1183,23 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
     @Override
     public void onResponse(String response, int flag) {
         MyLog.myInfo("成功" + response);
+    }
+
+    int pressCount = 0;
+    @Override
+    public void onBackPressed() {
+        if(pressCount==0){
+            ToastUtils.showToast(this,"再次点击退出！");
+            pressCount++;
+            Timer timer = new Timer();//实例化Timer类
+            timer.schedule(new TimerTask() {
+                public void run() {
+                    pressCount=0;
+                    this.cancel();
+                }
+            }, 2000);//五百毫秒
+            return;
+        }
+        super.onBackPressed();
     }
 }

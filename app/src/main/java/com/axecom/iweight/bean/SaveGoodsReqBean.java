@@ -39,5 +39,6 @@ public class SaveGoodsReqBean implements Serializable {
         public int traceable_code;
         public String price;
         public int is_default;
+        public String batch_code;
     }
 }

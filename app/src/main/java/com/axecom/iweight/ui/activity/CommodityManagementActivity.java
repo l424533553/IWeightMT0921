@@ -48,6 +48,7 @@ import com.axecom.iweight.ui.uiutils.UIUtils;
 import com.axecom.iweight.utils.FileUtils;
 import com.axecom.iweight.utils.NetworkUtil;
 import com.axecom.iweight.utils.SPUtils;
+import com.luofx.utils.ToastUtils;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -205,7 +206,7 @@ public class CommodityManagementActivity extends Activity implements View.OnClic
                 for (CommodityBean bean : hotKeyList) {
                     list.add(bean.getHotKeyBean());
                 }
-                requestSaveSelectedGoods(list);
+                saveSelectedGoods(list);
                 break;
             case R.id.commodity_management_back_btn:
                 finish();
@@ -213,7 +214,7 @@ public class CommodityManagementActivity extends Activity implements View.OnClic
         }
     }
 
-    public void requestSaveSelectedGoods(List<HotKeyBean> dataList) {
+    public void saveSelectedGoods(List<HotKeyBean> dataList) {
         SaveGoodsReqBean goodsReqBean = new SaveGoodsReqBean();
         List<SaveGoodsReqBean.Goods> goodsList = new ArrayList<>();
         SaveGoodsReqBean.Goods good;
@@ -393,11 +394,16 @@ public class CommodityManagementActivity extends Activity implements View.OnClic
                 public void onClick(View v) {
                     categoryChildList.clear();
                     CommodityBean clildBean;
-                    for (int j = 0; j < (data.categoryGoods.get(finalI)).child.size(); j++) {
-                        if (((data.categoryGoods.get(finalI)).child.get(j)).cid ==
+                    List<CategoryGoods.child> child = (data.categoryGoods.get(finalI)).child;
+                    if(child==null){
+                        ToastUtils.showToast(getBaseContext(),"该分类已停用！");
+                        return;
+                    }
+                    for (int j = 0; j < child.size(); j++) {
+                        if ((child.get(j)).cid ==
                                 (data.categoryGoods.get(finalI1)).id) {
                             clildBean = new CommodityBean();
-                            clildBean.setCategoryChilds((data.categoryGoods.get(finalI)).child.get(j));
+                            clildBean.setCategoryChilds(child.get(j));
                             categoryChildList.add(clildBean);
                             ClassAdapter adapter = new ClassAdapter(CommodityManagementActivity.this, categoryChildList);
                             classGv.setAdapter(adapter);

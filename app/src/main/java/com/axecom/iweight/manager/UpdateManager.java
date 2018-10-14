@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.RemoteViews;
 
 import com.allenliu.versionchecklib.v2.AllenVersionChecker;
+import com.allenliu.versionchecklib.v2.builder.DownloadBuilder;
 import com.allenliu.versionchecklib.v2.builder.UIData;
 import com.axecom.iweight.R;
 import com.axecom.iweight.base.BaseActivity;
@@ -47,7 +48,10 @@ import static com.shangtongyin.tools.serialport.IConstants_ST.MARKET_ID;
  * Created by Administrator on 2016-9-11.
  */
 public class UpdateManager {
-    public static void getNewVersion(final Activity context) {
+   public interface UpdateResult {
+        void onResult(boolean hasUpdate);
+    }
+    public static void getNewVersion(final Activity context, final UpdateResult updateResult) {
         String id = PreferenceUtils.getInt(context, MARKET_ID, -1) + "";
         if("-1".equals(id))return;
         RetrofitFactory.getInstance().API()
@@ -64,9 +68,12 @@ public class UpdateManager {
                         if (versionBeanBaseEntity.isSuccess()) {
                             VersionBean version = versionBeanBaseEntity.getData();
                             String versionName = CommonUtils.getVersionName(context);
-                            if (version==null||TextUtils.isEmpty(version.version) || version.version.compareTo(versionName) <= 0)
+                            boolean noUpdate = version == null || TextUtils.isEmpty(version.version) || version.version.compareTo(versionName) <= 0;
+                            updateResult.onResult(!noUpdate);
+                            if (noUpdate){
                                 return;
-                            AllenVersionChecker
+                            }
+                            DownloadBuilder builder = AllenVersionChecker
                                     .getInstance()
                                     .downloadOnly(
                                             UIData.create()
@@ -74,8 +81,10 @@ public class UpdateManager {
                                                     .setTitle("更新")
                                                     .setContent(version.description)
 
-                                    )
-                                    .excuteMission(context);
+                                    );
+                            builder.setForceRedownload(true);
+//                                    .setSilentDownload(true);
+                            builder.excuteMission(context);
 
                         }
                     }

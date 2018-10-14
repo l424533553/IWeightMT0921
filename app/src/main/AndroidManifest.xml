@@ -147,6 +147,7 @@
             android:windowSoftInputMode="stateHidden|stateAlwaysHidden" />
         <activity android:name=".ui.activity.LocalSettingsActivity" />
         <activity android:name=".ui.activity.SystemSettingsActivity" />
+        <activity android:name=".ui.activity.SystemSettingsActivity2" />
 
         <service android:name="com.inuker.bluetooth.library.BluetoothService" />
 

@@ -16,15 +16,21 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.axecom.iweight.R;
+import com.axecom.iweight.base.BaseActivity;
+import com.axecom.iweight.bean.HotKeyBean;
 import com.axecom.iweight.bean.SubOrderReqBean;
+import com.axecom.iweight.my.adapter.CommodityAdapter;
 import com.axecom.iweight.ui.uiutils.UIUtils;
 import com.bigkoo.convenientbanner.ConvenientBanner;
 import com.bigkoo.convenientbanner.holder.CBViewHolderCreator;
 import com.bigkoo.convenientbanner.holder.Holder;
+import com.bumptech.glide.Glide;
 
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.axecom.iweight.utils.CommonUtils.parseFloat;
 
 /**
  * Created by Administrator on 2018/7/20.
@@ -43,6 +49,7 @@ public class BannerActivity extends Presentation {
     private LinearLayout alertView;
     private Button messageBtn;
     private TextView titleTv;
+    private ListView mOrderListView;
 
     public BannerActivity(Context outerContext, Display display) {
         super(outerContext, display);
@@ -53,7 +60,7 @@ public class BannerActivity extends Presentation {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.banner_activity);
-        ListView orderListView = findViewById(R.id.banner_order_listview);
+        mOrderListView = findViewById(R.id.banner_order_listview);
         bannerQRCode = findViewById(R.id.banner_qrcode_iv);
         tvPayWay = findViewById(R.id.tvPayWay);
         bannerTotalPriceTv = findViewById(R.id.banner_total_price_tv);
@@ -75,11 +82,13 @@ public class BannerActivity extends Presentation {
 
         goodsList = new ArrayList<>();
         adapter = new MyAdapter(context, goodsList);
-        orderListView.setAdapter(adapter);
+        mOrderListView.setAdapter(adapter);
 
     }
 
     public void showPayResult(String titleText,String confirmText,long times) {
+        bannerOrderLayout.setVisibility(View.VISIBLE);
+        Glide.with(context).load(R.drawable.logo).into(bannerQRCode);
         titleTv.setText(titleText);
         messageBtn.setText(confirmText);
         alertView.setVisibility(View.VISIBLE);
@@ -106,6 +115,14 @@ public class BannerActivity extends Presentation {
         public void UpdateUI(Context context, int position, Integer data) {
             imageView.setImageResource(data);
         }
+    }
+
+    public void showSelectedGoodsResult(List<SubOrderReqBean.Goods> goodsList){
+        mOrderListView.setAdapter(new MyAdapter(context,goodsList));
+    }
+
+    public void showSelectedGoods(List<HotKeyBean> goodsList){
+        mOrderListView.setAdapter(new CommodityAdapter (context,goodsList));
     }
 
     class MyAdapter extends BaseAdapter {
@@ -164,5 +181,20 @@ public class BannerActivity extends Presentation {
             TextView subtotalTv;
             Button deleteBtn;
         }
+    }
+
+    public void showPayAmount(String totalAmount, String payMethod) {
+       bannerOrderLayout.setVisibility(View.VISIBLE);
+       bannerTotalPriceTv.setText(context.getString(R.string.string_amount_txt3, parseFloat(totalAmount)));
+       tvPayWay.setText(payMethod);
+       bannerQRCode.setImageDrawable(this.getResources().getDrawable(R.drawable.logo));
+    }
+
+    public void showInfoToBanner(SubOrderReqBean bean) {
+        bannerOrderLayout.setVisibility(View.VISIBLE);
+        bannerTotalPriceTv.setText(context.getString(R.string.string_amount_txt3, Float.parseFloat(bean.getTotal_amount())));
+        goodsList.clear();
+        goodsList.addAll(bean.getGoods());
+        adapter.notifyDataSetChanged();
     }
 }

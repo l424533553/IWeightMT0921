@@ -287,6 +287,9 @@ public abstract class BaseActivity extends Activity implements View.OnClickListe
     }
 
     public void showLoading(String titleText, int type) {
+        if(mSweetAlertDialog!=null){
+            mSweetAlertDialog.dismiss();
+        }
         mSweetAlertDialog = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE);
         mSweetAlertDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
         mSweetAlertDialog.setTitleText(titleText);
@@ -295,6 +298,9 @@ public abstract class BaseActivity extends Activity implements View.OnClickListe
     }
 
     public void showLoading() {
+        if(mSweetAlertDialog!=null){
+            mSweetAlertDialog.dismiss();
+        }
         mSweetAlertDialog = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE);
         mSweetAlertDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
         mSweetAlertDialog.setCancelable(true);
@@ -302,6 +308,9 @@ public abstract class BaseActivity extends Activity implements View.OnClickListe
     }
 
     public void showLoading(String titleText,String confirmText) {
+        if(mSweetAlertDialog!=null){
+            mSweetAlertDialog.dismiss();
+        }
         mSweetAlertDialog = new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE);
         mSweetAlertDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
         mSweetAlertDialog.setTitleText(titleText);
@@ -312,6 +321,7 @@ public abstract class BaseActivity extends Activity implements View.OnClickListe
     }
 
     public void showLoading(String titleText,String confirmText,long times) {
+
         showLoading(titleText,confirmText);
         UIUtils.getMainThreadHandler().postDelayed(new Runnable() {
             @Override
@@ -592,10 +602,6 @@ public abstract class BaseActivity extends Activity implements View.OnClickListe
         if (isAinmain) {
             this.overridePendingTransition(R.anim.activity_translate_x_in, R.anim.activity_translate_x_out);
         }
-    }
-
-    protected void share() {
-
     }
 
     public <T> ObservableTransformer<T, T> setThread() {

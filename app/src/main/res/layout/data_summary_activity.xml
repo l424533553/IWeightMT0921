@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="10dp"
-    android:background="@color/green_3CB371">
+    android:background="@color/green_3CB371"
+    android:padding="10dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -96,11 +96,12 @@
                     android:text="打印"
                     android:textColor="@color/black"
                     android:textSize="20sp" />
+
                 <TextView
-                    android:layout_marginTop="-2dp"
                     android:id="@+id/data_summary_back_tv"
                     android:layout_width="match_parent"
                     android:layout_height="65dp"
+                    android:layout_marginTop="-2dp"
                     android:background="@drawable/shape_white_btn_bg"
                     android:gravity="center"
                     android:paddingLeft="10dp"
@@ -116,17 +117,17 @@
 
                 <LinearLayout
                     android:id="@+id/data_summary_reports_title_layout"
-                    android:layout_marginTop="1dp"
-                    android:layout_marginRight="2dp"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
+                    android:layout_marginRight="2dp"
+                    android:layout_marginTop="1dp"
                     android:background="@color/gray_ccc"
                     android:orientation="horizontal">
 
                     <TextView
                         android:layout_width="0dp"
-                        android:layout_weight="1"
                         android:layout_height="match_parent"
+                        android:layout_weight="1"
                         android:gravity="center"
                         android:text="时间"
                         android:textColor="@color/black"
@@ -134,8 +135,8 @@
 
                     <TextView
                         android:layout_width="0dp"
-                        android:layout_weight="1"
                         android:layout_height="match_parent"
+                        android:layout_weight="1"
                         android:gravity="center"
                         android:text="笔数"
                         android:textColor="@color/black"
@@ -143,8 +144,8 @@
 
                     <TextView
                         android:layout_width="0dp"
-                        android:layout_weight="1"
                         android:layout_height="match_parent"
+                        android:layout_weight="1"
                         android:gravity="center"
                         android:text="重量(kg)/件数"
                         android:textColor="@color/black"
@@ -152,8 +153,8 @@
 
                     <TextView
                         android:layout_width="0dp"
-                        android:layout_weight="1"
                         android:layout_height="match_parent"
+                        android:layout_weight="1"
                         android:gravity="center"
                         android:text="小计(元)"
                         android:textColor="@color/black"
@@ -161,8 +162,8 @@
 
                     <TextView
                         android:layout_width="0dp"
-                        android:layout_weight="1"
                         android:layout_height="match_parent"
+                        android:layout_weight="1"
                         android:gravity="center"
                         android:text="实收(元)"
                         android:textColor="@color/black"
@@ -170,18 +171,19 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:visibility="gone"
                     android:id="@+id/data_summary_sales_title_layout"
-                    android:layout_marginTop="1dp"
-                    android:layout_marginRight="2dp"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
+                    android:layout_marginRight="2dp"
+                    android:layout_marginTop="1dp"
                     android:background="@color/gray_ccc"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:visibility="gone">
+
                     <TextView
                         android:layout_width="0dp"
-                        android:layout_weight="1"
                         android:layout_height="match_parent"
+                        android:layout_weight="1"
                         android:gravity="center"
                         android:text="商品名"
                         android:textColor="@color/black"
@@ -189,8 +191,8 @@
 
                     <TextView
                         android:layout_width="0dp"
-                        android:layout_weight="1"
                         android:layout_height="match_parent"
+                        android:layout_weight="1"
                         android:gravity="center"
                         android:text="时间"
                         android:textColor="@color/black"
@@ -198,8 +200,8 @@
 
                     <TextView
                         android:layout_width="0dp"
-                        android:layout_weight="1"
                         android:layout_height="match_parent"
+                        android:layout_weight="1"
                         android:gravity="center"
                         android:text="重量(kg)"
                         android:textColor="@color/black"
@@ -207,8 +209,8 @@
 
                     <TextView
                         android:layout_width="0dp"
-                        android:layout_weight="1"
                         android:layout_height="match_parent"
+                        android:layout_weight="1"
                         android:gravity="center"
                         android:text="单价"
                         android:textColor="@color/black"
@@ -216,8 +218,8 @@
 
                     <TextView
                         android:layout_width="0dp"
-                        android:layout_weight="1"
                         android:layout_height="match_parent"
+                        android:layout_weight="1"
                         android:gravity="center"
                         android:text="件数"
                         android:textColor="@color/black"
@@ -225,8 +227,8 @@
 
                     <TextView
                         android:layout_width="0dp"
-                        android:layout_weight="1"
                         android:layout_height="match_parent"
+                        android:layout_weight="1"
                         android:gravity="center"
                         android:text="小计"
                         android:textColor="@color/black"
@@ -234,29 +236,30 @@
 
                     <TextView
                         android:layout_width="0dp"
-                        android:layout_weight="1"
                         android:layout_height="match_parent"
+                        android:layout_weight="1"
                         android:gravity="center"
                         android:text="结算方式"
                         android:textColor="@color/black"
                         android:textSize="20sp" />
 
-                    </LinearLayout>
+                </LinearLayout>
 
                 <ListView
                     android:id="@+id/data_summary_listview"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:visibility="visible"
-                    android:listSelector="@color/gray_ccc" />
+                    android:listSelector="@color/gray_ccc"
+                    android:visibility="visible" />
+
                 <ListView
                     android:id="@+id/sales_details_listview"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:visibility="gone"
                     android:layout_weight="1"
-                    android:listSelector="@color/gray_ccc" />
+                    android:listSelector="@color/gray_ccc"
+                    android:visibility="gone" />
 
                 <ImageView
                     android:layout_width="match_parent"
@@ -264,12 +267,13 @@
                     android:background="@color/gray_ccc" />
 
                 <LinearLayout
-                    android:visibility="gone"
                     android:id="@+id/data_summary_sales_total_layout"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:gravity="center"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:visibility="gone">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
@@ -281,14 +285,15 @@
 
                     <TextView
                         android:id="@+id/data_summary_order_amount_total_tv"
-                        android:layout_marginLeft="20dp"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
+                        android:layout_marginLeft="20dp"
                         android:gravity="center"
                         android:textColor="@color/green_3CB371"
                         android:textSize="22sp"
                         android:textStyle="bold" />
-                    </LinearLayout>
+                </LinearLayout>
+
                 <LinearLayout
                     android:id="@+id/data_summary_reports_total_layout"
                     android:layout_width="match_parent"
@@ -297,8 +302,8 @@
 
                     <TextView
                         android:layout_width="0dp"
-                        android:layout_weight="1"
                         android:layout_height="match_parent"
+                        android:layout_weight="1"
                         android:gravity="center"
                         android:text="总计"
                         android:textColor="@color/green_3CB371"
@@ -308,8 +313,8 @@
                     <TextView
                         android:id="@+id/data_summary_reports_count_total_tv"
                         android:layout_width="0dp"
-                        android:layout_weight="1"
                         android:layout_height="match_parent"
+                        android:layout_weight="1"
                         android:gravity="center"
                         android:textColor="@color/green_3CB371"
                         android:textSize="22sp"
@@ -318,8 +323,8 @@
                     <TextView
                         android:id="@+id/data_summary_reports_weight_total_tv"
                         android:layout_width="0dp"
-                        android:layout_weight="1"
                         android:layout_height="match_parent"
+                        android:layout_weight="1"
                         android:gravity="center"
                         android:textColor="@color/green_3CB371"
                         android:textSize="22sp"
@@ -328,8 +333,8 @@
                     <TextView
                         android:id="@+id/data_summary_reports_grand_total_tv"
                         android:layout_width="0dp"
-                        android:layout_weight="1"
                         android:layout_height="match_parent"
+                        android:layout_weight="1"
                         android:gravity="center"
                         android:textColor="@color/green_3CB371"
                         android:textSize="22sp"
@@ -338,8 +343,8 @@
                     <TextView
                         android:id="@+id/data_summary_reports_amount_total_tv"
                         android:layout_width="0dp"
-                        android:layout_weight="1"
                         android:layout_height="match_parent"
+                        android:layout_weight="1"
                         android:gravity="center"
                         android:textColor="@color/green_3CB371"
                         android:textSize="22sp"
@@ -365,9 +370,9 @@
                         android:layout_weight="1"
                         android:background="@drawable/shape_weight_display_bg"
                         android:text="@string/string_previous_page"
-                        android:visibility="gone"
                         android:textColor="@color/black"
-                        android:textSize="20sp" />
+                        android:textSize="20sp"
+                        android:visibility="gone" />
 
                     <Button
                         android:id="@+id/data_summary_reports_next_page_btn"
@@ -376,10 +381,10 @@
                         android:layout_marginLeft="20dp"
                         android:layout_weight="1"
                         android:background="@drawable/shape_weight_display_bg"
-                        android:visibility="gone"
                         android:text="@string/string_next_page"
                         android:textColor="@color/black"
-                        android:textSize="20sp" />
+                        android:textSize="20sp"
+                        android:visibility="gone" />
 
                     <Button
                         android:id="@+id/data_summary_reports_prev_day_btn"
@@ -403,8 +408,8 @@
                         android:text="@string/string_next_day"
                         android:textColor="@color/black"
                         android:textSize="20sp" />
+
                     <Button
-                        android:visibility="gone"
                         android:id="@+id/data_summary_reports_prev_month_btn"
                         android:layout_width="200dp"
                         android:layout_height="wrap_content"
@@ -413,10 +418,10 @@
                         android:background="@drawable/shape_weight_display_bg"
                         android:text="@string/string_previous_month"
                         android:textColor="@color/black"
-                        android:textSize="20sp" />
+                        android:textSize="20sp"
+                        android:visibility="gone" />
 
                     <Button
-                        android:visibility="gone"
                         android:id="@+id/data_summary_reports_next_month_btn"
                         android:layout_width="200dp"
                         android:layout_height="wrap_content"
@@ -426,7 +431,8 @@
                         android:background="@drawable/shape_weight_display_bg"
                         android:text="@string/string_next_month"
                         android:textColor="@color/black"
-                        android:textSize="20sp" />
+                        android:textSize="20sp"
+                        android:visibility="gone" />
 
 
                     <Button
@@ -437,9 +443,9 @@
                         android:layout_weight="1"
                         android:background="@drawable/shape_weight_display_bg"
                         android:text="@string/string_previous_page"
-                        android:visibility="gone"
                         android:textColor="@color/black"
-                        android:textSize="20sp" />
+                        android:textSize="20sp"
+                        android:visibility="gone" />
 
                     <Button
                         android:id="@+id/data_summary_sales_details_next_page_btn"
@@ -448,10 +454,10 @@
                         android:layout_marginLeft="20dp"
                         android:layout_weight="1"
                         android:background="@drawable/shape_weight_display_bg"
-                        android:visibility="gone"
                         android:text="@string/string_next_page"
                         android:textColor="@color/black"
-                        android:textSize="20sp" />
+                        android:textSize="20sp"
+                        android:visibility="gone" />
 
                     <Button
                         android:id="@+id/data_summary_sales_details_prev_day_btn"
@@ -460,10 +466,10 @@
                         android:layout_marginLeft="50dp"
                         android:layout_weight="1"
                         android:background="@drawable/shape_weight_display_bg"
-                        android:visibility="gone"
                         android:text="@string/string_prev_day"
                         android:textColor="@color/black"
-                        android:textSize="20sp" />
+                        android:textSize="20sp"
+                        android:visibility="gone" />
 
                     <Button
                         android:id="@+id/data_summary_sales_details_next_day_btn"
@@ -473,12 +479,41 @@
                         android:layout_marginRight="50dp"
                         android:layout_weight="1"
                         android:background="@drawable/shape_weight_display_bg"
-                        android:visibility="gone"
                         android:text="@string/string_next_day"
                         android:textColor="@color/black"
-                        android:textSize="20sp" />
+                        android:textSize="20sp"
+                        android:visibility="gone" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+
+
+    <LinearLayout
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="insert"
+            android:text="插入" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:onClick="read"
+            android:text="读取" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:onClick="readGoods"
+            android:text="读取" />
+
+    </LinearLayout>
+</FrameLayout>

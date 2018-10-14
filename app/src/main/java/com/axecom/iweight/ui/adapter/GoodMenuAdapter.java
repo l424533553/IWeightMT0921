@@ -1,10 +1,12 @@
 package com.axecom.iweight.ui.adapter;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.axecom.iweight.R;
@@ -55,6 +57,7 @@ public class GoodMenuAdapter extends BaseAdapter {
             convertView = LayoutInflater.from(context).inflate(R.layout.main_grid_item, null);
             holder = new ViewHolder();
             holder.commodityBtn = convertView.findViewById(R.id.main_grid_item_btn);
+            holder.tag = convertView.findViewById(R.id.img_tag);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
@@ -69,10 +72,13 @@ public class GoodMenuAdapter extends BaseAdapter {
             holder.commodityBtn.setBackground(context.getResources().getDrawable(R.drawable.shape_weight_display_bg));
             holder.commodityBtn.setTextColor(context.getResources().getColor(R.color.black));
         }
+        holder.tag.setVisibility(TextUtils.isEmpty(goods.batch_code)?View.GONE:View.VISIBLE);
+
         return convertView;
     }
 
     class ViewHolder {
         TextView commodityBtn;
+        ImageView tag;
     }
 }

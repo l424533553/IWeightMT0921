@@ -7,20 +7,23 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.axecom.iweight.R;
 import com.axecom.iweight.base.BaseActivity;
 import com.axecom.iweight.base.BaseEntity;
-import com.axecom.iweight.bean.ChooseBean;
-import com.axecom.iweight.bean.SettingDataBean;
-import com.axecom.iweight.conf.Constants;
+import com.axecom.iweight.base.BusEvent;
+import com.axecom.iweight.bean.FastLoginInfo;
 import com.axecom.iweight.manager.AccountManager;
 import com.axecom.iweight.manager.MacManager;
 import com.axecom.iweight.net.RetrofitFactory;
 import com.axecom.iweight.ui.view.ChooseDialog;
 import com.axecom.iweight.ui.view.SoftKeyborad;
+import com.axecom.iweight.utils.NetworkUtil;
 import com.axecom.iweight.utils.SPUtils;
 import com.google.gson.internal.LinkedTreeMap;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -135,6 +138,7 @@ public class SystemSettingsActivity extends BaseActivity {
         icCardSettlementCtv.setOnClickListener(this);
 
 
+
         loginTypeTv.setOnClickListener(this);
 
         return rootView;
@@ -214,6 +218,10 @@ public class SystemSettingsActivity extends BaseActivity {
                 }).show();
                 break;
             case R.id.system_settings_default_seller_number_tv:
+                if (!NetworkUtil.isConnected(this)) {
+                    Toast.makeText(this, "请先连接网络", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 softBuilder.create(new SoftKeyborad.OnConfirmedListener() {
                     @Override
                     public void onConfirmed(String result) {
@@ -258,7 +266,7 @@ public class SystemSettingsActivity extends BaseActivity {
                 stopAlipayCtv.setChecked(!stopCashCtv.isChecked());
                 break;
             case R.id.system_settings_stop_weichatpay_ctv:
-                stopweichatpayCtv.setChecked(!stopCashCtv.isChecked());
+                stopweichatpayCtv.setChecked(!stopweichatpayCtv.isChecked());
                 break;
             case R.id.system_settings_back_btn:
                 finish();
@@ -271,6 +279,12 @@ public class SystemSettingsActivity extends BaseActivity {
     }
 
     public void saveSettingsToSP() {
+
+        String sellerNumber = sellerNumberTv.getText().toString();
+        if (!TextUtils.isEmpty(sellerNumber)) {
+            requestBindSeller(sellerNumber);
+        }
+
         if (valueMap == null)
             return;
 
@@ -314,7 +328,7 @@ public class SystemSettingsActivity extends BaseActivity {
 
         LinkedHashMap sellerNumberMap = new LinkedHashMap();
         sellerNumberMap.put("update_time", System.currentTimeMillis());
-        sellerNumberMap.put("val", sellerNumberTv.getText().toString());
+        sellerNumberMap.put("val", sellerNumber);
         valueMap.put("default_seller_number", sellerNumberMap);
         SPUtils.saveObject(this, KEY_SELLER_NUMBER, valueMap.get("default_seller_number"));
 
@@ -393,9 +407,49 @@ public class SystemSettingsActivity extends BaseActivity {
         showLoading("保存成功");
     }
 
-    public void getSettingData() {
+    private void requestBindSeller(String sellerNumber) {
         RetrofitFactory.getInstance().API()
-                .getSettingData(AccountManager.getInstance().getAdminToken(), MacManager.getInstace(this).getMac())
+                .fastLogin(AccountManager.getInstance().getScalesId(), sellerNumber)
+                .compose(this.<BaseEntity<FastLoginInfo>>setThread())
+                .subscribe(new Observer<BaseEntity<FastLoginInfo>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(final BaseEntity<FastLoginInfo> fastLoginInfo) {
+                        AccountManager instance = AccountManager.getInstance();
+                        boolean success = fastLoginInfo.isSuccess();
+                        if (success) {
+                            Toast.makeText(SystemSettingsActivity.this,"绑定卖家成功",Toast.LENGTH_SHORT).show();
+                            instance.saveToken(fastLoginInfo.getData().getToken());
+                        }else{
+//                            instance.saveToken(AccountManager.getInstance().getAdminToken());
+                            Toast.makeText(SystemSettingsActivity.this,"绑定卖家失败",Toast.LENGTH_SHORT).show();
+                        }
+                        EventBus.getDefault().post(new BusEvent(BusEvent.notifiySellerInfo,success));
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+
+
+    }
+
+    public void getSettingData() {
+        String mac = MacManager.getInstace(this).getMac();
+        mac = "10:d0:7a:6f:23:23";
+        RetrofitFactory.getInstance().API()
+                .getSettingData(AccountManager.getInstance().getAdminToken(), mac)
                 .compose(this.<BaseEntity>setThread())
                 .subscribe(new Observer<BaseEntity>() {
                     @Override
@@ -647,22 +701,6 @@ public class SystemSettingsActivity extends BaseActivity {
                             } else {
                                 stopCashCtv.setChecked((Boolean) ((LinkedTreeMap) valueMap.get("disable_cash_mode")).get("val"));
                             }
-
-//                            LinkedTreeMap priceAfterSaving = (LinkedTreeMap) valueMap.get("price_after_saving");
-//                            notClearPriceCtv.setChecked((Boolean) priceAfterSaving.get("val"));
-//                            saveWeightCtv.setChecked((Boolean) ((LinkedTreeMap) valueMap.get("confirm_the_preservation")).get("val"));
-//                            autoObtainCtv.setChecked((Boolean) ((LinkedTreeMap) valueMap.get("buyers_and_sellers_by_default")).get("val"));
-//                            cashEttlementCtv.setChecked((Boolean) ((LinkedTreeMap) valueMap.get("online_settlement")).get("val"));
-//                            distinguishCtv.setChecked((Boolean) ((LinkedTreeMap) valueMap.get("buyers_and_sellers_after_weighing")).get("val"));
-//                            icCardSettlementCtv.setChecked((Boolean) ((LinkedTreeMap) valueMap.get("card_settlement")).get("val"));
-//                            stopPrintCtv.setChecked((Boolean) ((LinkedTreeMap) valueMap.get("disable_printing")).get("val"));
-//                            noPatchSettlementCtv.setChecked((Boolean) ((LinkedTreeMap) valueMap.get("allow_batchless_settlement")).get("val"));
-//                            autoPrevCtv.setChecked((Boolean) ((LinkedTreeMap) valueMap.get("take_a_unit_price")).get("val"));
-//                            cashRoundingCtv.setChecked((Boolean) ((LinkedTreeMap) valueMap.get("cash_change_rounding")).get("val"));
-//                            stopCashCtv.setChecked((Boolean) ((LinkedTreeMap) valueMap.get("disable_cash_mode")).get("val"));
-
-//                            buyerNumberTv.setText(((LinkedTreeMap) valueMap.get("default_buyer_number")).get("val") != null ? ((LinkedTreeMap) valueMap.get("default_buyer_number")).get("val").toString() : "");
-//                            sellerNumberTv.setText(((LinkedTreeMap) valueMap.get("default_seller_number")).get("val") != null ? ((LinkedTreeMap) valueMap.get("default_seller_number")).get("val").toString() : "");
 
                         } else {
                             showLoading(settingDataBeanBaseEntity.getMsg());
