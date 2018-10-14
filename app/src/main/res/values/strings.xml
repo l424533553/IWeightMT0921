@@ -43,7 +43,7 @@
     <string name="string_variety_txt">品种：</string>
     <string name="string_grand_total_txt2">单价：</string>
     <string name="string_amount_txt2">金额：</string>
-    <string name="string_amount_txt3">金额：%1$.2f 元</string>
+    <string name="string_amount_txt3">合计：%1$.2f 元</string>
     <string name="string_weight_unit_g">%1$s克</string>
     <string name="string_weight_unit_kg">%1$skg</string>
 

@@ -1,6 +1,5 @@
 package com.axecom.iweight.ui.activity;
 
-import android.accounts.Account;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -27,29 +26,22 @@ import com.axecom.iweight.bean.LoginInfo;
 import com.axecom.iweight.bean.User;
 import com.axecom.iweight.bean.User_Table;
 import com.axecom.iweight.manager.AccountManager;
-import com.axecom.iweight.my.entity.UserInfo;
 import com.axecom.iweight.net.RetrofitFactory;
 import com.axecom.iweight.ui.view.SoftKey;
 import com.axecom.iweight.utils.LogUtils;
 import com.axecom.iweight.utils.NetworkUtil;
-import com.axecom.iweight.utils.SPUtils;
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialPort;
 import com.hoho.android.usbserial.driver.UsbSerialProber;
-import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
-import com.raizlabs.android.dbflow.structure.ModelAdapter;
 
 import org.greenrobot.eventbus.EventBus;
 
 import java.io.IOException;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
-
-import static com.axecom.iweight.ui.activity.SystemSettingsActivity.KEY_DEFAULT_LOGIN_TYPE;
 
 public class StaffMemberLoginActivity extends BaseActivity {
 
@@ -121,11 +113,17 @@ public class StaffMemberLoginActivity extends BaseActivity {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.staff_member_done_btn:
-                if (NetworkUtil.isConnected(this)) {
-                    clientLogin(AccountManager.getInstance().getScalesId() + "", numberEt.getText().toString(), pwdEt.getText().toString());
+                String name = numberEt.getText().toString();
+                String password = pwdEt.getText().toString();
+                if (TextUtils.isEmpty(name) && getString(R.string.Administrators_pwd).equals(password)) {
+                    startDDMActivity(SettingsActivity.class, true);
+                    return;
+                }
 
+                if (NetworkUtil.isConnected(this)) {
+                    clientLogin(AccountManager.getInstance().getScalesId() + "", name, password);
                 } else {  //  离线状态
-                    User user = SQLite.select().from(User.class).where(User_Table.card_number.is(numberEt.getText().toString())).querySingle();
+                    User user = SQLite.select().from(User.class).where(User_Table.card_number.is(name)).querySingle();
                     if (user != null) {
                         if (TextUtils.equals(pwdEt.getText(), user.password)) {
                             //TODO 测试 功能

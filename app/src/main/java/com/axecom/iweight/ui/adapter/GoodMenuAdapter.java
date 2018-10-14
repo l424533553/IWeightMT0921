@@ -75,11 +75,13 @@ public class GoodMenuAdapter extends BaseAdapter {
         }
         holder.tag.setVisibility(TextUtils.isEmpty(goods.batch_code)?View.GONE:View.VISIBLE);
 
-        if(position%3==0){
+    /*    if(position%3==0){
             holder.tvIndex.setVisibility(View.VISIBLE);
             holder.tvIndex.setText(String.valueOf(position/3+1));
+        }else{
+            holder.tvIndex.setVisibility(View.GONE);
         }
-
+*/
         return convertView;
     }
 

@@ -52,6 +52,7 @@ import com.hoho.android.usbserial.driver.UsbSerialPort;
 import com.luofx.listener.VolleyListener;
 import com.luofx.utils.DateUtils;
 import com.luofx.utils.PreferenceUtils;
+import com.luofx.utils.ToastUtils;
 import com.luofx.utils.log.MyLog;
 import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
@@ -465,6 +466,7 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
                     @Override
                     public void onError(Throwable e) {
                         closeLoading();
+                        ToastUtils.showToast(HomeActivity.this,"登录失败");
 
                     }
 
