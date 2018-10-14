@@ -357,6 +357,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                     heartBeatServcice.setTerid(tid);
                 }
 
+
                 @Override
                 public void onServiceDisconnected(ComponentName name) {
                     Log.d("MainActivity", "onServiceDisconnected");
@@ -371,7 +372,6 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
             MainActivity.this.finish();
         }
     }
-
 
     @Override
     protected void onResume() {
@@ -443,7 +443,6 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                     public void onSubscribe(Disposable d) {
 
                     }
-
                     @Override
                     public void onNext(BaseEntity<Advertis> advertisBaseEntity) {
                         if (advertisBaseEntity.isSuccess()) {
@@ -465,12 +464,10 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
 
                     @Override
                     public void onError(Throwable e) {
-
                     }
 
                     @Override
                     public void onComplete() {
-
                     }
                 });
     }
@@ -513,7 +510,9 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
 
     @Override
     protected void onDestroy() {
-        unbindService(mConnection);
+        if(mConnection!=null){
+            unbindService(mConnection);
+        }
         weighUtils.closeSerialPort();
         super.onDestroy();
     }
@@ -582,8 +581,6 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
     private void accumulative(boolean clean) {
         if (selectedGoods == null) {
             return;
-
-
         }
         if (TextUtils.isEmpty(etPrice.getText()) && TextUtils.isEmpty(etPrice.getHint().toString())) {
             return;
@@ -781,7 +778,6 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
 
         // 还需要传订单信息
         final OrderInfo orderInfo = new OrderInfo();
-
         new AsyncTask<Void, Void, OrderInfo>() {
             @Override
             protected OrderInfo doInBackground(Void... voids) {
@@ -846,33 +842,37 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                 sb.append("司磅员：").append(operator).append("\t\t").append("秤号：").append(AccountManager.getInstance().getScalesId()).append("\n");
                 sb.append("\n\n");
 
-
-                byte[] bytes = null;
-                try {
-                    int index1 = bitmap.indexOf("url=");
-                    if (index1 > 0) {
-                        String qrString = bitmap.substring(index1 + 4);
-                        if (qrString.length() > 0) {
-                            bytes = print.getbyteData(qrString, 32, 32);
+                if(NetworkUtil.isAvailable(context)){// 有网打印二维码
+                    byte[] bytes = null;
+                    try {
+                        int index1 = bitmap.indexOf("url=");
+                        if (index1 > 0) {
+                            String qrString = bitmap.substring(index1 + 4);
+                            if (qrString.length() > 0) {
+                                bytes = print.getbyteData(qrString, 32, 32);
+                            }
                         }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
+
+                    try {
+                        if (bytes != null) {
+                            print.PrintltString("扫一扫获取追溯信息：");
+                            print.printQR(bytes);
+                            print.PrintltString("--------------------------------\n\n\n");
+                        }
+
+                    } catch (IOException | InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }else{
+                    sb.append("\n\n");
                 }
 
                 print.setLineSpacing((byte) 32);
                 print.PrintString(sb.toString());
 
-                try {
-                    if (bytes != null) {
-                        print.PrintltString("扫一扫获取追溯信息：");
-                        print.printQR(bytes);
-                        print.PrintltString("--------------------------------\n\n\n");
-                    }
-
-                } catch (IOException | InterruptedException e) {
-                    e.printStackTrace();
-                }
                 orderInfo.setItems(itemsBeans);
                 return orderInfo;
             }

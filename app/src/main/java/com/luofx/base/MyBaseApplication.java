@@ -128,7 +128,7 @@ public class MyBaseApplication extends Application implements Thread.UncaughtExc
             getQueues().add(request);
 
         } else {
-            Toast.makeText(context, TAG, Toast.LENGTH_SHORT).show();
+//            Toast.makeText(context, TAG, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -184,7 +184,7 @@ public class MyBaseApplication extends Application implements Thread.UncaughtExc
             getQueues().add(stringRequest);
 
         } else {
-            Toast.makeText(context, TAG, Toast.LENGTH_SHORT).show();
+//            Toast.makeText(context, TAG, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -231,7 +231,7 @@ public class MyBaseApplication extends Application implements Thread.UncaughtExc
             getQueues().add(stringRequest);
 
         } else {
-            Toast.makeText(context, TAG, Toast.LENGTH_SHORT).show();
+//            Toast.makeText(context, TAG, Toast.LENGTH_SHORT).show();
         }
     }
 
