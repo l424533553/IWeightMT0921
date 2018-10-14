@@ -126,7 +126,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
     private String bitmap;
 
 
-    public  BannerActivity banner = null;
+    public BannerActivity banner = null;
     boolean switchSimpleOrComplex;
     boolean stopPrint;
 
@@ -354,7 +354,6 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                     heartBeatServcice.setTerid(tid);
                 }
 
-
                 @Override
                 public void onServiceDisconnected(ComponentName name) {
                     Log.d("MainActivity", "onServiceDisconnected");
@@ -440,6 +439,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                     public void onSubscribe(Disposable d) {
 
                     }
+
                     @Override
                     public void onNext(BaseEntity<Advertis> advertisBaseEntity) {
                         if (advertisBaseEntity.isSuccess()) {
@@ -507,7 +507,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
 
     @Override
     protected void onDestroy() {
-        if(mConnection!=null){
+        if (mConnection != null) {
             unbindService(mConnection);
         }
         weighUtils.closeSerialPort();
@@ -544,9 +544,9 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                     //结算时带上当前称重的记录
                     appendCurrentGood();
                     if (parseFloat(priceTotalTv.getText().toString()) > 0 || parseFloat(tvgrandTotal.getText().toString()) > 0) {
-                        if(!NetworkUtil.isConnected(this)){
-                            ToastUtils.showToast(this,"使用第三方支付需要连接网络！");
-                        }else {
+                        if (!NetworkUtil.isConnected(this)) {
+                            ToastUtils.showToast(this, "使用第三方支付需要连接网络！");
+                        } else {
                             charge(false);
                         }
                     }
@@ -615,7 +615,6 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         if (clean)
             clear(3, false);
     }
-
 
 
     @SuppressLint("DefaultLocale")
@@ -763,7 +762,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         final String stallNumber2 = stallNumberTv.getText().toString();//摊位号
         final String currentTime = getCurrentTime();
 
-        RecordManage.record(true,companyName,
+        RecordManage.record(true, companyName,
                 bitmap,
                 orderNo,
                 seller,
@@ -851,7 +850,15 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                 sb.append("司磅员：").append(operator).append("\t\t").append("秤号：").append(AccountManager.getInstance().getScalesId()).append("\n");
                 sb.append("\n\n");
 
-                if(NetworkUtil.isAvailable(context)){// 有网打印二维码
+                boolean isAvailable = NetworkUtil.isAvailable(context);// 有网打印二维码
+                if (!isAvailable) {
+                    sb.append("\n\n");
+                    print.setLineSpacing((byte) 32);
+                    print.PrintString(sb.toString());
+                } else {
+                    print.setLineSpacing((byte) 32);
+                    print.PrintString(sb.toString());
+
                     byte[] bytes = null;
                     try {
                         int index1 = bitmap.indexOf("url=");
@@ -875,12 +882,8 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                     } catch (IOException | InterruptedException e) {
                         e.printStackTrace();
                     }
-                }else{
-                    sb.append("\n\n");
                 }
 
-                print.setLineSpacing((byte) 32);
-                print.PrintString(sb.toString());
 
                 orderInfo.setItems(itemsBeans);
                 return orderInfo;
@@ -892,7 +895,6 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
             }
         }.execute();
     }
-
 
 
     @SuppressLint("SetTextI18n")
@@ -975,7 +977,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         if (useCash) {
             payCashDirect(subOrderReqBean);
         } else {
-            banner.showPayAmount( subOrderReqBean.getTotal_amount(), "");
+            banner.showPayAmount(subOrderReqBean.getTotal_amount(), "");
             startActivity(intent);
         }
     }
@@ -1186,15 +1188,16 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
     }
 
     int pressCount = 0;
+
     @Override
     public void onBackPressed() {
-        if(pressCount==0){
-            ToastUtils.showToast(this,"再次点击退出！");
+        if (pressCount == 0) {
+            ToastUtils.showToast(this, "再次点击退出！");
             pressCount++;
             Timer timer = new Timer();//实例化Timer类
             timer.schedule(new TimerTask() {
                 public void run() {
-                    pressCount=0;
+                    pressCount = 0;
                     this.cancel();
                 }
             }, 2000);//五百毫秒
