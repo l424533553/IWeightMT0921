@@ -58,6 +58,7 @@ public class GoodMenuAdapter extends BaseAdapter {
             holder = new ViewHolder();
             holder.commodityBtn = convertView.findViewById(R.id.main_grid_item_btn);
             holder.tag = convertView.findViewById(R.id.img_tag);
+            holder.tvIndex = convertView.findViewById(R.id.tvIndex);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
@@ -74,11 +75,16 @@ public class GoodMenuAdapter extends BaseAdapter {
         }
         holder.tag.setVisibility(TextUtils.isEmpty(goods.batch_code)?View.GONE:View.VISIBLE);
 
+        if(position%3==0){
+            holder.tvIndex.setVisibility(View.VISIBLE);
+            holder.tvIndex.setText(String.valueOf(position/3+1));
+        }
+
         return convertView;
     }
 
     class ViewHolder {
-        TextView commodityBtn;
+        TextView commodityBtn,tvIndex;
         ImageView tag;
     }
 }
