@@ -1,14 +1,8 @@
 package com.axecom.iweight.ui.activity;
 
-import android.content.Context;
-import android.content.Intent;
-import android.hardware.display.DisplayManager;
-import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -22,20 +16,16 @@ import com.axecom.iweight.base.BusEvent;
 import com.axecom.iweight.base.SysApplication;
 import com.axecom.iweight.bean.SubOrderReqBean;
 import com.axecom.iweight.manager.PayCheckManage;
-import com.axecom.iweight.ui.uiutils.ImageLoaderHelper;
 import com.axecom.iweight.ui.view.SoftKey;
 import com.axecom.iweight.utils.MoneyTextWatcher;
 import com.axecom.iweight.utils.NetworkUtil;
 import com.axecom.iweight.utils.SPUtils;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
 
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Created by Administrator on 2018-5-15.
