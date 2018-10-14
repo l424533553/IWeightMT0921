@@ -240,10 +240,8 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
             if (available) {
                 getScalesIdByMac(MacManager.getInstace(this).getMac());
                 getSettingData(MacManager.getInstace(this).getMac());
-//                getScalesIdByMac("80:5e:4f:85:57:9d");
             }
         }
-
     }
 
     private BroadcastReceiver usbReceiver = new BroadcastReceiver() {
@@ -309,7 +307,6 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
                         } else {
                             Toast.makeText(this, "没有该卡号", Toast.LENGTH_SHORT).show();
                         }
-
                     }
                 }
                 break;
@@ -328,7 +325,6 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
                         }
                     }).show();
                 }
-
                 break;
             case R.id.home_pwd_tv:
                 if (!ButtonUtils.isFastDoubleClick(R.id.home_pwd_tv)) {
@@ -359,8 +355,35 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
         }
     }
 
+    // 设置数据类型
     public void getSettingData(String mac) {
+
         SystemSettingManager.getSettingData(this);
+        RetrofitFactory.getInstance().API()
+                .getSettingData("", mac)
+                .compose(this.<BaseEntity>setThread())
+                .subscribe(new Observer<BaseEntity>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                    }
+
+                    @Override
+                    public void onNext(BaseEntity baseEntity) {
+                        if (baseEntity.isSuccess()) {
+                            LinkedTreeMap valueMap = (LinkedTreeMap) ((LinkedTreeMap) baseEntity.getData()).get("value");
+                            loginType = (((LinkedTreeMap) valueMap.get("default_login_type")).get("val")).toString();
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                    }
+
+                    @Override
+                    public void onComplete() {
+                    }
+                });
+
     }
 
     public void getScalesIdByMac(String mac) {
@@ -394,7 +417,6 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
                             showLoading(baseEntity.getMsg());
                         }
                     }
-
 
                     @Override
                     public void onError(@NonNull Throwable e) {
@@ -449,10 +471,10 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
                     @Override
                     public void onComplete() {
                         closeLoading();
-
                     }
                 });
     }
+
 
     public void staffMemberLogin(String scalesId, final String serialNumber, final String password) {
         RetrofitFactory.getInstance().API()
