@@ -15,6 +15,16 @@ public class SubOrderReqBean implements Serializable{
     private String pricing_model;
     private List<Goods> goods;
 
+    public String getOrder_no() {
+        return order_no;
+    }
+
+    public void setOrder_no(String order_no) {
+        this.order_no = order_no;
+    }
+
+    private String order_no;
+
     public List<Goods> getGoods() {
         return goods;
     }

@@ -135,6 +135,7 @@ public class LocalSettingsActivity extends BaseActivity {
         printerPorts = new ArrayList<>();
         externalLedPorts = new ArrayList<>();
         cardReaderPorts = new ArrayList<>();
+        serverPortTv.setText(Constants.URL);
 //        ChooseBean bean;
 //        for (int i = 0; i < 4; i++) {
 //            bean= new ChooseBean();

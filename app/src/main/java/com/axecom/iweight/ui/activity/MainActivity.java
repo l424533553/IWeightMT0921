@@ -278,13 +278,13 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         initSettlement();
         commoditysGridView.setAdapter(goodMenuAdapter);
 
-       /* List<HotKeyBean> hotKeyBeanList = SQLite.select().from(HotKeyBean.class).queryList();
+        List<HotKeyBean> hotKeyBeanList = SQLite.select().from(HotKeyBean.class).queryList();
         if (hotKeyBeanList.size() > 0) {
             HotKeyBeanList.addAll(hotKeyBeanList);
             goodMenuAdapter.notifyDataSetChanged();
-        } else {*/
+        } else {
         getGoodsData();
-//        }
+        }
 
         commoditysGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @SuppressLint("DefaultLocale")
@@ -963,6 +963,8 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         subOrderReqBean.setTotal_amount(priceTotalTv.getText().toString());
         subOrderReqBean.setTotal_weight(weightTotalTv.getText().toString());
         subOrderReqBean.setCreate_time(getCurrentTime());
+        String orderNo = "AX" + getCurrentTime("yyyyMMddHHmmss") + AccountManager.getInstance().getScalesId();
+        subOrderReqBean.setOrder_no(orderNo);
         subOrderReqBean.setGoods(goodsList);
         if (switchSimpleOrComplex) {
             subOrderReqBean.setPricing_model("2");

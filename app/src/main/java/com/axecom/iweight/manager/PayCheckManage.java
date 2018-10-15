@@ -119,7 +119,7 @@ public class PayCheckManage {
 
                     @Override
                     public void onComplete() {
-//                        content.closeLoading();
+                        content.closeLoading();
                     }
                 });
     }
