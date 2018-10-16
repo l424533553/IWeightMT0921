@@ -951,6 +951,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         List<SubOrderReqBean.Goods> goodsList = new ArrayList<>();
         int count=0;
         ModelAdapter<Order> modelAdapter = FlowManager.getModelAdapter(Order.class);
+        String orderNo = "AX" + getCurrentTime("yyyyMMddHHmmss") + AccountManager.getInstance().getScalesId();
 
         for (int i = 0; i < seledtedGoodsList.size(); i++) {
             good = new SubOrderReqBean.Goods();
@@ -971,6 +972,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
             order.create_time = subOrderReqBean.getCreate_time();
             order.payment_id = subOrderReqBean.getPayment_id();
             order.pricing_model = subOrderReqBean.getPricing_model();
+            order.order_no = orderNo;
             order.total_amount = subOrderReqBean.getTotal_amount();
             order.total_number = subOrderReqBean.getTotal_number();
             order.total_weight = subOrderReqBean.getTotal_weight();
@@ -990,7 +992,6 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         subOrderReqBean.setTotal_weight(weightTotalTv.getText().toString());
         subOrderReqBean.setTotal_number(count+"");
         subOrderReqBean.setCreate_time(getCurrentTime());
-        String orderNo = "AX" + getCurrentTime("yyyyMMddHHmmss") + AccountManager.getInstance().getScalesId();
         subOrderReqBean.setOrder_no(orderNo);
         subOrderReqBean.setGoods(goodsList);
         if (switchSimpleOrComplex) {

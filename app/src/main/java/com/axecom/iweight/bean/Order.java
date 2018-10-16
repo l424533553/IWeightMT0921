@@ -37,6 +37,8 @@ public class Order extends BaseModel implements Serializable{
     @Column
     public String pricing_model;
 
+    @Column
+    public String order_no;
 
     @Column
     public String goods_id;
