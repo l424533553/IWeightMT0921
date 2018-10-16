@@ -4,6 +4,16 @@ public class LoginData {
 
     private String token;
     private String adminToken;
+    private int user_type;
+    private int card_id;
+
+    public int getCard_id() {
+        return card_id;
+    }
+
+    public void setCard_id(int card_id) {
+        this.card_id = card_id;
+    }
 
     public int getUser_type() {
         return user_type;
@@ -13,7 +23,6 @@ public class LoginData {
         this.user_type = user_type;
     }
 
-    private int user_type;
 
     public String getToken() {
         return token;

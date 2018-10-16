@@ -16,6 +16,7 @@ public interface Constants {
 
     String USER_TOKEN = "user_token";
     String USER_SCALES_ID = "scales_id";
+    String USER_CARD_ID = "card_id";
 
 
 }

@@ -36,6 +36,8 @@ public class Order extends BaseModel implements Serializable{
     public String total_number;
     @Column
     public String pricing_model;
+    @Column
+    public  int card_id;
 
     @Column
     public String order_no;

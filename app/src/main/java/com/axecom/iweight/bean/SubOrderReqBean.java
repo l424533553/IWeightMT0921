@@ -16,6 +16,16 @@ public class SubOrderReqBean implements Serializable{
     private List<Goods> goods;
     private String total_number;
 
+    public int getCard_id() {
+        return card_id;
+    }
+
+    public void setCard_id(int card_id) {
+        this.card_id = card_id;
+    }
+
+    private int card_id;
+
     public String getTotal_number() {
         return total_number;
     }

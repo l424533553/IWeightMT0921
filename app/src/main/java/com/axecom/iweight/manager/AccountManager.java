@@ -12,9 +12,20 @@ import com.axecom.iweight.utils.SPUtils;
 public class AccountManager {
     private static final String LAST_SERIALNUMBER = "last_serialnumber";
     private static final String IS_SAVE_PWD = "is_save_pwd";
-    private static AccountManager accountManager ;
-    private String adminToken; 
+    private static AccountManager accountManager;
+    private String adminToken;
     private String mToken;
+
+    public String getCardId() {
+        String cardId = SPUtils.getString(mCtx, Constants.USER_CARD_ID, "");
+        return cardId;
+    }
+
+    public void setCardId(int cardId) {
+        SPUtils.putString(mCtx, Constants.USER_CARD_ID, cardId + "");
+    }
+
+    private int cardId;
 
     private static Context mCtx;
     private int userType;
@@ -27,64 +38,65 @@ public class AccountManager {
         this.userType = userType;
     }
 
-    private AccountManager(){}
+    private AccountManager() {
+    }
 
-    public static AccountManager getInstance(){
+    public static AccountManager getInstance() {
         mCtx = SysApplication.getContext();
-        if(accountManager==null){
+        if (accountManager == null) {
             accountManager = new AccountManager();
         }
         return accountManager;
     }
 
     public String getToken() {
-        if(mToken!=null){
+        if (mToken != null) {
             return mToken;
         }
         return SPUtils.getString(mCtx, Constants.USER_TOKEN, null);
     }
 
-    public void saveToken(String token){
+    public void saveToken(String token) {
         SPUtils.putString(mCtx, Constants.USER_TOKEN, token);
     }
 
-    public void saveScalesId(String scalesId){
+    public void saveScalesId(String scalesId) {
         SPUtils.putString(mCtx, Constants.USER_SCALES_ID, scalesId);
     }
 
-    public String getScalesId(){
+    public String getScalesId() {
         return SPUtils.getString(mCtx, Constants.USER_SCALES_ID, null);
     }
 
-    public void saveRememberPwdState(boolean save){
+    public void saveRememberPwdState(boolean save) {
         SPUtils.put(mCtx, IS_SAVE_PWD, save);
     }
 
-    public boolean getRememberPwdState(){
-        return (boolean)SPUtils.get(mCtx, IS_SAVE_PWD,false);
+    public boolean getRememberPwdState() {
+        return (boolean) SPUtils.get(mCtx, IS_SAVE_PWD, false);
     }
 
-    public void saveLastSerialNumber(String serialNumber){
+    public void saveLastSerialNumber(String serialNumber) {
         SPUtils.putString(mCtx, LAST_SERIALNUMBER, serialNumber);
     }
 
-    public String getLastSerialNumber(){
-       return SPUtils.getString(mCtx, LAST_SERIALNUMBER, "");
+    public String getLastSerialNumber() {
+        return SPUtils.getString(mCtx, LAST_SERIALNUMBER, "");
     }
 
-    public void savePwd(String serialNumber, String pwd){
+    public void savePwd(String serialNumber, String pwd) {
         SPUtils.putString(mCtx, serialNumber, pwd);
     }
 
-    public String getPwdBySerialNumber(String serialNumber){
+    public String getPwdBySerialNumber(String serialNumber) {
         return SPUtils.getString(mCtx, serialNumber, null);
     }
 
-    public void savePwdChecked(String serialNumber, boolean isChecked){
+    public void savePwdChecked(String serialNumber, boolean isChecked) {
         SPUtils.put(mCtx, serialNumber, isChecked);
     }
 
-    public Boolean getPwdChecked(String serialNumber){
+    public Boolean getPwdChecked(String serialNumber) {
         return (Boolean) SPUtils.get(mCtx, serialNumber, null);
     }
 

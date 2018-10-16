@@ -543,6 +543,10 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                 }
                 break;
             case R.id.main_scan_pay:
+                if(SystemSettingManager.disable_alipay_mode() && SystemSettingManager.disable_weixin_mode()){
+                    showLoading("微信与支付宝已停用");
+                    return;
+                }
                 if (!ButtonUtils.isFastDoubleClick(R.id.main_scan_pay)) {
                     //结算时带上当前称重的记录
                     appendCurrentGood();
@@ -950,9 +954,17 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         SubOrderReqBean.Goods good;
         List<SubOrderReqBean.Goods> goodsList = new ArrayList<>();
         int count=0;
-        ModelAdapter<Order> modelAdapter = FlowManager.getModelAdapter(Order.class);
         String orderNo = "AX" + getCurrentTime("yyyyMMddHHmmss") + AccountManager.getInstance().getScalesId();
+        subOrderReqBean.setToken(AccountManager.getInstance().getToken());
+        subOrderReqBean.setMac(MacManager.getInstace(this).getMac());
+        subOrderReqBean.setTotal_amount(priceTotalTv.getText().toString());
+        subOrderReqBean.setTotal_weight(weightTotalTv.getText().toString());
+        subOrderReqBean.setTotal_number(count+"");
+        subOrderReqBean.setCreate_time(getCurrentTime());
+        subOrderReqBean.setOrder_no(orderNo);
+        subOrderReqBean.setCard_id(Integer.parseInt(AccountManager.getInstance().getCardId()));
 
+        ModelAdapter<Order> modelAdapter = FlowManager.getModelAdapter(Order.class);
         for (int i = 0; i < seledtedGoodsList.size(); i++) {
             good = new SubOrderReqBean.Goods();
             HotKeyBean HotKeyBean = seledtedGoodsList.get(i);
@@ -973,6 +985,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
             order.payment_id = subOrderReqBean.getPayment_id();
             order.pricing_model = subOrderReqBean.getPricing_model();
             order.order_no = orderNo;
+            order.card_id = subOrderReqBean.getCard_id();
             order.total_amount = subOrderReqBean.getTotal_amount();
             order.total_number = subOrderReqBean.getTotal_number();
             order.total_weight = subOrderReqBean.getTotal_weight();
@@ -986,13 +999,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
             order.goods_weight = hotKeyBean.getWeight();
             modelAdapter.insert(order);
         }
-        subOrderReqBean.setToken(AccountManager.getInstance().getToken());
-        subOrderReqBean.setMac(MacManager.getInstace(this).getMac());
-        subOrderReqBean.setTotal_amount(priceTotalTv.getText().toString());
-        subOrderReqBean.setTotal_weight(weightTotalTv.getText().toString());
-        subOrderReqBean.setTotal_number(count+"");
-        subOrderReqBean.setCreate_time(getCurrentTime());
-        subOrderReqBean.setOrder_no(orderNo);
+
         subOrderReqBean.setGoods(goodsList);
         if (switchSimpleOrComplex) {
             subOrderReqBean.setPricing_model("2");
