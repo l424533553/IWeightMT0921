@@ -135,7 +135,6 @@ public class LocalSettingsActivity extends BaseActivity {
         printerPorts = new ArrayList<>();
         externalLedPorts = new ArrayList<>();
         cardReaderPorts = new ArrayList<>();
-        serverPortTv.setText(Constants.URL);
 //        ChooseBean bean;
 //        for (int i = 0; i < 4; i++) {
 //            bean= new ChooseBean();
@@ -147,8 +146,8 @@ public class LocalSettingsActivity extends BaseActivity {
     }
 
     private void showLocalIp() {
-        serverIPTv.setText(SPUtils.getString(this,KEY_SERVER_IP,""));
-        serverPortTv.setText(SPUtils.getString(this,KEY_SVERVER_PORT,""));
+        serverIPTv.setText(Constants.URL);
+        serverPortTv.setText(Constants.PORT);
     }
 
     public void getUsbDevices() {

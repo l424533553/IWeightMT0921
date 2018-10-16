@@ -3,16 +3,12 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/IWeightMT0921.iml" filepath="$PROJECT_DIR$/IWeightMT0921.iml" />
-      <module fileurl="file://E:\worksapce\IWeightMT0921\IWeightMT0921.iml" filepath="E:\worksapce\IWeightMT0921\IWeightMT0921.iml" />
       <module fileurl="file://D:\new\IWeightMT0921\IWeightMT0921.iml" filepath="D:\new\IWeightMT0921\IWeightMT0921.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://D:\new\IWeightMT0921\app\app.iml" filepath="D:\new\IWeightMT0921\app\app.iml" />
-      <module fileurl="file://E:\worksapce\IWeightMT0921\app\app.iml" filepath="E:\worksapce\IWeightMT0921\app\app.iml" />
       <module fileurl="file://$PROJECT_DIR$/bthelper/bthelper.iml" filepath="$PROJECT_DIR$/bthelper/bthelper.iml" />
       <module fileurl="file://D:\new\IWeightMT0921\bthelper\bthelper.iml" filepath="D:\new\IWeightMT0921\bthelper\bthelper.iml" />
-      <module fileurl="file://E:\worksapce\IWeightMT0921\bthelper\bthelper.iml" filepath="E:\worksapce\IWeightMT0921\bthelper\bthelper.iml" />
       <module fileurl="file://$PROJECT_DIR$/usbSerialForAndroid/usbSerialForAndroid.iml" filepath="$PROJECT_DIR$/usbSerialForAndroid/usbSerialForAndroid.iml" />
-      <module fileurl="file://E:\worksapce\IWeightMT0921\usbSerialForAndroid\usbSerialForAndroid.iml" filepath="E:\worksapce\IWeightMT0921\usbSerialForAndroid\usbSerialForAndroid.iml" />
       <module fileurl="file://D:\new\IWeightMT0921\usbSerialForAndroid\usbSerialForAndroid.iml" filepath="D:\new\IWeightMT0921\usbSerialForAndroid\usbSerialForAndroid.iml" />
     </modules>
   </component>
