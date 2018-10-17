@@ -10,19 +10,7 @@ import android.support.annotation.Nullable;
 import android.view.Display;
 import android.view.WindowManager;
 
-import com.axecom.iweight.base.BaseEntity;
-import com.axecom.iweight.bean.Advertis;
-import com.axecom.iweight.net.RetrofitFactory;
 import com.axecom.iweight.ui.activity.BannerActivity;
-import com.axecom.iweight.utils.LogUtils;
-
-import io.reactivex.ObservableTransformer;
-import io.reactivex.Observer;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 /**
  * Created by Administrator on 2018/7/25.
@@ -42,7 +30,9 @@ public class BannerService extends Service {
             banner.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
             banner.show();
         }
-        banner.show();
+        if (banner != null){
+            banner.show();
+        }
     }
 
     @Override

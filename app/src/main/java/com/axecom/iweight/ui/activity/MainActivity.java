@@ -56,7 +56,6 @@ import com.axecom.iweight.my.helper.HeartBeatServcice;
 import com.axecom.iweight.my.helper.HttpHelper;
 import com.axecom.iweight.net.RetrofitFactory;
 import com.axecom.iweight.ui.adapter.GoodMenuAdapter;
-import com.axecom.iweight.ui.uiutils.UIUtils;
 import com.axecom.iweight.utils.ButtonUtils;
 import com.axecom.iweight.utils.FileUtils;
 import com.axecom.iweight.utils.MoneyTextWatcher;
@@ -547,6 +546,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                         if (!NetworkUtil.isConnected(this)) {
                             ToastUtils.showToast(this, "使用第三方支付需要连接网络！");
                         } else {
+                            //扫码支付
                             charge(false);
                         }
                     }

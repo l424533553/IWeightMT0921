@@ -4,9 +4,7 @@ package com.axecom.iweight.net;
 import android.text.TextUtils;
 
 import com.axecom.iweight.base.SysApplication;
-import com.axecom.iweight.bean.LocalSettingsBean;
 import com.axecom.iweight.conf.Constants;
-import com.axecom.iweight.ui.activity.LocalSettingsActivity;
 import com.axecom.iweight.utils.SPUtils;
 
 import java.util.concurrent.TimeUnit;

@@ -1,2 +1,2 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merger version="3"><dataSet config="main"><source path="E:\11\IWeightMT0921\usbSerialForAndroid\src\main\assets"/><source path="E:\11\IWeightMT0921\usbSerialForAndroid\build\generated\assets\shaders\debug"/></dataSet><dataSet config="debug"><source path="E:\11\IWeightMT0921\usbSerialForAndroid\src\debug\assets"/></dataSet></merger>
+<merger version="3"><dataSet config="main"><source path="/Users/hl/Develop/ASProject/IWeightMT0921/usbSerialForAndroid/src/main/assets"/><source path="/Users/hl/Develop/ASProject/IWeightMT0921/usbSerialForAndroid/build/generated/assets/shaders/debug"/></dataSet><dataSet config="debug"><source path="/Users/hl/Develop/ASProject/IWeightMT0921/usbSerialForAndroid/src/debug/assets"/></dataSet></merger>
