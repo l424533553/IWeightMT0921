@@ -51,7 +51,7 @@ public class DataSummaryActivity extends BaseActivity {
     private TextView backTv;
     private TextView printTv;
     private TextView dateTv;
-    private List<ReportResultBean.list> dataList;
+    private List<ReportResultBean.list> dataList = new ArrayList<>();
     private List<OrderListResultBean.list> orderList;
 
     private TextView countTotalTv, weightTotalTv, grandTotalTv, amountTotalTv;
@@ -132,10 +132,9 @@ public class DataSummaryActivity extends BaseActivity {
             printerManager.usbConn();
         }
         currentDay = getCurrentTime("yyyy-MM-dd");
-        dataList = new ArrayList<>();
-        getReportsList(currentDay, typeVal, currentPage + "", pageNum + "");
         dataAdapter = new DataAdapter(this, dataList);
         dataListView.setAdapter(dataAdapter);
+        getReportsList(currentDay, typeVal, currentPage + "", pageNum + "");
 
         orderList = new ArrayList<>();
         salesAdapter = new SalesAdapter(this, orderList);
@@ -168,7 +167,6 @@ public class DataSummaryActivity extends BaseActivity {
         //获取当前日，月选中的列表数据
         for (Order order : getListOrder){
             LogUtils.d(order.total_amount + "--"+order.goods_price+"--"+order.amount+"--"+order.goods_number+"--"+order.pricing_model);
-
             list = new ReportResultBean.list();
             list.total_amount = order.total_amount;
             list.total_weight = order.total_weight;
@@ -197,12 +195,12 @@ public class DataSummaryActivity extends BaseActivity {
         grandTotalTv.setText(reportResultBean.total_amount);
         amountTotalTv.setText(reportResultBean.total_amount);
         dataList.addAll(reportResultBean.list);
+        dataAdapter.notifyDataSetChanged();
     }
 
     public void getOrderList(String dateVal, String page, String pageNum) {
 
-        List<Order> getlist = SQLite.select().from(Order.class).queryList();
-        LogUtils.d(getlist.size()+"---->"+getlist.get(0).payment_id+"--->");
+        List<Order> getlist = SQLite.select().from(Order.class).where(Order_Table.create_time_day.is(dateVal)).queryList();
         orderListResultBean = new OrderListResultBean();
         orderListResultBean.list = new ArrayList<OrderListResultBean.list>();
         OrderListResultBean.list list = new OrderListResultBean.list();
