@@ -210,6 +210,7 @@ public class DataSummaryActivity extends BaseActivity {
             list.order_no = order.order_no;
             list.goods_name  = order.goods_name;
             list.times = order.create_time;
+            LogUtils.d("---ordercreatetime---->"+order.create_time);
             list.goods_weight = order.goods_weight;
             list.goods_price = order.goods_price;
             list.goods_number = order.goods_number;
