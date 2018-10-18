@@ -23,20 +23,16 @@ import com.axecom.iweight.conf.Constants;
 import com.axecom.iweight.manager.AccountManager;
 import com.axecom.iweight.manager.MacManager;
 import com.axecom.iweight.net.RetrofitFactory;
-import com.axecom.iweight.ui.view.ChooseDialog;
 import com.axecom.iweight.ui.view.ChooseDialog2;
 import com.axecom.iweight.ui.view.SoftKeyborad;
-import com.axecom.iweight.utils.LogUtils;
 import com.axecom.iweight.utils.NetworkUtil;
 import com.axecom.iweight.utils.SPUtils;
-import com.google.gson.internal.LinkedTreeMap;
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialProber;
 
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import io.reactivex.Observer;

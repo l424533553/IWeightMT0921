@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+              xmlns:tools="http://schemas.android.com/tools">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,7 +16,8 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:textColor="@color/black"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            tools:text="1232123-123131231123"/>
 
         <TextView
             android:id="@+id/data_item_count_tv"
@@ -24,7 +26,8 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:textColor="@color/black"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            tools:text="12321312312312"/>
 
         <TextView
             android:id="@+id/data_item_weight_tv"

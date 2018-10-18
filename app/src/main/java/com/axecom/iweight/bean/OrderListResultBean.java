@@ -10,7 +10,7 @@ public class OrderListResultBean<T> extends BaseEntity {
 
     public List<list> list;
 
-    public class list{
+    public static class list{
         public String order_no;
         public String goods_name;
         public String goods_weight;

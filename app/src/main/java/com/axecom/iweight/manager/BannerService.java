@@ -30,9 +30,7 @@ public class BannerService extends Service {
             banner.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
             banner.show();
         }
-        if (banner != null){
-            banner.show();
-        }
+//        banner.show();
     }
 
     @Override

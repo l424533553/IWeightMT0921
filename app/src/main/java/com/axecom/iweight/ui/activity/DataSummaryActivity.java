@@ -13,17 +13,15 @@ import android.widget.TextView;
 
 import com.axecom.iweight.R;
 import com.axecom.iweight.base.BaseActivity;
-import com.axecom.iweight.base.BaseEntity;
 import com.axecom.iweight.bean.LocalSettingsBean;
+import com.axecom.iweight.bean.Order;
 import com.axecom.iweight.bean.OrderGoods;
 import com.axecom.iweight.bean.OrderListResultBean;
 import com.axecom.iweight.bean.OrderLocal;
+import com.axecom.iweight.bean.Order_Table;
 import com.axecom.iweight.bean.ReportResultBean;
-import com.axecom.iweight.manager.AccountManager;
-import com.axecom.iweight.manager.MacManager;
 import com.axecom.iweight.manager.PrinterManager;
 import com.axecom.iweight.manager.ThreadPool;
-import com.axecom.iweight.net.RetrofitFactory;
 import com.axecom.iweight.utils.LogUtils;
 import com.axecom.iweight.utils.SPUtils;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
@@ -31,9 +29,6 @@ import com.raizlabs.android.dbflow.sql.language.SQLite;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import io.reactivex.Observer;
-import io.reactivex.disposables.Disposable;
 
 /**
  * Created by Administrator on 2018-5-24.
@@ -137,8 +132,8 @@ public class DataSummaryActivity extends BaseActivity {
             printerManager.usbConn();
         }
         currentDay = getCurrentTime("yyyy-MM-dd");
-        getReportsList(currentDay, typeVal + "", currentPage + "", pageNum + "");
         dataList = new ArrayList<>();
+        getReportsList(currentDay, typeVal, currentPage + "", pageNum + "");
         dataAdapter = new DataAdapter(this, dataList);
         dataListView.setAdapter(dataAdapter);
 
@@ -149,84 +144,88 @@ public class DataSummaryActivity extends BaseActivity {
 
     }
 
-    public void getReportsList(final String dateVal, String typeVal, String page, final String pNum) {
-        RetrofitFactory.getInstance().API()
-                .getReportsList(AccountManager.getInstance().getAdminToken(), MacManager.getInstace(this).getMac(), dateVal, typeVal, page, pNum)
-                .compose(this.<BaseEntity<ReportResultBean>>setThread())
-                .subscribe(new Observer<BaseEntity<ReportResultBean>>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                        showLoading();
-                    }
+    public void getReportsList(final String dateVal, int typeVal, String page, final String pNum) {
 
-                    @Override
-                    public void onNext(BaseEntity<ReportResultBean> reportResultBeanBaseEntity) {
-                        if (reportResultBeanBaseEntity.isSuccess()) {
-                            reportResultBean = reportResultBeanBaseEntity.getData();
-                            dataList.clear();
-                            dataList.addAll(reportResultBean.list);
-                            LogUtils.d("-----list size " + dataList.size());
-                            dataAdapter.notifyDataSetChanged();
-                            countTotalTv.setText(reportResultBean.total_num + "");
-                            weightTotalTv.setText(reportResultBean.total_weight + "kg/" + reportResultBean.all_number + "件");
-                            grandTotalTv.setText(reportResultBean.total_amount);
-                            amountTotalTv.setText(reportResultBean.total_amount);
-                            closeLoading();
-                        } else {
-                            showLoading(reportResultBeanBaseEntity.getMsg());
-                        }
-                    }
+        LogUtils.d(dateVal+"----"+typeVal+"------"+page+"-----"+pNum+"----");
 
-                    @Override
-                    public void onError(Throwable e) {
-                        e.printStackTrace();
-                        closeLoading();
-                    }
+        dataList.clear();
+        //获取数据库所有订单资料
+        List<Order> getListOrder = new ArrayList<>();
 
-                    @Override
-                    public void onComplete() {
-                        closeLoading();
-                        dataAdapter.notifyDataSetChanged();
-                    }
-                });
+        if (typeVal == 1){//当前 日数据
+            getListOrder = SQLite.select().from(Order.class).where(Order_Table.create_time_day.is(dateVal)).queryList();
+        }else if (typeVal == 2){//当前 月数据
+            getListOrder = SQLite.select().from(Order.class).where(Order_Table.create_time_month.is(dateVal)).queryList();
+        }
+
+        reportResultBean = new ReportResultBean();
+        reportResultBean.list = new ArrayList<ReportResultBean.list>();
+        ReportResultBean.list list = new ReportResultBean.list();
+        float amount = 0f;
+        float weight=0f;
+        int num=0;
+        int total_number = 0;
+        //获取当前日，月选中的列表数据
+        for (Order order : getListOrder){
+            LogUtils.d(order.total_amount + "--"+order.goods_price+"--"+order.amount+"--"+order.goods_number+"--"+order.pricing_model);
+
+            list = new ReportResultBean.list();
+            list.total_amount = order.total_amount;
+            list.total_weight = order.total_weight;
+            list.all_num = Integer.parseInt(order.total_number);
+            list.total_number = Integer.parseInt(order.goods_number);
+            if (typeVal == 1){//日
+                    list.times = order.create_time;
+            }else if(typeVal == 2){//月
+                    list.times = order.create_time_day;
+            }
+            reportResultBean.list.add(list);
+            amount = amount + Float.parseFloat(order.total_amount);
+            weight = weight + Float.parseFloat(order.total_weight);
+            num = num + Integer.parseInt(order.goods_number);
+            total_number = total_number + Integer.parseInt(order.total_number);
+
+        }
+        reportResultBean.total_amount = String.format("%.2f", amount);
+        reportResultBean.total=total_number;
+        reportResultBean.all_number=num;
+        reportResultBean.total_num=num;
+        reportResultBean.total_weight=String.format("%.2f",weight);
+
+        countTotalTv.setText(reportResultBean.total_num + "");
+        weightTotalTv.setText(reportResultBean.total_weight + "kg/" + reportResultBean.all_number + "件");
+        grandTotalTv.setText(reportResultBean.total_amount);
+        amountTotalTv.setText(reportResultBean.total_amount);
+        dataList.addAll(reportResultBean.list);
     }
 
     public void getOrderList(String dateVal, String page, String pageNum) {
-        RetrofitFactory.getInstance().API()
-                .getOrderList(AccountManager.getInstance().getAdminToken(), MacManager.getInstace(this).getMac(), dateVal, page, pageNum)
-                .compose(this.<BaseEntity<OrderListResultBean>>setThread())
-                .subscribe(new Observer<BaseEntity<OrderListResultBean>>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                        showLoading();
-                    }
 
-                    @Override
-                    public void onNext(BaseEntity<OrderListResultBean> orderListResultBeanBaseEntity) {
-                        if (orderListResultBeanBaseEntity.isSuccess()) {
-                            orderListResultBean = orderListResultBeanBaseEntity.getData();
-                            orderList.clear();
-                            orderList.addAll(orderListResultBean.list);
-                            salesAdapter.notifyDataSetChanged();
-                            scrollTo(salesDetailsListView, salesDetailsListView.getCount() - 1);
-
-                            orderAmountTv.setText(orderListResultBeanBaseEntity.getData().total_amount);
-                        } else {
-                            showLoading(orderListResultBeanBaseEntity.getMsg());
-                        }
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        e.printStackTrace();
-                        closeLoading();
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        closeLoading();
-                    }
-                });
+        List<Order> getlist = SQLite.select().from(Order.class).queryList();
+        LogUtils.d(getlist.size()+"---->"+getlist.get(0).payment_id+"--->");
+        orderListResultBean = new OrderListResultBean();
+        orderListResultBean.list = new ArrayList<OrderListResultBean.list>();
+        OrderListResultBean.list list = new OrderListResultBean.list();
+        float amount = 0f;
+        for (Order order : getlist){
+            list = new OrderListResultBean.list();
+            list.order_no = order.order_no;
+            list.goods_name  = order.goods_name;
+            list.times = order.create_time;
+            list.goods_weight = order.goods_weight;
+            list.goods_price = order.goods_price;
+            list.goods_number = order.goods_number;
+            list.total_amount = order.total_amount;
+//            list.payment_type = order.pricing_model;
+            orderListResultBean.list.add(list);
+            amount = amount + Float.parseFloat(order.total_amount);
+        }
+        orderListResultBean.total_amount = String.format("%.2f", amount);
+        orderList.clear();
+        orderList.addAll(orderListResultBean.list);
+        salesAdapter.notifyDataSetChanged();
+        scrollTo(salesDetailsListView, salesDetailsListView.getCount() - 1);
+        orderAmountTv.setText(orderListResultBean.total_amount);
     }
 
     @Override
@@ -259,7 +258,8 @@ public class DataSummaryActivity extends BaseActivity {
                 dayReportTv.setBackground(DataSummaryActivity.this.getResources().getDrawable(R.drawable.shape_gray_btn_bg));
                 monthReportTv.setBackground(DataSummaryActivity.this.getResources().getDrawable(R.drawable.shape_white_btn_bg));
                 salesDetailsReportTv.setBackground(DataSummaryActivity.this.getResources().getDrawable(R.drawable.shape_white_btn_bg));
-                getReportsList(currentDay, typeVal + "", currentPage + "", pageNum + "");
+                LogUtils.d(currentDay+"-currentDay-"+typeVal+"--"+currentPage+"--"+pageNum);
+                getReportsList(currentDay, typeVal, currentPage + "", pageNum + "");
                 break;
             case R.id.data_summary_month_report_tv:
                 orderType = 2;
@@ -288,9 +288,10 @@ public class DataSummaryActivity extends BaseActivity {
                 dayReportTv.setBackground(DataSummaryActivity.this.getResources().getDrawable(R.drawable.shape_white_btn_bg));
                 monthReportTv.setBackground(DataSummaryActivity.this.getResources().getDrawable(R.drawable.shape_gray_btn_bg));
                 salesDetailsReportTv.setBackground(DataSummaryActivity.this.getResources().getDrawable(R.drawable.shape_white_btn_bg));
-                getReportsList(currentDay, typeVal + "", currentPage + "", pageNum + "");
+                getReportsList(currentDay, typeVal , currentPage + "", pageNum + "");
                 break;
             case R.id.data_summary_sales_details_report_tv:
+                //销售明细
                 orderType = 3;
                 currentDay = getCurrentTime("yyyy-MM-dd");
                 dateTv.setText(currentDay);
@@ -322,47 +323,54 @@ public class DataSummaryActivity extends BaseActivity {
                 finish();
                 break;
             case R.id.data_summary_reports_prev_page_btn:
-                getReportsList(currentDay, typeVal + "", --currentPage <= 1 ? (currentPage = 1) + "" : --currentPage + "", pageNum + "");
+                getReportsList(currentDay, typeVal, --currentPage <= 1 ? (currentPage = 1) + "" : --currentPage + "", pageNum + "");
                 break;
             case R.id.data_summary_reports_next_page_btn:
-                getReportsList(currentDay, typeVal + "", ++currentPage + "", pageNum + "");
+                getReportsList(currentDay, typeVal, ++currentPage + "", pageNum + "");
                 break;
             case R.id.data_summary_reports_prev_month_btn:
                 currentPage = 1;
                 currentDay = getMonthTime(currentDay, "yyyy-MM", 1);
                 dateTv.setText(currentDay);
-                getReportsList(currentDay, typeVal + "", (currentPage = 1) + "", pageNum + "");
+                //上一月
+                getReportsList(currentDay, typeVal, (currentPage = 1) + "", pageNum + "");
                 break;
             case R.id.data_summary_reports_next_month_btn:
                 currentPage = 1;
                 currentDay = getMonthTime(currentDay, "yyyy-MM", 2);
                 dateTv.setText(currentDay);
-                getReportsList(currentDay, typeVal + "", (currentPage = 1) + "", pageNum + "");
+                //下一月
+                getReportsList(currentDay, typeVal, (currentPage = 1) + "", pageNum + "");
                 break;
             case R.id.data_summary_reports_prev_day_btn:
+                //前一天
                 currentDay = getCurrentTime(currentDay, "yyyy-MM-dd", 3);
                 dateTv.setText(currentDay);
-                getReportsList(currentDay, typeVal + "", (currentPage = 1) + "", pageNum + "");
+                getReportsList(currentDay, typeVal, (currentPage = 1) + "", pageNum + "");
                 break;
             case R.id.data_summary_reports_next_day_btn:
+                //后一天
                 currentDay = getCurrentTime(currentDay, "yyyy-MM-dd", 4);
                 dateTv.setText(currentDay);
-                getReportsList(currentDay, typeVal + "", (currentPage = 1) + "", pageNum + "");
+                getReportsList(currentDay, typeVal, (currentPage = 1) + "", pageNum + "");
                 break;
             case R.id.data_summary_sales_details_prev_page_btn:
+                //商品明细 上一页
                 scrollTo(salesDetailsListView, salesDetailsListView.getFirstVisiblePosition() - previousPos <= 0 ? 0 : salesDetailsListView.getFirstVisiblePosition() - previousPos);
-
-//                getOrderList(currentDay,  --currentPage <= 1 ? (currentPage=1)+"" : --currentPage + "", "10");
+                getOrderList(currentDay,  --currentPage <= 1 ? (currentPage=1)+"" : --currentPage + "", "10");
                 break;
             case R.id.data_summary_sales_details_next_page_btn:
+                //商品明细 下一页
                 getOrderList(currentDay, ++currentPage + "", previousPos + "");
                 break;
             case R.id.data_summary_sales_details_prev_day_btn:
+                //销售明细 前一天
                 currentDay = getCurrentTime(currentDay, "yyyy-MM-dd", 3);
                 dateTv.setText(currentDay);
                 getOrderList(currentDay, "1", "10");
                 break;
             case R.id.data_summary_sales_details_next_day_btn:
+                //销售明细 后一天
                 currentDay = getCurrentTime(currentDay, "yyyy-MM-dd", 4);
                 dateTv.setText(currentDay);
                 getOrderList(currentDay, "1", "10");

@@ -36,10 +36,8 @@ import com.axecom.iweight.base.BaseEntity;
 import com.axecom.iweight.base.BusEvent;
 import com.axecom.iweight.base.SysApplication;
 import com.axecom.iweight.bean.Advertis;
-import com.axecom.iweight.bean.Commodity;
 import com.axecom.iweight.bean.HotKeyBean;
 import com.axecom.iweight.bean.HotKeyBean_Table;
-import com.axecom.iweight.bean.LocalOrder;
 import com.axecom.iweight.bean.LoginInfo;
 import com.axecom.iweight.bean.Order;
 import com.axecom.iweight.bean.SaveGoodsReqBean;
@@ -61,6 +59,7 @@ import com.axecom.iweight.net.RetrofitFactory;
 import com.axecom.iweight.ui.adapter.GoodMenuAdapter;
 import com.axecom.iweight.utils.ButtonUtils;
 import com.axecom.iweight.utils.FileUtils;
+import com.axecom.iweight.utils.LogUtils;
 import com.axecom.iweight.utils.MoneyTextWatcher;
 import com.axecom.iweight.utils.NetworkUtil;
 import com.axecom.iweight.utils.SPUtils;
@@ -186,10 +185,15 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         Display[] presentationDisplays = displayManager.getDisplays();
 //        LogUtils.d("------------: " + presentationDisplays.length + "  --- " + presentationDisplays[1].getName());
         if (presentationDisplays.length > 1) {
-            banner = new BannerActivity(this.getApplicationContext(), presentationDisplays[1]);
+            banner = new BannerActivity(this, presentationDisplays[1]);
+            LogUtils.d("1111------------: " + banner);
             SysApplication.bannerActivity = banner;
             Objects.requireNonNull(banner.getWindow()).setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
+            LogUtils.d("2222------------: " + banner);
             banner.show();
+        }
+        if (banner == null){
+            ToastUtils.showToast(MainActivity.this,"banner不能为空");
         }
 
         advertising();
@@ -450,6 +454,16 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                             for (int i = 0; i < advertis.list.size(); i++) {
                                 list.add(advertis.list.get(i).img);
                             }
+                            if (banner == null){
+                                ToastUtils.showToast(MainActivity.this,"banner不能为空");
+                                return;
+                            }
+                            if (banner.convenientBanner == null){
+                                ToastUtils.showToast(MainActivity.this,"banner convenientBanner不能为空");
+                                return;
+                            }
+
+
                             banner.convenientBanner.setPages(new CBViewHolderCreator<NetworkImageHolderView>() {
                                 @Override
                                 public NetworkImageHolderView createHolder() {
@@ -943,7 +957,7 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
             etPrice.setHint(hint);
         }
     }
-
+    //现金生成订单
     public void charge(boolean useCash) {
 
         if (seledtedGoodsList.size() < 1) {
@@ -982,6 +996,8 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
             order.mac = subOrderReqBean.getMac();
             order.token = subOrderReqBean.getToken();
             order.create_time = subOrderReqBean.getCreate_time();
+            order.create_time_day = getCurrentTime("yyyy-MM-dd");
+            order.create_time_month = getCurrentTime("yyyy-MM");
             order.payment_id = subOrderReqBean.getPayment_id();
             order.pricing_model = subOrderReqBean.getPricing_model();
             order.order_no = orderNo;
@@ -989,6 +1005,8 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
             order.total_amount = subOrderReqBean.getTotal_amount();
             order.total_number = subOrderReqBean.getTotal_number();
             order.total_weight = subOrderReqBean.getTotal_weight();
+
+
 
             HotKeyBean hotKeyBean = seledtedGoodsList.get(i);
             order.goods_id = hotKeyBean.getId() + "";

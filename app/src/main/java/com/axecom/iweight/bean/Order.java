@@ -2,14 +2,11 @@ package com.axecom.iweight.bean;
 
 import com.axecom.iweight.base.AppDatabase;
 import com.raizlabs.android.dbflow.annotation.Column;
-import com.raizlabs.android.dbflow.annotation.OneToMany;
 import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.annotation.Table;
-import com.raizlabs.android.dbflow.sql.language.Select;
 import com.raizlabs.android.dbflow.structure.BaseModel;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * Created by Administrator on 2018/7/22.
@@ -31,7 +28,13 @@ public class Order extends BaseModel implements Serializable{
     @Column
     public String payment_id;
     @Column
+    public String payment_type;
+    @Column
     public String create_time;
+    @Column
+    public String create_time_day;
+    @Column
+    public String create_time_month;
     @Column
     public String total_number;
     @Column

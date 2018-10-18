@@ -1,2 +1,2 @@
 com.hoho.android.usbserial
-xml device_filter
+int xml device_filter 0x7f190001

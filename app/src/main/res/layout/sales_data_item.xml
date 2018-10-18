@@ -64,15 +64,16 @@
             android:text="11"
             android:textColor="@color/black"
             android:textSize="20sp" />
+
         <TextView
             android:id="@+id/sales_data_item_total_amount_tv"
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_width="116dp"
             android:layout_height="match_parent"
+            android:layout_weight="1"
             android:gravity="center"
             android:text="127.80"
             android:textColor="@color/black"
-            android:textSize="20sp" />
+            android:textSize="20sp"/>
         <TextView
             android:id="@+id/sales_data_item_grand_total_tv"
             android:layout_width="0dp"

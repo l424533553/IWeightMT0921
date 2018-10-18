@@ -1,12 +1,12 @@
 -- Merging decision tree log ---
 manifest
-ADDED from /Users/hl/Develop/ASProject/IWeightMT0921/usbSerialForAndroid/src/main/AndroidManifest.xml:2:1-7:12
-INJECTED from /Users/hl/Develop/ASProject/IWeightMT0921/usbSerialForAndroid/src/main/AndroidManifest.xml:2:1-7:12
-INJECTED from /Users/hl/Develop/ASProject/IWeightMT0921/usbSerialForAndroid/src/main/AndroidManifest.xml:2:1-7:12
-INJECTED from /Users/hl/Develop/ASProject/IWeightMT0921/usbSerialForAndroid/src/main/AndroidManifest.xml:2:1-7:12
-INJECTED from /Users/hl/Develop/ASProject/IWeightMT0921/usbSerialForAndroid/src/main/AndroidManifest.xml:2:1-7:12
-INJECTED from /Users/hl/Develop/ASProject/IWeightMT0921/usbSerialForAndroid/src/main/AndroidManifest.xml:2:1-7:12
-INJECTED from /Users/hl/Develop/ASProject/IWeightMT0921/usbSerialForAndroid/src/main/AndroidManifest.xml:2:1-7:12
+ADDED from /Users/hl/Develop/ASProject/IWeightMT0921/usbSerialForAndroid/src/main/AndroidManifest.xml:2:1-6:12
+INJECTED from /Users/hl/Develop/ASProject/IWeightMT0921/usbSerialForAndroid/src/main/AndroidManifest.xml:2:1-6:12
+INJECTED from /Users/hl/Develop/ASProject/IWeightMT0921/usbSerialForAndroid/src/main/AndroidManifest.xml:2:1-6:12
+INJECTED from /Users/hl/Develop/ASProject/IWeightMT0921/usbSerialForAndroid/src/main/AndroidManifest.xml:2:1-6:12
+INJECTED from /Users/hl/Develop/ASProject/IWeightMT0921/usbSerialForAndroid/src/main/AndroidManifest.xml:2:1-6:12
+INJECTED from /Users/hl/Develop/ASProject/IWeightMT0921/usbSerialForAndroid/src/main/AndroidManifest.xml:2:1-6:12
+INJECTED from /Users/hl/Develop/ASProject/IWeightMT0921/usbSerialForAndroid/src/main/AndroidManifest.xml:2:1-6:12
 	package
 		ADDED from /Users/hl/Develop/ASProject/IWeightMT0921/usbSerialForAndroid/src/main/AndroidManifest.xml:3:7-43
 		INJECTED from /Users/hl/Develop/ASProject/IWeightMT0921/usbSerialForAndroid/src/main/AndroidManifest.xml
@@ -22,16 +22,16 @@ INJECTED from /Users/hl/Develop/ASProject/IWeightMT0921/usbSerialForAndroid/src/
 		INJECTED from /Users/hl/Develop/ASProject/IWeightMT0921/usbSerialForAndroid/src/main/AndroidManifest.xml
 		INJECTED from /Users/hl/Develop/ASProject/IWeightMT0921/usbSerialForAndroid/src/main/AndroidManifest.xml
 uses-sdk
-ADDED from /Users/hl/Develop/ASProject/IWeightMT0921/usbSerialForAndroid/src/main/AndroidManifest.xml:6:5-44
-INJECTED from /Users/hl/Develop/ASProject/IWeightMT0921/usbSerialForAndroid/src/main/AndroidManifest.xml:6:5-44
-INJECTED from /Users/hl/Develop/ASProject/IWeightMT0921/usbSerialForAndroid/src/main/AndroidManifest.xml:6:5-44
-INJECTED from /Users/hl/Develop/ASProject/IWeightMT0921/usbSerialForAndroid/src/main/AndroidManifest.xml:6:5-44
-INJECTED from /Users/hl/Develop/ASProject/IWeightMT0921/usbSerialForAndroid/src/main/AndroidManifest.xml:6:5-44
+INJECTED from /Users/hl/Develop/ASProject/IWeightMT0921/usbSerialForAndroid/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /Users/hl/Develop/ASProject/IWeightMT0921/usbSerialForAndroid/src/main/AndroidManifest.xml
+INJECTED from /Users/hl/Develop/ASProject/IWeightMT0921/usbSerialForAndroid/src/main/AndroidManifest.xml
+INJECTED from /Users/hl/Develop/ASProject/IWeightMT0921/usbSerialForAndroid/src/main/AndroidManifest.xml
+INJECTED from /Users/hl/Develop/ASProject/IWeightMT0921/usbSerialForAndroid/src/main/AndroidManifest.xml
 	android:targetSdkVersion
 		INJECTED from /Users/hl/Develop/ASProject/IWeightMT0921/usbSerialForAndroid/src/main/AndroidManifest.xml
-		ADDED from /Users/hl/Develop/ASProject/IWeightMT0921/usbSerialForAndroid/src/main/AndroidManifest.xml:6:5-44
+		ADDED from /Users/hl/Develop/ASProject/IWeightMT0921/usbSerialForAndroid/src/main/AndroidManifest.xml
 		INJECTED from /Users/hl/Develop/ASProject/IWeightMT0921/usbSerialForAndroid/src/main/AndroidManifest.xml
 	android:minSdkVersion
-		ADDED from /Users/hl/Develop/ASProject/IWeightMT0921/usbSerialForAndroid/src/main/AndroidManifest.xml:6:15-41
 		INJECTED from /Users/hl/Develop/ASProject/IWeightMT0921/usbSerialForAndroid/src/main/AndroidManifest.xml
+		ADDED from /Users/hl/Develop/ASProject/IWeightMT0921/usbSerialForAndroid/src/main/AndroidManifest.xml
 		INJECTED from /Users/hl/Develop/ASProject/IWeightMT0921/usbSerialForAndroid/src/main/AndroidManifest.xml
