@@ -27,8 +27,6 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
-    <permission android:name="android.permission.WRITE_SETTINGS" />
-
     <!-- 允许系统 弹框 ，想要在Service 和 application中启动弹框，需要添加 改权限 -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
@@ -105,7 +103,7 @@
 
         <activity
             android:name=".ui.activity.MainActivity"
-            android:hardwareAccelerated="false"
+            android:hardwareAccelerated="true"
             android:windowSoftInputMode="stateHidden|stateAlwaysHidden">
             <intent-filter>
                 <action android:name="android.intent.action.DEFAULT" />

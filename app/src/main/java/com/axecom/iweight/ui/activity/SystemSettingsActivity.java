@@ -56,6 +56,8 @@ public class SystemSettingsActivity extends BaseActivity {
     public static final String KEY_AUTO_PREV = "key_auto_prev";
     public static final String KEY_CASH_ROUNDING = "key_cash_rounding";
     public static final String KEY_STOP_CASH = "key_stop_cash";
+    public static final String KEY_STOP_ALIPAY = "key_stop_alipay";
+    public static final String KEY_STOP_WECHAT = "key_stop_wechat";
 
 
     private View rootView;
@@ -263,7 +265,7 @@ public class SystemSettingsActivity extends BaseActivity {
                 stopCashCtv.setChecked(!stopCashCtv.isChecked());
                 break;
             case R.id.system_settings_stop_alipay_ctv:
-                stopAlipayCtv.setChecked(!stopCashCtv.isChecked());
+                stopAlipayCtv.setChecked(!stopAlipayCtv.isChecked());
                 break;
             case R.id.system_settings_stop_weichatpay_ctv:
                 stopweichatpayCtv.setChecked(!stopweichatpayCtv.isChecked());
@@ -294,7 +296,6 @@ public class SystemSettingsActivity extends BaseActivity {
         valueMap.put("default_login_type", v);
         SPUtils.saveObject(this, KEY_DEFAULT_LOGIN_TYPE, valueMap.get("default_login_type"));
 
-
         LinkedHashMap printerMap = new LinkedHashMap();
         printerMap.put("update_time", System.currentTimeMillis());
         printerMap.put("val", printerTv.getText().toString());
@@ -318,7 +319,6 @@ public class SystemSettingsActivity extends BaseActivity {
         priceingMethodMap.put("val", priceingMethodTv.getText().toString());
         valueMap.put("default_pricing_model", priceingMethodMap);
         SPUtils.saveObject(this, KEY_PRICEING_METHOD, valueMap.get("default_pricing_model"));
-
 
         LinkedHashMap weightRoundingMap = new LinkedHashMap();
         weightRoundingMap.put("update_time", System.currentTimeMillis());
@@ -403,6 +403,18 @@ public class SystemSettingsActivity extends BaseActivity {
         stopCashMap.put("val", stopCashCtv.isChecked());
         valueMap.put("disable_cash_mode", stopCashMap);
         SPUtils.saveObject(this, KEY_STOP_CASH, valueMap.get("disable_cash_mode"));
+
+        LinkedHashMap stopAlipayMap = new LinkedHashMap();
+        stopAlipayMap.put("update_time", System.currentTimeMillis());
+        stopAlipayMap.put("val", stopAlipayCtv.isChecked());
+        valueMap.put("disable_alipay_mode", stopAlipayMap);
+        SPUtils.saveObject(this, KEY_STOP_ALIPAY, valueMap.get("disable_alipay_mode"));
+
+        LinkedHashMap stopWechatMap = new LinkedHashMap();
+        stopWechatMap.put("update_time", System.currentTimeMillis());
+        stopWechatMap.put("val", stopweichatpayCtv.isChecked());
+        valueMap.put("disable_weixin_mode", stopWechatMap);
+        SPUtils.saveObject(this, KEY_STOP_WECHAT, valueMap.get("disable_weixin_mode"));
 
         showLoading("保存成功");
     }
@@ -700,6 +712,31 @@ public class SystemSettingsActivity extends BaseActivity {
                                 }
                             } else {
                                 stopCashCtv.setChecked((Boolean) ((LinkedTreeMap) valueMap.get("disable_cash_mode")).get("val"));
+                            }
+
+                            LinkedHashMap stopAlipayMap = (LinkedHashMap) SPUtils.readObject(SystemSettingsActivity.this, KEY_STOP_ALIPAY);
+                            if (stopAlipayMap != null) {
+                                Long loginDate = (Long) stopAlipayMap.get("update_time");
+                                Long valueDate = ((Double) ((LinkedTreeMap) valueMap.get("disable_weixin_mode")).get("update_time")).longValue();
+                                if (loginDate.compareTo(valueDate) > 0) {
+                                    stopCashCtv.setChecked((Boolean) stopAlipayMap.get("val"));
+                                } else {
+                                    stopCashCtv.setChecked((Boolean) ((LinkedTreeMap) valueMap.get("disable_weixin_mode")).get("val"));
+                                }
+                            } else {
+                                stopCashCtv.setChecked((Boolean) ((LinkedTreeMap) valueMap.get("disable_weixin_mode")).get("val"));
+                            }
+                            LinkedHashMap stopWechatMap = (LinkedHashMap) SPUtils.readObject(SystemSettingsActivity.this, KEY_STOP_WECHAT);
+                            if (stopWechatMap != null) {
+                                Long loginDate = (Long) stopWechatMap.get("update_time");
+                                Long valueDate = ((Double) ((LinkedTreeMap) valueMap.get("disable_alipay_mode")).get("update_time")).longValue();
+                                if (loginDate.compareTo(valueDate) > 0) {
+                                    stopCashCtv.setChecked((Boolean) stopWechatMap.get("val"));
+                                } else {
+                                    stopCashCtv.setChecked((Boolean) ((LinkedTreeMap) valueMap.get("disable_alipay_mode")).get("val"));
+                                }
+                            } else {
+                                stopCashCtv.setChecked((Boolean) ((LinkedTreeMap) valueMap.get("disable_alipay_mode")).get("val"));
                             }
 
                         } else {

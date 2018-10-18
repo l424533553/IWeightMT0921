@@ -16,10 +16,12 @@ import com.axecom.iweight.base.BusEvent;
 import com.axecom.iweight.base.SysApplication;
 import com.axecom.iweight.bean.SubOrderReqBean;
 import com.axecom.iweight.manager.PayCheckManage;
+import com.axecom.iweight.manager.SystemSettingManager;
 import com.axecom.iweight.ui.view.SoftKey;
 import com.axecom.iweight.utils.MoneyTextWatcher;
 import com.axecom.iweight.utils.NetworkUtil;
 import com.axecom.iweight.utils.SPUtils;
+import com.google.gson.internal.LinkedTreeMap;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -103,6 +105,17 @@ public class UseCashActivity extends BaseActivity implements View.OnClickListene
 
             }
         });
+
+            if(SystemSettingManager.disable_weixin_mode()){
+                aliPayBtn.setVisibility(View.GONE);
+            }else {
+                aliPayBtn.setVisibility(View.VISIBLE);
+            }
+            if(SystemSettingManager.disable_alipay_mode()){
+                wechatPayBtn.setVisibility(View.GONE);
+            }else {
+                wechatPayBtn.setVisibility(View.VISIBLE);
+            }
 //        showInfoToBanner(orderBean);
     }
 

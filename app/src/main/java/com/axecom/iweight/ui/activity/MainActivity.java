@@ -36,9 +36,12 @@ import com.axecom.iweight.base.BaseEntity;
 import com.axecom.iweight.base.BusEvent;
 import com.axecom.iweight.base.SysApplication;
 import com.axecom.iweight.bean.Advertis;
+import com.axecom.iweight.bean.Commodity;
 import com.axecom.iweight.bean.HotKeyBean;
 import com.axecom.iweight.bean.HotKeyBean_Table;
+import com.axecom.iweight.bean.LocalOrder;
 import com.axecom.iweight.bean.LoginInfo;
+import com.axecom.iweight.bean.Order;
 import com.axecom.iweight.bean.SaveGoodsReqBean;
 import com.axecom.iweight.bean.ScalesCategoryGoods;
 import com.axecom.iweight.bean.SubOrderReqBean;
@@ -277,13 +280,13 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         initSettlement();
         commoditysGridView.setAdapter(goodMenuAdapter);
 
-       /* List<HotKeyBean> hotKeyBeanList = SQLite.select().from(HotKeyBean.class).queryList();
+        List<HotKeyBean> hotKeyBeanList = SQLite.select().from(HotKeyBean.class).queryList();
         if (hotKeyBeanList.size() > 0) {
             HotKeyBeanList.addAll(hotKeyBeanList);
             goodMenuAdapter.notifyDataSetChanged();
-        } else {*/
-        getGoodsData();
-//        }
+        } else {
+            getGoodsData();
+        }
 
         commoditysGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @SuppressLint("DefaultLocale")
@@ -539,6 +542,10 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
                 }
                 break;
             case R.id.main_scan_pay:
+                if(SystemSettingManager.disable_alipay_mode() && SystemSettingManager.disable_weixin_mode()){
+                    showLoading("微信与支付宝已停用");
+                    return;
+                }
                 if (!ButtonUtils.isFastDoubleClick(R.id.main_scan_pay)) {
                     //结算时带上当前称重的记录
                     appendCurrentGood();
@@ -946,23 +953,53 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         SubOrderReqBean subOrderReqBean = new SubOrderReqBean();
         SubOrderReqBean.Goods good;
         List<SubOrderReqBean.Goods> goodsList = new ArrayList<>();
+        int count=0;
+        String orderNo = "AX" + getCurrentTime("yyyyMMddHHmmss") + AccountManager.getInstance().getScalesId();
+        subOrderReqBean.setToken(AccountManager.getInstance().getToken());
+        subOrderReqBean.setMac(MacManager.getInstace(this).getMac());
+        subOrderReqBean.setTotal_amount(priceTotalTv.getText().toString());
+        subOrderReqBean.setTotal_weight(weightTotalTv.getText().toString());
+        subOrderReqBean.setTotal_number(count+"");
+        subOrderReqBean.setCreate_time(getCurrentTime());
+        subOrderReqBean.setOrder_no(orderNo);
+        subOrderReqBean.setCard_id(Integer.parseInt(AccountManager.getInstance().getCardId()));
+
+        ModelAdapter<Order> modelAdapter = FlowManager.getModelAdapter(Order.class);
         for (int i = 0; i < seledtedGoodsList.size(); i++) {
             good = new SubOrderReqBean.Goods();
             HotKeyBean HotKeyBean = seledtedGoodsList.get(i);
             good.setGoods_id(HotKeyBean.id + "");
             good.setGoods_name(HotKeyBean.name);
             good.setGoods_price(HotKeyBean.price);
-            good.setGoods_number(countEt.getText().toString());
+            good.setGoods_number(HotKeyBean.getCount());
             good.setGoods_weight(HotKeyBean.weight);
             good.setGoods_amount(HotKeyBean.grandTotal);
             good.setBatch_code(HotKeyBean.batch_code);
+            count+=Integer.parseInt(HotKeyBean.getCount());
             goodsList.add(good);
+
+            Order order = new Order();
+            order.mac = subOrderReqBean.getMac();
+            order.token = subOrderReqBean.getToken();
+            order.create_time = subOrderReqBean.getCreate_time();
+            order.payment_id = subOrderReqBean.getPayment_id();
+            order.pricing_model = subOrderReqBean.getPricing_model();
+            order.order_no = orderNo;
+            order.card_id = subOrderReqBean.getCard_id();
+            order.total_amount = subOrderReqBean.getTotal_amount();
+            order.total_number = subOrderReqBean.getTotal_number();
+            order.total_weight = subOrderReqBean.getTotal_weight();
+
+            HotKeyBean hotKeyBean = seledtedGoodsList.get(i);
+            order.goods_id = hotKeyBean.getId() + "";
+            order.amount = hotKeyBean.getGrandTotal();
+            order.goods_name = hotKeyBean.getName();
+            order.goods_number = hotKeyBean.getCount();
+            order.goods_price = hotKeyBean.getPrice();
+            order.goods_weight = hotKeyBean.getWeight();
+            modelAdapter.insert(order);
         }
-        subOrderReqBean.setToken(AccountManager.getInstance().getToken());
-        subOrderReqBean.setMac(MacManager.getInstace(this).getMac());
-        subOrderReqBean.setTotal_amount(priceTotalTv.getText().toString());
-        subOrderReqBean.setTotal_weight(weightTotalTv.getText().toString());
-        subOrderReqBean.setCreate_time(getCurrentTime());
+
         subOrderReqBean.setGoods(goodsList);
         if (switchSimpleOrComplex) {
             subOrderReqBean.setPricing_model("2");

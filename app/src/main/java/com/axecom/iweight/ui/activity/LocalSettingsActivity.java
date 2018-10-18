@@ -146,8 +146,8 @@ public class LocalSettingsActivity extends BaseActivity {
     }
 
     private void showLocalIp() {
-        serverIPTv.setText(SPUtils.getString(this,KEY_SERVER_IP,""));
-        serverPortTv.setText(SPUtils.getString(this,KEY_SVERVER_PORT,""));
+        serverIPTv.setText(Constants.URL);
+        serverPortTv.setText(Constants.PORT);
     }
 
     public void getUsbDevices() {

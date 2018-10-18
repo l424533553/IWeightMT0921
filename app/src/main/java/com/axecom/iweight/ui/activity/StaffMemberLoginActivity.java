@@ -68,7 +68,6 @@ public class StaffMemberLoginActivity extends BaseActivity {
         backBtn = rootView.findViewById(R.id.staff_member_back_btn);
         rootView.findViewById(R.id.login_out_btn).setOnClickListener(this);
 
-
         doneBtn.setOnClickListener(this);
         backBtn.setOnClickListener(this);
         return rootView;

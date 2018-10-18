@@ -445,6 +445,7 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
                     public void onNext(BaseEntity<LoginData> loginDataBaseEntity) {
                         if (loginDataBaseEntity.isSuccess()) {
                             AccountManager.getInstance().saveToken(loginDataBaseEntity.getData().getToken());
+                            AccountManager.getInstance().setCardId(loginDataBaseEntity.getData().getCard_id());
                             if (savePwdCtv.isChecked()||autoLogin.isChecked()) {
                                 AccountManager.getInstance().savePwd(serialNumber, password);
                             } else {
@@ -493,6 +494,7 @@ public class HomeActivity extends BaseActivity implements VolleyListener, IConst
                     public void onNext(BaseEntity<LoginData> loginDataBaseEntity) {
                         if (loginDataBaseEntity.isSuccess()) {
 //                            AccountManager.getInstance().saveToken(loginDataBaseEntity.getData().getAdminToken());
+                            AccountManager.getInstance().setCardId(loginDataBaseEntity.getData().getCard_id());
                             if (savePwdCtv.isChecked()) {
                                 AccountManager.getInstance().savePwd(serialNumber, password);
                             } else {
