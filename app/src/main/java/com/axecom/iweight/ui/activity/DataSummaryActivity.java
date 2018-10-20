@@ -160,30 +160,83 @@ public class DataSummaryActivity extends BaseActivity {
         reportResultBean = new ReportResultBean();
         reportResultBean.list = new ArrayList<ReportResultBean.list>();
         ReportResultBean.list list = new ReportResultBean.list();
+
+        ReportResultBean.list listMonth = new ReportResultBean.list();
+
+
         float amount = 0f;
         float weight=0f;
         int num=0;
         int total_number = 0;
-        //获取当前日，月选中的列表数据
-        for (Order order : getListOrder){
-            LogUtils.d(order.total_amount + "--"+order.goods_price+"--"+order.amount+"--"+order.goods_number+"--"+order.pricing_model);
-            list = new ReportResultBean.list();
-            list.total_amount = order.total_amount;
-            list.total_weight = order.total_weight;
-            list.all_num = Integer.parseInt(order.total_number);
-            list.total_number = Integer.parseInt(order.goods_number);
-            if (typeVal == 1){//日
+
+        if (typeVal == 1){//日报表，计算分时，2小时
+            for (Order order : getListOrder){
+                LogUtils.d(order.total_amount + "--"+order.goods_price+"--"+order.amount+"--"+order.goods_number+"--"+order.pricing_model);
+                list = new ReportResultBean.list();
+                list.total_amount = order.total_amount;
+                list.total_weight = order.total_weight;
+                list.all_num = Integer.parseInt(order.total_number);
+                list.total_number = Integer.parseInt(order.goods_number);
+                if (typeVal == 1){//日
                     list.times = order.create_time;
-            }else if(typeVal == 2){//月
+                }else if(typeVal == 2){//月
                     list.times = order.create_time_day;
+                }
+                reportResultBean.list.add(list);
+                amount = amount + Float.parseFloat(order.total_amount);
+                weight = weight + Float.parseFloat(order.total_weight);
+                num = num + Integer.parseInt(order.goods_number);
+                total_number = total_number + Integer.parseInt(order.total_number);
             }
-            reportResultBean.list.add(list);
-            amount = amount + Float.parseFloat(order.total_amount);
-            weight = weight + Float.parseFloat(order.total_weight);
-            num = num + Integer.parseInt(order.goods_number);
-            total_number = total_number + Integer.parseInt(order.total_number);
+
+        }else if(typeVal == 2) {//月报表，分天，
+
+                for (int i=0 ;i< getListOrder.size();i++){
+                    list = new ReportResultBean.list();
+                    String create_day_time = null;
+                    int size=0;
+                    float amount_day = 0f;
+                    float weight_day=0f;
+                    int num_day=0;
+                    int total_number_day = 0;
+                    for (Order order:getListOrder){
+                        if (getListOrder.get(i).create_time_day.equals(order.create_time_day)){//循环当天的数据，做累计
+                            amount_day = amount_day + Float.parseFloat(order.total_amount);
+                            weight_day = weight_day + Float.parseFloat(order.total_weight);
+                            num_day = num_day + Integer.parseInt(order.goods_number);
+                            total_number_day = total_number_day + Integer.parseInt(order.total_number);
+                            create_day_time = order.create_time_day;
+                            size++;
+                        }
+                    }
+                    if (create_day_time != null){
+                        list.total_amount = String.format("%.2f", amount_day);
+                        list.total_weight = String.format("%.2f", weight_day);;
+                        list.all_num = size;
+                        list.total_number = size;
+                        list.times = create_day_time;
+                        if (reportResultBean.list.size() == 0){
+                            reportResultBean.list.add(list);
+                            amount = amount + amount_day;
+                            weight = weight + weight_day;
+                            num = num + size;
+                            total_number = total_number + size;
+
+                        }else {
+                            if (!create_day_time.equals(getListOrder.get(i).create_time_day)){
+                                reportResultBean.list.add(list);
+                                amount = amount + amount_day;
+                                weight = weight + weight_day;
+                                num = num + size;
+                                total_number = total_number + size;
+                            }
+                        }
+                    }
+
+                }
 
         }
+
         reportResultBean.total_amount = String.format("%.2f", amount);
         reportResultBean.total=total_number;
         reportResultBean.all_number=num;
@@ -226,6 +279,9 @@ public class DataSummaryActivity extends BaseActivity {
         scrollTo(salesDetailsListView, salesDetailsListView.getCount() - 1);
         orderAmountTv.setText(orderListResultBean.total_amount);
     }
+
+
+
 
     @Override
     public void onClick(View v) {
