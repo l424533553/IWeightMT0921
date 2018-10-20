@@ -26,6 +26,8 @@ import com.axecom.iweight.utils.LogUtils;
 import com.axecom.iweight.utils.SPUtils;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -161,7 +163,6 @@ public class DataSummaryActivity extends BaseActivity {
         reportResultBean.list = new ArrayList<ReportResultBean.list>();
         ReportResultBean.list list = new ReportResultBean.list();
 
-        ReportResultBean.list listMonth = new ReportResultBean.list();
 
 
         float amount = 0f;
@@ -170,24 +171,122 @@ public class DataSummaryActivity extends BaseActivity {
         int total_number = 0;
 
         if (typeVal == 1){//日报表，计算分时，2小时
-            for (Order order : getListOrder){
-                LogUtils.d(order.total_amount + "--"+order.goods_price+"--"+order.amount+"--"+order.goods_number+"--"+order.pricing_model);
-                list = new ReportResultBean.list();
-                list.total_amount = order.total_amount;
-                list.total_weight = order.total_weight;
-                list.all_num = Integer.parseInt(order.total_number);
-                list.total_number = Integer.parseInt(order.goods_number);
-                if (typeVal == 1){//日
-                    list.times = order.create_time;
-                }else if(typeVal == 2){//月
-                    list.times = order.create_time_day;
+            List<Order> order1 = new ArrayList<>();
+            List<Order> order2 = new ArrayList<>();
+            List<Order> order3 = new ArrayList<>();
+            List<Order> order4 = new ArrayList<>();
+            List<Order> order5 = new ArrayList<>();
+            List<Order> order6 = new ArrayList<>();
+            List<Order> order7 = new ArrayList<>();
+            List<Order> order8 = new ArrayList<>();
+            List<Order> order9 = new ArrayList<>();
+            List<Order> order10 = new ArrayList<>();
+            List<Order> order11 = new ArrayList<>();
+            List<Order> order12 = new ArrayList<>();
+
+            for (Order order : getListOrder) {
+                if (dateDiff(dateVal, order.create_time, "h") >= 0 && dateDiff(dateVal, order.create_time, "h") < 2) {
+                    order1.add(order);
+                } else if (dateDiff(dateVal, order.create_time, "h") >= 2 && dateDiff(dateVal, order.create_time, "h") < 4) {
+                    order2.add(order);
+                } else if (dateDiff(dateVal, order.create_time, "h") >= 4 && dateDiff(dateVal, order.create_time, "h") < 6) {
+                    order3.add(order);
+                } else if (dateDiff(dateVal, order.create_time, "h") >= 6 && dateDiff(dateVal, order.create_time, "h") < 8) {
+                    order4.add(order);
+                } else if (dateDiff(dateVal, order.create_time, "h") >= 8 && dateDiff(dateVal, order.create_time, "h") < 10) {
+                    order5.add(order);
+                } else if (dateDiff(dateVal, order.create_time, "h") >= 10 && dateDiff(dateVal, order.create_time, "h") < 12) {
+                    order6.add(order);
+                } else if (dateDiff(dateVal, order.create_time, "h") >= 12 && dateDiff(dateVal, order.create_time, "h") < 14) {
+                    order7.add(order);
+                } else if (dateDiff(dateVal, order.create_time, "h") >= 14 && dateDiff(dateVal, order.create_time, "h") < 16) {
+                    order8.add(order);
+                } else if (dateDiff(dateVal, order.create_time, "h") >= 16 && dateDiff(dateVal, order.create_time, "h") < 18) {
+                    order9.add(order);
+                } else if (dateDiff(dateVal, order.create_time, "h") >= 18 && dateDiff(dateVal, order.create_time, "h") < 20) {
+                    order10.add(order);
+                } else if (dateDiff(dateVal, order.create_time, "h") >= 20 && dateDiff(dateVal, order.create_time, "h") < 22) {
+                    order11.add(order);
+                } else if (dateDiff(dateVal, order.create_time, "h") >= 22 && dateDiff(dateVal, order.create_time, "h") < 24) {
+                    order12.add(order);
                 }
-                reportResultBean.list.add(list);
-                amount = amount + Float.parseFloat(order.total_amount);
-                weight = weight + Float.parseFloat(order.total_weight);
-                num = num + Integer.parseInt(order.goods_number);
-                total_number = total_number + Integer.parseInt(order.total_number);
             }
+
+            if (order1.size() > 0){
+                weight = weight + Float.parseFloat(getList(order1,1).total_weight);
+                amount = amount + Float.parseFloat(getList(order1,1).total_amount);
+                total_number = total_number + getList(order1,1).total_number;
+                reportResultBean.list.add(getList(order1,1));
+            }
+            if (order2.size() > 0){
+                weight = weight + Float.parseFloat(getList(order2,2).total_weight);
+                amount = amount + Float.parseFloat(getList(order2,2).total_amount);
+                total_number = total_number + getList(order2,2).total_number;
+                reportResultBean.list.add(getList(order2,2));
+            }
+            if (order3.size() > 0){
+                weight = weight + Float.parseFloat(getList(order3,3).total_weight);
+                amount = amount + Float.parseFloat(getList(order3,3).total_amount);
+                total_number = total_number + getList(order3,3).total_number;
+                reportResultBean.list.add(getList(order3,3));
+            }
+            if (order4.size() > 0){
+                weight = weight + Float.parseFloat(getList(order4,4).total_weight);
+                amount = amount + Float.parseFloat(getList(order4,4).total_amount);
+                total_number = total_number + getList(order4,4).total_number;
+                reportResultBean.list.add(getList(order4,4));
+            }
+            if (order5.size() > 0){
+                weight = weight + Float.parseFloat(getList(order5,5).total_weight);
+                amount = amount + Float.parseFloat(getList(order5,5).total_amount);
+                total_number = total_number + getList(order5,5).total_number;
+                reportResultBean.list.add(getList(order5,5));
+            }
+            if (order6.size() > 0){
+                weight = weight + Float.parseFloat(getList(order6,6).total_weight);
+                amount = amount + Float.parseFloat(getList(order6,6).total_amount);
+                total_number = total_number + getList(order6,6).total_number;
+                reportResultBean.list.add(getList(order6,6));
+            }
+            if (order7.size() > 0){
+                weight = weight + Float.parseFloat(getList(order7,7).total_weight);
+                amount = amount + Float.parseFloat(getList(order7,7).total_amount);
+                total_number = total_number + getList(order7,7).total_number;
+                reportResultBean.list.add(getList(order7,7));
+            }
+            if (order8.size() > 0){
+                weight = weight + Float.parseFloat(getList(order8,8).total_weight);
+                amount = amount + Float.parseFloat(getList(order8,8).total_amount);
+                total_number = total_number + getList(order8,8).total_number;
+                reportResultBean.list.add(getList(order8,8));
+            }
+            if (order9.size() > 0){
+                weight = weight + Float.parseFloat(getList(order9,9).total_weight);
+                amount = amount + Float.parseFloat(getList(order9,9).total_amount);
+                total_number = total_number + getList(order9,9).total_number;
+                reportResultBean.list.add(getList(order9,9));
+            }
+            if (order10.size() > 0){
+                weight = weight + Float.parseFloat(getList(order10,10).total_weight);
+                amount = amount + Float.parseFloat(getList(order10,10).total_amount);
+                total_number = total_number + getList(order10,10).total_number;
+                reportResultBean.list.add(getList(order10,10));
+            }
+            if (order11.size() > 0){
+                weight = weight + Float.parseFloat(getList(order11,11).total_weight);
+                amount = amount + Float.parseFloat(getList(order11,11).total_amount);
+                total_number = total_number + getList(order11,11).total_number;
+                reportResultBean.list.add(getList(order11,11));
+            }
+            if (order12.size() > 0){
+                weight = weight + Float.parseFloat(getList(order12,12).total_weight);
+                amount = amount + Float.parseFloat(getList(order12,12).total_amount);
+                total_number = total_number + getList(order12,12).total_number;
+                reportResultBean.list.add(getList(order12,12));
+            }
+//
+            num = order1.size()+order2.size()+order3.size()+order4.size()+order5.size()+order6.size()+order7.size()+order8.size()+order9.size()+order10.size()+order11.size()+order12.size();
+
 
         }else if(typeVal == 2) {//月报表，分天，
 
@@ -213,14 +312,14 @@ public class DataSummaryActivity extends BaseActivity {
                         list.total_amount = String.format("%.2f", amount_day);
                         list.total_weight = String.format("%.2f", weight_day);;
                         list.all_num = size;
-                        list.total_number = size;
+                        list.total_number = total_number;
                         list.times = create_day_time;
                         if (reportResultBean.list.size() == 0){
                             reportResultBean.list.add(list);
                             amount = amount + amount_day;
                             weight = weight + weight_day;
                             num = num + size;
-                            total_number = total_number + size;
+                            total_number = total_number + total_number_day;
 
                         }else {
                             if (!create_day_time.equals(getListOrder.get(i).create_time_day)){
@@ -228,7 +327,7 @@ public class DataSummaryActivity extends BaseActivity {
                                 amount = amount + amount_day;
                                 weight = weight + weight_day;
                                 num = num + size;
-                                total_number = total_number + size;
+                                total_number = total_number + total_number_day;
                             }
                         }
                     }
@@ -239,7 +338,7 @@ public class DataSummaryActivity extends BaseActivity {
 
         reportResultBean.total_amount = String.format("%.2f", amount);
         reportResultBean.total=total_number;
-        reportResultBean.all_number=num;
+        reportResultBean.all_number=total_number;
         reportResultBean.total_num=num;
         reportResultBean.total_weight=String.format("%.2f",weight);
 
@@ -263,7 +362,7 @@ public class DataSummaryActivity extends BaseActivity {
             list.order_no = order.order_no;
             list.goods_name  = order.goods_name;
             list.times = order.create_time;
-            LogUtils.d("---ordercreatetime---->"+order.create_time);
+            LogUtils.d("---ordercreatetime---->"+order.create_time+"-payment--"+order.payment_type+"-payid-->"+order.payment_id);
             list.goods_weight = order.goods_weight;
             list.goods_price = order.goods_price;
             list.goods_number = order.goods_number;
@@ -280,7 +379,58 @@ public class DataSummaryActivity extends BaseActivity {
         orderAmountTv.setText(orderListResultBean.total_amount);
     }
 
+    private ReportResultBean.list getList(List<Order> orders,int type){
+        ReportResultBean.list list = new ReportResultBean.list();
+        float amount = 0f;
+        float weight=0f;
+        for (Order order:orders){
+            weight = weight+ Float.parseFloat(order.total_weight);
+            amount = amount + Float.parseFloat(order.total_amount);
+            switch (type){
+                case 1:
+                    list.times = "00点-02点";
+                    break;
+                case 2:
+                    list.times = "02点-04点";
+                    break;
+                case 3:
+                    list.times = "04点-06点";
+                    break;
+                case 4:
+                    list.times = "06点-08点";
+                    break;
+                case 5:
+                    list.times = "08点-10点";
+                    break;
+                case 6:
+                    list.times = "10点-12点";
+                    break;
+                case 7:
+                    list.times = "12点-14点";
+                    break;
+                case 8:
+                    list.times = "14点-16点";
+                    break;
+                case 9:
+                    list.times = "16点-18点";
+                    break;
+                case 10:
+                    list.times = "18点-20点";
+                    break;
+                case 11:
+                    list.times = "20点-22点";
+                    break;
+                case 12:
+                    list.times = "22点-24点";
+                    break;
+            }
+        }
+        list.all_num=orders.size();
+        list.total_weight= String.format("%.2f", weight);
+        list.total_amount= String.format("%.2f", amount);
 
+        return list;
+    }
 
 
     @Override
@@ -618,6 +768,49 @@ public class DataSummaryActivity extends BaseActivity {
             TextView priceNumberTv;
             TextView totalAmountTv;
             TextView payTypeTv;
+        }
+    }
+
+
+
+    public static Long dateDiff(String startTime, String endTime, String str) {
+        // 按照传入的格式生成一个simpledateformate对象
+        SimpleDateFormat sd_day = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        long nd = 1000 * 24 * 60 * 60;// 一天的毫秒数
+        long nh = 1000 * 60 * 60;// 一小时的毫秒数
+        long nm = 1000 * 60;// 一分钟的毫秒数
+        long ns = 1000;// 一秒钟的毫秒数
+        long diff;
+        long day = 0;
+        long hour = 0;
+        long min = 0;
+        long sec = 0;
+        // 获得两个时间的毫秒时间差异
+        try {
+            diff = sd.parse(endTime).getTime() - sd_day.parse(startTime).getTime();
+            day = diff / nd;// 计算差多少天
+            hour = diff % nd / nh + day * 24;// 计算差多少小时
+            min = diff % nd % nh / nm + day * 24 * 60;// 计算差多少分钟
+            sec = diff % nd % nh % nm / ns;// 计算差多少秒
+            // 输出结果
+            System.out.println("时间相差：" + day + "天" + (hour - day * 24) + "小时"
+                    + (min - day * 24 * 60) + "分钟" + sec + "秒。");
+            System.out.println("hour=" + hour + ",min=" + min);
+            if (str.equalsIgnoreCase("h")) {
+                return hour;
+            } else {
+                return min;
+            }
+
+        } catch (ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        if (str.equalsIgnoreCase("h")) {
+            return hour;
+        } else {
+            return min;
         }
     }
 }
