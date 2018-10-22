@@ -14,13 +14,18 @@ import com.axecom.iweight.R;
 import com.axecom.iweight.base.BaseActivity;
 import com.axecom.iweight.base.BusEvent;
 import com.axecom.iweight.base.SysApplication;
+import com.axecom.iweight.bean.HotKeyBean;
+import com.axecom.iweight.bean.Order;
 import com.axecom.iweight.bean.SubOrderReqBean;
+import com.axecom.iweight.manager.AccountManager;
 import com.axecom.iweight.manager.PayCheckManage;
 import com.axecom.iweight.manager.SystemSettingManager;
 import com.axecom.iweight.ui.view.SoftKey;
 import com.axecom.iweight.utils.MoneyTextWatcher;
 import com.axecom.iweight.utils.NetworkUtil;
 import com.axecom.iweight.utils.SPUtils;
+import com.raizlabs.android.dbflow.config.FlowManager;
+import com.raizlabs.android.dbflow.structure.ModelAdapter;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -177,6 +182,33 @@ public class UseCashActivity extends BaseActivity implements View.OnClickListene
 
     public void setOrderBean(String payId) {
         orderBean.setPayment_id(payId);
+        String orderNo = "AX" + getCurrentTime("yyyyMMddHHmmss") + AccountManager.getInstance().getScalesId();
+        ModelAdapter<Order> modelAdapter = FlowManager.getModelAdapter(Order.class);
+        for (int i = 0; i < orderBean.getGoods().size(); i++) {
+            Order order = new Order();
+            order.mac = orderBean.getMac();
+            order.token = orderBean.getToken();
+            order.create_time = orderBean.getCreate_time();
+            order.create_time_day = getCurrentTime("yyyy-MM-dd");
+            order.create_time_month = getCurrentTime("yyyy-MM");
+            order.payment_id = orderBean.getPayment_id();
+            order.pricing_model = orderBean.getPricing_model();
+            order.order_no = orderNo;
+            order.card_id = orderBean.getCard_id();
+            order.total_amount = orderBean.getTotal_amount();
+            order.total_number = orderBean.getTotal_number();
+            order.total_weight = orderBean.getTotal_weight();
+
+            SubOrderReqBean.Goods hotKeyBean = orderBean.getGoods().get(i);
+            order.goods_id = hotKeyBean.getGoods_id();
+            order.amount = hotKeyBean.getGoods_amount();
+            order.goods_name = hotKeyBean.getGoods_name();
+            order.goods_number = hotKeyBean.getGoods_number();
+            order.goods_price = hotKeyBean.getGoods_price();
+            order.goods_weight = hotKeyBean.getGoods_weight();
+            modelAdapter.insert(order);
+        }
+
         if (NetworkUtil.isConnected(this)) {
             if(mPayCheckManage!=null){
                 mPayCheckManage.setCancelCheck(true);

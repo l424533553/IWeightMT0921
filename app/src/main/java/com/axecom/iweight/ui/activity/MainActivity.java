@@ -978,7 +978,6 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
         subOrderReqBean.setOrder_no(orderNo);
         subOrderReqBean.setCard_id(Integer.parseInt(AccountManager.getInstance().getCardId()));
 
-        ModelAdapter<Order> modelAdapter = FlowManager.getModelAdapter(Order.class);
         for (int i = 0; i < seledtedGoodsList.size(); i++) {
             good = new SubOrderReqBean.Goods();
             HotKeyBean HotKeyBean = seledtedGoodsList.get(i);
@@ -992,30 +991,6 @@ public class MainActivity extends BaseActivity implements VolleyListener, Volley
             count+=Integer.parseInt(HotKeyBean.getCount());
             goodsList.add(good);
 
-            Order order = new Order();
-            order.mac = subOrderReqBean.getMac();
-            order.token = subOrderReqBean.getToken();
-            order.create_time = subOrderReqBean.getCreate_time();
-            order.create_time_day = getCurrentTime("yyyy-MM-dd");
-            order.create_time_month = getCurrentTime("yyyy-MM");
-            order.payment_id = subOrderReqBean.getPayment_id();
-            order.pricing_model = subOrderReqBean.getPricing_model();
-            order.order_no = orderNo;
-            order.card_id = subOrderReqBean.getCard_id();
-            order.total_amount = subOrderReqBean.getTotal_amount();
-            order.total_number = subOrderReqBean.getTotal_number();
-            order.total_weight = subOrderReqBean.getTotal_weight();
-
-
-
-            HotKeyBean hotKeyBean = seledtedGoodsList.get(i);
-            order.goods_id = hotKeyBean.getId() + "";
-            order.amount = hotKeyBean.getGrandTotal();
-            order.goods_name = hotKeyBean.getName();
-            order.goods_number = hotKeyBean.getCount();
-            order.goods_price = hotKeyBean.getPrice();
-            order.goods_weight = hotKeyBean.getWeight();
-            modelAdapter.insert(order);
         }
 
         subOrderReqBean.setGoods(goodsList);
